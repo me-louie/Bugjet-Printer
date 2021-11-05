@@ -18,7 +18,8 @@ no longer interested in this idea we think Java’s superior class functionality
 - If time permits, potentially include a static analysis portion to the project which would generate a Program Slice with the variables of interest
 
 A mock-up of our visualization is shown below:
-![mockup 1](/mockups/mockup1.png)
+<img width="1120" alt="mockup1" src="https://media.github.students.cs.ubc.ca/user/3391/files/0dae5280-3e40-11ec-96ac-03d809f44f94">
+
 
 ### Roadmap and Division of Responsibilities:
 
