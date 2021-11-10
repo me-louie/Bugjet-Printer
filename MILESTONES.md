@@ -11,10 +11,11 @@ no longer interested in this idea we think Java’s superior class functionality
 
 ### Refined Project Scope
 
-- Allow the user to add code annotations to indicate which variables they are interested in analysing
+- Allow the user to add code annotations to indicate which variables they are interested in analysing.
 - Handle logging of primitive types (int, int array, String, boolean) and user defined objects.
-- Handle logging of fields within user defined objects.
-- Generate a visualization of logged variables
+- Handle logging of fields within user defined objects (nested structures).
+- Support variable referencing and aliasing.
+- Generate a visualization of logged variables, differentiating between variables with the same name but different scopes.
 - If time permits, potentially include a static analysis portion to the project which would generate a Program Slice with the variables of interest
 
 A mock-up of our visualization is shown below:
