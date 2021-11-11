@@ -1,29 +1,88 @@
 package ast;
 
-import ast.VariableHistory;
-import ast.VariableHistoryCollector;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.visitor.ModifierVisitor;
 import com.github.javaparser.ast.visitor.VoidVisitor;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.*;
+import java.util.*;
 
 public class Main {
 
-    private static final String FILE_PATH = "wherever/frontend/puts/input/file.java";
+    private static final String INPUT_FILE_PATH = "backend/test/SimpleTest.java";
+    private static final String MODIFIED_AST_FILE_PATH = "backend/test/modifiedasts/SimpleTest.java";
+    private static final String VARIABLE_LOGGER_FILE_PATH = "backend/src/ast/VariableLogger.java";
+    private static final String LINE_INFO_FILE_PATH = "backend/src/ast/LineInfo.java";
 
-    public static void main(String[] args) throws FileNotFoundException {
-        // todo: assuming frontend pass in args for which variables we should analyze, then we can just grab those instead
-        //       of every variable, as this currently does
-        CompilationUnit cu = StaticJavaParser.parse(new File(FILE_PATH));
-        VoidVisitor<Map<String, VariableHistory>> variableHistoryCollector = new VariableHistoryCollector();
-        Map<String, VariableHistory> variableHistories = new HashMap<>(); // map of variable names -> their histories (note that this assumes we couldn't have duplicate names, which we could have if we have multiple functions/classes that reuse the same name. Will likely need a more complex way of keying variables)
-        variableHistoryCollector.visit(cu, variableHistories);
-        // todo: Put variableHistories in a format that frontend can read and pass it back.
-        //       Will have to have discussion with whoever is implementing visualizer about how they'd like the data
-        //       to be represented--maybe outputting variableHistories as a json file or something
+    public static void main(String[] args) throws IOException {
+        // get ast
+        CompilationUnit cu = StaticJavaParser.parse(new File(INPUT_FILE_PATH));
+        // collect names/aliases of variables to track
+        VoidVisitor<Map<String, String>> variableAnnotationCollector = new VariableAnnotationCollector();
+        Map<String, String> variablesToTrack = new HashMap<>(); // map of variable names -> the aliases we'll track them under
+        variableAnnotationCollector.visit(cu, variablesToTrack);
+        // add logging code to ast
+        ModifierVisitor<Map<String, List<LineInfo>>> variableHistoryModifier = new VariableHistoryModifier();
+        Map<String, List<LineInfo>> lineInfoMap = new HashMap<>(); // map of variable names -> list of LineInfo for each line a mutation occurs
+        // we add an entry for the first declaration of a variable to pass in the alias
+        variablesToTrack.keySet().forEach(var ->
+                lineInfoMap.put(var, new ArrayList<>(List.of(new LineInfo(var, variablesToTrack.get(var))))));
+        variableHistoryModifier.visit(cu, lineInfoMap);
+        // this is super hacky, in order to get the alias info to the visit methods the first item in the list is a
+        // LineInfo with only the name and alias. Since it's not a real LineInfo we delete it here. I'll fix this at a later date
+        lineInfoMap.values().forEach(statementList -> statementList.remove(0));
+        // add a call to VariableLogger.writeOutputToDisk() to write output after execution is complete
+        try {
+            MethodDeclaration mainMethod = cu.findFirst(MethodDeclaration.class, methodDeclaration ->
+                    methodDeclaration.getDeclarationAsString().contains("public static void main(String[] args)")).get();
+            mainMethod.getBody().get().addStatement("VariableLogger.writeOutputToDisk();");
+        } catch (NoSuchElementException e) {
+            System.out.println("File does not contain a main method");
+            // todo: we'll probably want to return this error to the frontend to display to user
+            System.exit(1);
+        }
+        // write modified ast back to file
+        BufferedWriter writer = new BufferedWriter(new FileWriter(MODIFIED_AST_FILE_PATH));
+        writer.write(cu.toString());
+        // append VariableLogger class to bottom of file
+        BufferedReader reader = new BufferedReader(new FileReader(VARIABLE_LOGGER_FILE_PATH));
+        String line;
+        StringBuilder variableLoggerString = new StringBuilder();
+        while ((line = reader.readLine()) != null) {
+            variableLoggerString.append(line).append("\n");
+            if (line.contains("private static Map<Integer, LineInfo> lineInfoMap = new HashMap<>() {{")) {
+                // take lineInfoMap from above and stick it into lineInfoMap in VariableLogger
+                variableLoggerString.append(populateLineInfoMap(lineInfoMap));
+            }
+        }
+        writer.write(variableLoggerString.toString());
+        // VariableLogger uses LineInfo, write that as well
+        reader = new BufferedReader(new FileReader(LINE_INFO_FILE_PATH));
+        StringBuilder lineInfoString = new StringBuilder();
+        while ((line = reader.readLine()) != null) {
+            lineInfoString.append(line).append("\n");
+        }
+        writer.write(lineInfoString.toString());
+        writer.close();
+        // todo: run modified code, which will write output to out/output.json
+        //       we need to ensure that
+        //          1. the classes that will call VariableLogger.log() will be able to see the declaration
+        //          2. VariableLogger will be able to see its own dependencies (concerned about the Gson dependency)
+        // todo: send output.json to frontend
+    }
+
+    private static String populateLineInfoMap(Map<String, List<LineInfo>> lineInfoMap) {
+        StringBuilder putStatements = new StringBuilder();
+        for (List<LineInfo> lineInfos : lineInfoMap.values()) {
+            for (LineInfo lineInfo : lineInfos) {
+                putStatements.append("\t\tput(" + lineInfo.getUniqueIdentifier() + ", new LineInfo(\""
+                        + lineInfo.getName() + "\", \"" + lineInfo.getAlias() + "\", \"" + lineInfo.getType() + "\", \""
+                        + lineInfo.getLineNum() + "\", \"" + lineInfo.getStatement() + "\", \"" + lineInfo.getEnclosingClass()
+                        + "\", \"" + lineInfo.getEnclosingMethod() + "\", \"" + lineInfo.getUniqueIdentifier() + "\");" + "\n");
+            }
+        }
+        return putStatements.toString();
     }
 }
