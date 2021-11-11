@@ -11,7 +11,7 @@ import java.util.List;
 
 public class Demo {
 
-    private static final String FILE_PATH = "test/ReversePolishNotation.java";
+    private static final String FILE_PATH = "backend/test/ReversePolishNotation.java";
 
     public static void main(String[] args) throws FileNotFoundException {
         CompilationUnit cu = StaticJavaParser.parse(new File(FILE_PATH));

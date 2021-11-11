@@ -1,6 +1,5 @@
 package ast;
 
-import com.github.javaparser.ast.expr.MemberValuePair;
 import com.github.javaparser.ast.expr.NormalAnnotationExpr;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 
@@ -12,9 +11,9 @@ public class VariableAnnotationCollector extends VoidVisitorAdapter<Map<String, 
     public void visit(NormalAnnotationExpr nae, Map<String, String> collector) {
         super.visit(nae, collector);
         if (nae.getNameAsString().equals("Track")) {
-            for (MemberValuePair pair : nae.getPairs()) {
-                collector.put(pair.getNameAsString(), pair.getValue().toString());
-            }
+            String var = nae.getPairs().getFirst().get().getValue().toString();
+            String alias = nae.getPairs().getLast().get().getValue().toString();
+            collector.put(var, alias);
         }
     }
 }
