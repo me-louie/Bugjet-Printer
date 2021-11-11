@@ -12,12 +12,17 @@ public class ReversePolishNotation {
 
     private double memory = 0;
 
+    public static void main(String[] args) {
+        calc("8 + 3 - 2 / 6");
+    }
+
     /**
      * Takes reverse polish notation style string and returns the resulting calculation.
      *
      * @param input mathematical expression in the reverse Polish notation format
      * @return the calculation result
      */
+    @Track(a=a, b=b, tokens=t)
     public Double calc(String input) {
 
         String[] tokens = input.split(" ");
@@ -30,6 +35,7 @@ public class ReversePolishNotation {
                 case "+":
                     b = numbers.pop();
                     a = numbers.pop();
+                    nestedBlockStatementMethod(a, b, t);
                     numbers.push(a + b);
                     break;
                 case "/":
@@ -53,6 +59,13 @@ public class ReversePolishNotation {
         });
 
         return numbers.pop();
+    }
+
+    public void nestedBlockStatementMethod(double a, double b, String t) {
+        a = 111;
+        b = 222;
+        a += b;
+        System.out.println(t);
     }
 
     /**
