@@ -31,6 +31,7 @@ public class SimpleTest {
         }
         for (int i = 0; i < 10; i++) {
             a = b + 1;
+            i+=2;
         }
 
         // cases we don't currently handle:

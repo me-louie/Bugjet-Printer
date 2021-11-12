@@ -150,48 +150,6 @@
         "enclosingMethod": "public Double calc()",
         "value": "3.3856595500394866E241",
         "line": 33
-      },
-      {
-        "statement": "a \u003d b + 1;",
-        "enclosingClass": "SimpleTest",
-        "enclosingMethod": "public Double calc()",
-        "value": "3.3856595500394866E241",
-        "line": 33
-      },
-      {
-        "statement": "a \u003d b + 1;",
-        "enclosingClass": "SimpleTest",
-        "enclosingMethod": "public Double calc()",
-        "value": "3.3856595500394866E241",
-        "line": 33
-      },
-      {
-        "statement": "a \u003d b + 1;",
-        "enclosingClass": "SimpleTest",
-        "enclosingMethod": "public Double calc()",
-        "value": "3.3856595500394866E241",
-        "line": 33
-      },
-      {
-        "statement": "a \u003d b + 1;",
-        "enclosingClass": "SimpleTest",
-        "enclosingMethod": "public Double calc()",
-        "value": "3.3856595500394866E241",
-        "line": 33
-      },
-      {
-        "statement": "a \u003d b + 1;",
-        "enclosingClass": "SimpleTest",
-        "enclosingMethod": "public Double calc()",
-        "value": "3.3856595500394866E241",
-        "line": 33
-      },
-      {
-        "statement": "a \u003d b + 1;",
-        "enclosingClass": "SimpleTest",
-        "enclosingMethod": "public Double calc()",
-        "value": "3.3856595500394866E241",
-        "line": 33
       }
     ]
   },
@@ -341,18 +299,11 @@
         "line": 32
       },
       {
-        "statement": "for (int i \u003d 0; i \u003c 10; i++) ",
-        "enclosingClass": "SimpleTest",
-        "enclosingMethod": "public Double calc()",
-        "value": "1",
-        "line": 32
-      },
-      {
-        "statement": "for (int i \u003d 0; i \u003c 10; i++) ",
+        "statement": "i +\u003d 2;",
         "enclosingClass": "SimpleTest",
         "enclosingMethod": "public Double calc()",
         "value": "2",
-        "line": 32
+        "line": 34
       },
       {
         "statement": "for (int i \u003d 0; i \u003c 10; i++) ",
@@ -362,18 +313,11 @@
         "line": 32
       },
       {
-        "statement": "for (int i \u003d 0; i \u003c 10; i++) ",
-        "enclosingClass": "SimpleTest",
-        "enclosingMethod": "public Double calc()",
-        "value": "4",
-        "line": 32
-      },
-      {
-        "statement": "for (int i \u003d 0; i \u003c 10; i++) ",
+        "statement": "i +\u003d 2;",
         "enclosingClass": "SimpleTest",
         "enclosingMethod": "public Double calc()",
         "value": "5",
-        "line": 32
+        "line": 34
       },
       {
         "statement": "for (int i \u003d 0; i \u003c 10; i++) ",
@@ -383,18 +327,11 @@
         "line": 32
       },
       {
-        "statement": "for (int i \u003d 0; i \u003c 10; i++) ",
-        "enclosingClass": "SimpleTest",
-        "enclosingMethod": "public Double calc()",
-        "value": "7",
-        "line": 32
-      },
-      {
-        "statement": "for (int i \u003d 0; i \u003c 10; i++) ",
+        "statement": "i +\u003d 2;",
         "enclosingClass": "SimpleTest",
         "enclosingMethod": "public Double calc()",
         "value": "8",
-        "line": 32
+        "line": 34
       },
       {
         "statement": "for (int i \u003d 0; i \u003c 10; i++) ",
@@ -402,6 +339,13 @@
         "enclosingMethod": "public Double calc()",
         "value": "9",
         "line": 32
+      },
+      {
+        "statement": "i +\u003d 2;",
+        "enclosingClass": "SimpleTest",
+        "enclosingMethod": "public Double calc()",
+        "value": "11",
+        "line": 34
       },
       {
         "statement": "for (int i \u003d 0; i \u003c 10; i++) ",

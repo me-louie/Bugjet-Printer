@@ -42,11 +42,13 @@ public class SimpleTest {
             System.out.println("hello world");
         }
         for (int i = 0; i < 10; i++) {
-            VariableLogger.log("i", i, 10);
+            VariableLogger.log("i", i, 11);
             a = b + 1;
             VariableLogger.log("a", a, 8);
+            i += 2;
+            VariableLogger.log("i", i, 9);
         }
-        VariableLogger.log("i", 0, 9);
+        VariableLogger.log("i", 0, 10);
         return a;
     }
 }

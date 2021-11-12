@@ -18,7 +18,7 @@ public final class Formatter {
     }
 
     /**
-     * Returns conditional statement preceding the curly braces if it exists, otherwise returns the original string
+     * Returns statement preceding the curly braces if it exists, otherwise returns the original string
      */
     private static String parseStatement(String statement) {
         if (statement.contains("{")){
