@@ -13,7 +13,8 @@ public class ReversePolishNotation {
     private double memory = 0;
 
     public static void main(String[] args) {
-        calc("8 + 3 - 2 / 6");
+        ReversePolishNotation rpn = new ReversePolishNotation();
+        rpn.calc("8 + 3 - 2 / 6");
     }
 
     /**
@@ -22,7 +23,6 @@ public class ReversePolishNotation {
      * @param input mathematical expression in the reverse Polish notation format
      * @return the calculation result
      */
-    @Track(a=a, b=b, tokens=t)
     public Double calc(String input) {
 
         String[] tokens = input.split(" ");

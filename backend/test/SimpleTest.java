@@ -1,5 +1,4 @@
-import java.util.Stack;
-import java.util.stream.Stream;
+import annotation.Track;
 
 public class SimpleTest {
 
@@ -8,10 +7,12 @@ public class SimpleTest {
     private double memory = 0;
 
     public static void main(String[] args) {
-        calc();
+        SimpleTest st = new SimpleTest();
+        st.calc();
     }
 
-    @Track(a=a, b=c)
+    @Track(var="a", alias = "alias_for_a")
+    @Track(var="b", alias="alias_for_b")
     public Double calc() {
         double a;
         double b;
@@ -27,9 +28,8 @@ public class SimpleTest {
             b *= b / a;
             System.out.println("hello world");
         }
-
         for (int i = 0; i < 10; i++) {
-            a = b >> 1;
+            a = b + 1;
         }
 
         // cases we don't currently handle:
