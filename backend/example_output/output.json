@@ -2,8 +2,15 @@
   {
     "name": "a",
     "alias": "alias_for_a",
-    "type": "null",
+    "type": "double",
     "history": [
+      {
+        "statement": "double a;",
+        "enclosingClass": "SimpleTest",
+        "enclosingMethod": "public Double calc()",
+        "value": "\"uninitialized\"",
+        "line": 17
+      },
       {
         "statement": "a \u003d 5;",
         "enclosingClass": "SimpleTest",
@@ -121,78 +128,85 @@
         "enclosingClass": "SimpleTest",
         "enclosingMethod": "public Double calc()",
         "value": "3.3856595500394866E241",
-        "line": 33
+        "line": 32
       },
       {
         "statement": "a \u003d b + 1;",
         "enclosingClass": "SimpleTest",
         "enclosingMethod": "public Double calc()",
         "value": "3.3856595500394866E241",
-        "line": 33
+        "line": 32
       },
       {
         "statement": "a \u003d b + 1;",
         "enclosingClass": "SimpleTest",
         "enclosingMethod": "public Double calc()",
         "value": "3.3856595500394866E241",
-        "line": 33
+        "line": 32
       },
       {
         "statement": "a \u003d b + 1;",
         "enclosingClass": "SimpleTest",
         "enclosingMethod": "public Double calc()",
         "value": "3.3856595500394866E241",
-        "line": 33
+        "line": 32
       },
       {
         "statement": "a \u003d b + 1;",
         "enclosingClass": "SimpleTest",
         "enclosingMethod": "public Double calc()",
         "value": "3.3856595500394866E241",
-        "line": 33
+        "line": 32
       },
       {
         "statement": "a \u003d b + 1;",
         "enclosingClass": "SimpleTest",
         "enclosingMethod": "public Double calc()",
         "value": "3.3856595500394866E241",
-        "line": 33
+        "line": 32
       },
       {
         "statement": "a \u003d b + 1;",
         "enclosingClass": "SimpleTest",
         "enclosingMethod": "public Double calc()",
         "value": "3.3856595500394866E241",
-        "line": 33
+        "line": 32
       },
       {
         "statement": "a \u003d b + 1;",
         "enclosingClass": "SimpleTest",
         "enclosingMethod": "public Double calc()",
         "value": "3.3856595500394866E241",
-        "line": 33
+        "line": 32
       },
       {
         "statement": "a \u003d b + 1;",
         "enclosingClass": "SimpleTest",
         "enclosingMethod": "public Double calc()",
         "value": "3.3856595500394866E241",
-        "line": 33
+        "line": 32
       },
       {
         "statement": "a \u003d b + 1;",
         "enclosingClass": "SimpleTest",
         "enclosingMethod": "public Double calc()",
         "value": "3.3856595500394866E241",
-        "line": 33
+        "line": 32
       }
     ]
   },
   {
     "name": "b",
     "alias": "alias_for_b",
-    "type": "null",
+    "type": "double",
     "history": [
+      {
+        "statement": "double b;",
+        "enclosingClass": "SimpleTest",
+        "enclosingMethod": "public Double calc()",
+        "value": "\"uninitialized\"",
+        "line": 18
+      },
       {
         "statement": "b \u003d 6;",
         "enclosingClass": "SimpleTest",

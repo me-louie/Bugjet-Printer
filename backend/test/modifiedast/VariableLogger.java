@@ -16,7 +16,7 @@ public class VariableLogger {
 		put(0, new LineInfo("a", "alias_for_a", "double",17, "double a;", "SimpleTest", "public Double calc()", 0));
 		put(2, new LineInfo("a", "alias_for_a", "null",19, "a = 5;", "SimpleTest", "public Double calc()", 2));
 		put(6, new LineInfo("a", "alias_for_a", "null",27, "a++;", "SimpleTest", "public Double calc()", 6));
-		put(8, new LineInfo("a", "alias_for_a", "null",33, "a = b + 1;", "SimpleTest", "public Double calc()", 8));
+		put(8, new LineInfo("a", "alias_for_a", "null",32, "a = b + 1;", "SimpleTest", "public Double calc()", 8));
 		put(1, new LineInfo("b", "alias_for_b", "double",18, "double b;", "SimpleTest", "public Double calc()", 1));
 		put(3, new LineInfo("b", "alias_for_b", "null",20, "b = 6;", "SimpleTest", "public Double calc()", 3));
 		put(4, new LineInfo("b", "alias_for_b", "null",24, "b--;", "SimpleTest", "public Double calc()", 4));
@@ -27,8 +27,7 @@ public class VariableLogger {
     private static Map<String, Output> outputMap = new HashMap<>();
     private static Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
 
-    // TODO: Make this work with other types
-    public static void log(String variableName, double variableValue, Integer id) {
+    public static void logToOutputMap(String variableName, Object variableValue, Integer id) {
         LineInfo lineInfo = lineInfoMap.get(id);
         Output output = (outputMap.containsKey(variableName)) ?
             outputMap.get(variableName) :
@@ -43,98 +42,104 @@ public class VariableLogger {
         writer.write(gson.toJson(outputMap.values()));
         writer.close();
     }
+    // TODO: maybe document that we don't handle the tracking of Strings normally, this case is just for handling
+    //  null variable values. Alternatively, figure out a better way to handle the nulls.
+    protected static void log(String variableName, String variableValue, Integer id) {
+        logToOutputMap(variableName, variableValue, id);
+    }
 
-//    public static void log(String variableName, boolean variableValue, Integer id) {
-//        log(variableName, (Boolean) variableValue, id);
-//    }
-//
-//    public static void log(String variableName, int variableValue, Integer id) {
-//        log(variableName, (Integer) variableValue, id);
-//    }
-//
-//    public static void log(String variableName, long variableValue, Integer id) {
-//        log(variableName, (Long) variableValue, id);
-//    }
-//
-//    public static void log(String variableName, char variableValue, Integer id) {
-//        log(variableName, (Character) variableValue, id);
-//    }
-//
-//    public static void log(String variableName, float variableValue, Integer id) {
-//        log(variableName, (Float) variableValue, id);
-//    }
-//
-//    public static void log(String variableName, double variableValue, Integer id) {
-//        log(variableName, (Double) variableValue, id);
-//    }
-//
-//    public static void log(String variableName, short variableValue, Integer id) {
-//        log(variableName, (Short) variableValue, id);
-//    }
-//
-//    public static void log(String variableName, int[] variableValue, Integer id) {
-//        log(variableName, List.of(variableValue), id);
-//    }
-//
-//    public static void log(String variableName, boolean[] variableValue, Integer id) {
-//        log(variableName, List.of(variableValue), id);
-//    }
-//
-//    public static void log(String variableName, long[] variableValue, Integer id) {
-//        log(variableName, List.of(variableValue), id);
-//    }
-//
-//    public static void log(String variableName, char[] variableValue, Integer id) {
-//        log(variableName, List.of(variableValue), id);
-//    }
-//
-//    public static void log(String variableName, float[] variableValue, Integer id) {
-//        log(variableName, List.of(variableValue), id);
-//    }
-//
-//    public static void log(String variableName, double[] variableValue, Integer id) {
-//        log(variableName, List.of(variableValue), id);
-//    }
-//
-//    public static void log(String variableName, short[] variableValue, Integer id) {
-//        log(variableName, List.of(variableValue), id);
-//    }
-//
-//    public static void log(String variableName, Object[] variableValue, Integer id) {
-//        log(variableName, List.of(variableValue), id);
-//    }
-//
-//    public static void log(String variableName, int[][] variableValue, Integer id) {
-//        log(variableName, List.of(List.of(variableValue)), id);
-//    }
-//
-//    public static void log(String variableName, boolean[][] variableValue, Integer id) {
-//        log(variableName, List.of(List.of(variableValue)), id);
-//    }
-//
-//    public static void log(String variableName, long[][] variableValue, Integer id) {
-//        log(variableName, List.of(List.of(variableValue)), id);
-//    }
-//
-//    public static void log(String variableName, char[][] variableValue, Integer id) {
-//        log(variableName, List.of(List.of(variableValue)), id);
-//    }
-//
-//    public static void log(String variableName, float[][] variableValue, Integer id) {
-//        log(variableName, List.of(List.of(variableValue)), id);
-//    }
-//
-//    public static void log(String variableName, double[][] variableValue, Integer id) {
-//        log(variableName, List.of(List.of(variableValue)), id);
-//    }
-//
-//    public static void log(String variableName, short[][] variableValue, Integer id) {
-//        log(variableName, List.of(List.of(variableValue)), id);
-//    }
-//
-//    public static void log(String variableName, Object[][] variableValue, Integer id) {
-//        log(variableName, List.of(List.of(variableValue)), id);
-//    }
+    protected static void log(String variableName, boolean variableValue, Integer id) {
+        logToOutputMap(variableName, (Boolean) variableValue, id);
+    }
+
+    protected static void log(String variableName, int variableValue, Integer id) {
+        logToOutputMap(variableName, (Integer) variableValue, id);
+    }
+
+    protected static void log(String variableName, long variableValue, Integer id) {
+        logToOutputMap(variableName, (Long) variableValue, id);
+    }
+
+    protected static void log(String variableName, char variableValue, Integer id) {
+        logToOutputMap(variableName, (Character) variableValue, id);
+    }
+
+    protected static void log(String variableName, float variableValue, Integer id) {
+        logToOutputMap(variableName, (Float) variableValue, id);
+    }
+
+    protected static void log(String variableName, double variableValue, Integer id) {
+        logToOutputMap(variableName, (Double) variableValue, id);
+    }
+
+    protected static void log(String variableName, short variableValue, Integer id) {
+        logToOutputMap(variableName, (Short) variableValue, id);
+    }
+
+    protected static void log(String variableName, int[] variableValue, Integer id) {
+        logToOutputMap(variableName, List.of(variableValue), id);
+    }
+
+    protected static void log(String variableName, boolean[] variableValue, Integer id) {
+        logToOutputMap(variableName, List.of(variableValue), id);
+    }
+
+    protected static void log(String variableName, long[] variableValue, Integer id) {
+        logToOutputMap(variableName, List.of(variableValue), id);
+    }
+
+    protected static void log(String variableName, char[] variableValue, Integer id) {
+        logToOutputMap(variableName, List.of(variableValue), id);
+    }
+
+    protected static void log(String variableName, float[] variableValue, Integer id) {
+        logToOutputMap(variableName, List.of(variableValue), id);
+    }
+
+    protected static void log(String variableName, double[] variableValue, Integer id) {
+        logToOutputMap(variableName, List.of(variableValue), id);
+    }
+
+    protected static void log(String variableName, short[] variableValue, Integer id) {
+        logToOutputMap(variableName, List.of(variableValue), id);
+    }
+
+    protected static void log(String variableName, Object[] variableValue, Integer id) {
+        logToOutputMap(variableName, List.of(variableValue), id);
+    }
+
+    protected static void log(String variableName, int[][] variableValue, Integer id) {
+        logToOutputMap(variableName, List.of(List.of(variableValue)), id);
+    }
+
+    protected static void log(String variableName, boolean[][] variableValue, Integer id) {
+        logToOutputMap(variableName, List.of(List.of(variableValue)), id);
+    }
+
+    protected static void log(String variableName, long[][] variableValue, Integer id) {
+        logToOutputMap(variableName, List.of(List.of(variableValue)), id);
+    }
+
+    protected static void log(String variableName, char[][] variableValue, Integer id) {
+        logToOutputMap(variableName, List.of(List.of(variableValue)), id);
+    }
+
+    protected static void log(String variableName, float[][] variableValue, Integer id) {
+        logToOutputMap(variableName, List.of(List.of(variableValue)), id);
+    }
+
+    protected static void log(String variableName, double[][] variableValue, Integer id) {
+        logToOutputMap(variableName, List.of(List.of(variableValue)), id);
+    }
+
+    protected static void log(String variableName, short[][] variableValue, Integer id) {
+        logToOutputMap(variableName, List.of(List.of(variableValue)), id);
+    }
+
+    protected static void log(String variableName, Object[][] variableValue, Integer id) {
+        logToOutputMap(variableName, List.of(List.of(variableValue)), id);
+    }
+
 
     private static class Output {
 

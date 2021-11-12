@@ -19,9 +19,9 @@ public class SimpleTest {
     @Track(var = "b", alias = "alias_for_b")
     public Double calc() {
         double a;
-//        VariableLogger.log("a", null, 0);
+        VariableLogger.log("a", "uninitialized", 0);
         double b;
-//        VariableLogger.log("b", null, 1);
+        VariableLogger.log("b", "uninitialized", 1);
         a = 5;
         VariableLogger.log("a", a, 2);
         b = 6;
