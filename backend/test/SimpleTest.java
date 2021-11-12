@@ -12,6 +12,7 @@ public class SimpleTest {
     }
 
     @Track(var="a", alias = "alias_for_a")
+    @Track(var="b", alias="alias_for_b")
     public Double calc() {
         double a;
         double b;
