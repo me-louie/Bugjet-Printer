@@ -22,6 +22,7 @@ public class Main {
     public static void main(String[] args) throws IOException {
         // get ast
         CompilationUnit cu = StaticJavaParser.parse(new File(INPUT_FILE_PATH));
+        System.out.println(cu);
         // collect names/aliases of variables to track
         VoidVisitor<Map<String, String>> variableAnnotationCollector = new VariableAnnotationCollector();
         Map<String, String> variablesToTrack = new HashMap<>(); // map of variable names -> the aliases we'll track them under
@@ -58,10 +59,9 @@ public class Main {
         StringBuilder putStatements = new StringBuilder();
         for (List<LineInfo> lineInfos : lineInfoMap.values()) {
             for (LineInfo lineInfo : lineInfos) {
-                putStatements.append("\t\tput(" + lineInfo.getUniqueIdentifier() + ", new LineInfo(\""
-                        + lineInfo.getName() + "\", \"" + lineInfo.getAlias() + "\", \"" + lineInfo.getType() + "\","
-                        + lineInfo.getLineNum() + ", \"" + lineInfo.getStatement() + "\", \"" + lineInfo.getEnclosingClass()
-                        + "\", \"" + lineInfo.getEnclosingMethod() + "\", " + lineInfo.getUniqueIdentifier() + "));" + "\n");
+                putStatements.append(util.Formatter.generatePutStatement(lineInfo.getUniqueIdentifier(),
+                        lineInfo.getName(), lineInfo.getAlias(), lineInfo.getType(), lineInfo.getLineNum(),
+                        lineInfo.getStatement(), lineInfo.getEnclosingClass(), lineInfo.getEnclosingMethod() ));
             }
         }
         return putStatements.toString();

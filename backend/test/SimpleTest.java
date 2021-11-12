@@ -13,6 +13,7 @@ public class SimpleTest {
 
     @Track(var="a", alias = "alias_for_a")
     @Track(var="b", alias="alias_for_b")
+    @Track(var="i", alias="alias_for_i")
     public Double calc() {
         double a;
         double b;
@@ -46,11 +47,6 @@ public class SimpleTest {
 //        if (true)
 //            a = 5;
 //        else b = 6;
-
-//        @Track(i=i)
-//        for (int i = 0; i < 10; i++) {
-//            a = b >> 1;
-//        }
         return a;
     }
 }

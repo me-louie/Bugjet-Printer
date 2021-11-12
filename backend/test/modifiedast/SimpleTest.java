@@ -17,6 +17,7 @@ public class SimpleTest {
 
     @Track(var = "a", alias = "alias_for_a")
     @Track(var = "b", alias = "alias_for_b")
+    @Track(var = "i", alias = "alias_for_i")
     public Double calc() {
         double a;
         VariableLogger.log("a", "uninitialized", 0);
@@ -41,9 +42,11 @@ public class SimpleTest {
             System.out.println("hello world");
         }
         for (int i = 0; i < 10; i++) {
+            VariableLogger.log("i", i, 10);
             a = b + 1;
             VariableLogger.log("a", a, 8);
         }
+        VariableLogger.log("i", 0, 9);
         return a;
     }
 }
