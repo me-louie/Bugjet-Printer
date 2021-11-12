@@ -1,4 +1,4 @@
-package ast;
+package annotation;
 
 public @interface Track {
     String var();

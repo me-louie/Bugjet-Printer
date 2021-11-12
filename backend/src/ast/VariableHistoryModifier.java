@@ -87,7 +87,7 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<String, List<Li
     }
 
     private void addLoggingStatement(String name, String value, Statement statement, Node node, int uniqueIdentifier) {
-        Statement loggingStatement = StaticJavaParser.parseStatement("VariableLogger.log(" + name + ", "
+        Statement loggingStatement = StaticJavaParser.parseStatement("VariableLogger.log(\"" + name + "\", "
                 + value + ", "
                 + uniqueIdentifier + ");");
         if (node.getParentNode().isPresent() && node.getParentNode().get() instanceof ForStmt forStmt) {

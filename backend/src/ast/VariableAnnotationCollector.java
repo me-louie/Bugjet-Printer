@@ -11,8 +11,11 @@ public class VariableAnnotationCollector extends VoidVisitorAdapter<Map<String, 
     public void visit(NormalAnnotationExpr nae, Map<String, String> collector) {
         super.visit(nae, collector);
         if (nae.getNameAsString().equals("Track")) {
-            String var = nae.getPairs().getFirst().get().getValue().toString();
-            String alias = nae.getPairs().getLast().get().getValue().toString();
+            // TODO: fix this string hack
+            String var = nae.getPairs().getFirst().get().getValue().toString().replace("\""
+                    , "");
+            String alias = nae.getPairs().getLast().get().getValue().toString().replace("\""
+                    , "");
             collector.put(var, alias);
         }
     }

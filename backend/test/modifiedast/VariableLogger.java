@@ -1,4 +1,4 @@
-package ast;
+package modifiedast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -13,6 +13,10 @@ public class VariableLogger {
     private static final String FILE_PATH = "out/output.json";
     // uniqueId -> LineInfo for a line that causes variable mutation
     private static Map<Integer, LineInfo> lineInfoMap = new HashMap<>() {{
+		put(0, new LineInfo("a", "alias_for_a", "double",16, "double a;", "SimpleTest", "public Double calc()", 0));
+		put(1, new LineInfo("a", "alias_for_a", "null",18, "a = 5;", "SimpleTest", "public Double calc()", 1));
+		put(2, new LineInfo("a", "alias_for_a", "null",26, "a++;", "SimpleTest", "public Double calc()", 2));
+		put(3, new LineInfo("a", "alias_for_a", "null",32, "a = b + 1;", "SimpleTest", "public Double calc()", 3));
     }};
     // variable name -> Output object containing all info tracked about variable
     private static Map<String, Output> outputMap = new HashMap<>();
