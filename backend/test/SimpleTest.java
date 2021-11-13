@@ -15,8 +15,9 @@ public class SimpleTest {
     @Track(var="b", nickname ="nickname_for_b")
     @Track(var="arr", nickname ="nickname_for_arr")
     @Track(var = "arrCopy", nickname = "nickname_for_arr_copy")
+    @Track(var = "m", nickname = "nickname_for_m")
     public Double calc() {
-        double a;
+        double a = -1;
         double b;
         a = 5;
         b = 6;
@@ -43,6 +44,9 @@ public class SimpleTest {
         arrCopy = arr;
         arrCopy[0] = 1000;
 
+        int[] m = {1, 2, 3};
+        m[0] = 10;
+        m[1] = 11;
         // cases we don't currently handle:
 //        @Track(a=a)
 //        while (a++ < 30) {

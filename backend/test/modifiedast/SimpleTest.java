@@ -19,9 +19,10 @@ public class SimpleTest {
     @Track(var = "b", nickname = "nickname_for_b")
     @Track(var = "arr", nickname = "nickname_for_arr")
     @Track(var = "arrCopy", nickname = "nickname_for_arr_copy")
+    @Track(var = "m", nickname = "nickname_for_m")
     public Double calc() {
-        double a;
-        VariableLogger.log("a", "uninitialized", 0);
+        double a = -1;
+        VariableLogger.log("a", -1, 0);
         double b;
         VariableLogger.log("b", "uninitialized", 1);
         a = 5;
@@ -45,6 +46,7 @@ public class SimpleTest {
         for (int i = 0; i < 10; i++) {
             a = b + 1;
             VariableLogger.log("a", a, 8);
+            i += 2;
         }
         int[] arr;
         VariableLogger.log("arr", "uninitialized", 9);
@@ -60,6 +62,12 @@ public class SimpleTest {
         arrCopy[0] = 1000;
         VariableLogger.log("arr", arr, 16);
         VariableLogger.log("arrCopy", arrCopy, 15);
+        int[] m = { 1, 2, 3 };
+        VariableLogger.log("m", m, 17);
+        m[0] = 10;
+        VariableLogger.log("m", m, 18);
+        m[1] = 11;
+        VariableLogger.log("m", m, 19);
         return a;
     }
 }

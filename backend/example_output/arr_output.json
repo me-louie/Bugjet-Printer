@@ -9,35 +9,35 @@
         "enclosingClass": "SimpleTest",
         "enclosingMethod": "public Double calc()",
         "value": "\"uninitialized\"",
-        "line": 37
+        "line": 39
       },
       {
         "statement": "arr \u003d new int[3];",
         "enclosingClass": "SimpleTest",
         "enclosingMethod": "public Double calc()",
         "value": "[\n  0,\n  0,\n  0\n]",
-        "line": 38
+        "line": 40
       },
       {
         "statement": "arr[1] \u003d 123;",
         "enclosingClass": "SimpleTest",
         "enclosingMethod": "public Double calc()",
         "value": "[\n  0,\n  123,\n  0\n]",
-        "line": 39
+        "line": 41
       },
       {
         "statement": "arrCopy \u003d arr;",
         "enclosingClass": "SimpleTest",
         "enclosingMethod": "public Double calc()",
         "value": "[\n  0,\n  123,\n  0\n]",
-        "line": 42
+        "line": 44
       },
       {
         "statement": "arrCopy[0] \u003d 1000;",
         "enclosingClass": "SimpleTest",
         "enclosingMethod": "public Double calc()",
         "value": "[\n  1000,\n  123,\n  0\n]",
-        "line": 43
+        "line": 45
       }
     ]
   },
@@ -47,193 +47,151 @@
     "type": "double",
     "history": [
       {
-        "statement": "double a;",
+        "statement": "double a \u003d -1;",
         "enclosingClass": "SimpleTest",
         "enclosingMethod": "public Double calc()",
-        "value": "\"uninitialized\"",
-        "line": 19
+        "value": "-1",
+        "line": 20
       },
       {
         "statement": "a \u003d 5;",
         "enclosingClass": "SimpleTest",
         "enclosingMethod": "public Double calc()",
         "value": "5.0",
-        "line": 21
+        "line": 22
       },
       {
         "statement": "a++;",
         "enclosingClass": "SimpleTest",
         "enclosingMethod": "public Double calc()",
         "value": "6.0",
-        "line": 29
+        "line": 30
       },
       {
         "statement": "a++;",
         "enclosingClass": "SimpleTest",
         "enclosingMethod": "public Double calc()",
         "value": "7.0",
-        "line": 29
+        "line": 30
       },
       {
         "statement": "a++;",
         "enclosingClass": "SimpleTest",
         "enclosingMethod": "public Double calc()",
         "value": "8.0",
-        "line": 29
+        "line": 30
       },
       {
         "statement": "a++;",
         "enclosingClass": "SimpleTest",
         "enclosingMethod": "public Double calc()",
         "value": "9.0",
-        "line": 29
+        "line": 30
       },
       {
         "statement": "a++;",
         "enclosingClass": "SimpleTest",
         "enclosingMethod": "public Double calc()",
         "value": "10.0",
-        "line": 29
+        "line": 30
       },
       {
         "statement": "a++;",
         "enclosingClass": "SimpleTest",
         "enclosingMethod": "public Double calc()",
         "value": "11.0",
-        "line": 29
+        "line": 30
       },
       {
         "statement": "a++;",
         "enclosingClass": "SimpleTest",
         "enclosingMethod": "public Double calc()",
         "value": "12.0",
-        "line": 29
+        "line": 30
       },
       {
         "statement": "a++;",
         "enclosingClass": "SimpleTest",
         "enclosingMethod": "public Double calc()",
         "value": "13.0",
-        "line": 29
+        "line": 30
       },
       {
         "statement": "a++;",
         "enclosingClass": "SimpleTest",
         "enclosingMethod": "public Double calc()",
         "value": "14.0",
-        "line": 29
+        "line": 30
       },
       {
         "statement": "a++;",
         "enclosingClass": "SimpleTest",
         "enclosingMethod": "public Double calc()",
         "value": "15.0",
-        "line": 29
+        "line": 30
       },
       {
         "statement": "a++;",
         "enclosingClass": "SimpleTest",
         "enclosingMethod": "public Double calc()",
         "value": "16.0",
-        "line": 29
+        "line": 30
       },
       {
         "statement": "a++;",
         "enclosingClass": "SimpleTest",
         "enclosingMethod": "public Double calc()",
         "value": "17.0",
-        "line": 29
+        "line": 30
       },
       {
         "statement": "a++;",
         "enclosingClass": "SimpleTest",
         "enclosingMethod": "public Double calc()",
         "value": "18.0",
-        "line": 29
+        "line": 30
       },
       {
         "statement": "a++;",
         "enclosingClass": "SimpleTest",
         "enclosingMethod": "public Double calc()",
         "value": "19.0",
-        "line": 29
+        "line": 30
       },
       {
         "statement": "a++;",
         "enclosingClass": "SimpleTest",
         "enclosingMethod": "public Double calc()",
         "value": "20.0",
-        "line": 29
+        "line": 30
       },
       {
         "statement": "a \u003d b + 1;",
         "enclosingClass": "SimpleTest",
         "enclosingMethod": "public Double calc()",
         "value": "3.3856595500394866E241",
-        "line": 34
+        "line": 35
       },
       {
         "statement": "a \u003d b + 1;",
         "enclosingClass": "SimpleTest",
         "enclosingMethod": "public Double calc()",
         "value": "3.3856595500394866E241",
-        "line": 34
+        "line": 35
       },
       {
         "statement": "a \u003d b + 1;",
         "enclosingClass": "SimpleTest",
         "enclosingMethod": "public Double calc()",
         "value": "3.3856595500394866E241",
-        "line": 34
+        "line": 35
       },
       {
         "statement": "a \u003d b + 1;",
         "enclosingClass": "SimpleTest",
         "enclosingMethod": "public Double calc()",
         "value": "3.3856595500394866E241",
-        "line": 34
-      },
-      {
-        "statement": "a \u003d b + 1;",
-        "enclosingClass": "SimpleTest",
-        "enclosingMethod": "public Double calc()",
-        "value": "3.3856595500394866E241",
-        "line": 34
-      },
-      {
-        "statement": "a \u003d b + 1;",
-        "enclosingClass": "SimpleTest",
-        "enclosingMethod": "public Double calc()",
-        "value": "3.3856595500394866E241",
-        "line": 34
-      },
-      {
-        "statement": "a \u003d b + 1;",
-        "enclosingClass": "SimpleTest",
-        "enclosingMethod": "public Double calc()",
-        "value": "3.3856595500394866E241",
-        "line": 34
-      },
-      {
-        "statement": "a \u003d b + 1;",
-        "enclosingClass": "SimpleTest",
-        "enclosingMethod": "public Double calc()",
-        "value": "3.3856595500394866E241",
-        "line": 34
-      },
-      {
-        "statement": "a \u003d b + 1;",
-        "enclosingClass": "SimpleTest",
-        "enclosingMethod": "public Double calc()",
-        "value": "3.3856595500394866E241",
-        "line": 34
-      },
-      {
-        "statement": "a \u003d b + 1;",
-        "enclosingClass": "SimpleTest",
-        "enclosingMethod": "public Double calc()",
-        "value": "3.3856595500394866E241",
-        "line": 34
+        "line": 35
       }
     ]
   },
@@ -247,126 +205,126 @@
         "enclosingClass": "SimpleTest",
         "enclosingMethod": "public Double calc()",
         "value": "\"uninitialized\"",
-        "line": 20
+        "line": 21
       },
       {
         "statement": "b \u003d 6;",
         "enclosingClass": "SimpleTest",
         "enclosingMethod": "public Double calc()",
         "value": "6.0",
-        "line": 22
+        "line": 23
       },
       {
         "statement": "b++;",
         "enclosingClass": "SimpleTest",
         "enclosingMethod": "public Double calc()",
         "value": "7.0",
-        "line": 24
+        "line": 25
       },
       {
         "statement": "b *\u003d b / a;",
         "enclosingClass": "SimpleTest",
         "enclosingMethod": "public Double calc()",
         "value": "8.166666666666668",
-        "line": 30
+        "line": 31
       },
       {
         "statement": "b *\u003d b / a;",
         "enclosingClass": "SimpleTest",
         "enclosingMethod": "public Double calc()",
         "value": "9.52777777777778",
-        "line": 30
+        "line": 31
       },
       {
         "statement": "b *\u003d b / a;",
         "enclosingClass": "SimpleTest",
         "enclosingMethod": "public Double calc()",
         "value": "11.347318672839512",
-        "line": 30
+        "line": 31
       },
       {
         "statement": "b *\u003d b / a;",
         "enclosingClass": "SimpleTest",
         "enclosingMethod": "public Double calc()",
         "value": "14.306849006996918",
-        "line": 30
+        "line": 31
       },
       {
         "statement": "b *\u003d b / a;",
         "enclosingClass": "SimpleTest",
         "enclosingMethod": "public Double calc()",
         "value": "20.46859285090087",
-        "line": 30
+        "line": 31
       },
       {
         "statement": "b *\u003d b / a;",
         "enclosingClass": "SimpleTest",
         "enclosingMethod": "public Double calc()",
         "value": "38.08757211781365",
-        "line": 30
+        "line": 31
       },
       {
         "statement": "b *\u003d b / a;",
         "enclosingClass": "SimpleTest",
         "enclosingMethod": "public Double calc()",
         "value": "120.88859581913798",
-        "line": 30
+        "line": 31
       },
       {
         "statement": "b *\u003d b / a;",
         "enclosingClass": "SimpleTest",
         "enclosingMethod": "public Double calc()",
         "value": "1124.1578922402234",
-        "line": 30
+        "line": 31
       },
       {
         "statement": "b *\u003d b / a;",
         "enclosingClass": "SimpleTest",
         "enclosingMethod": "public Double calc()",
         "value": "90266.49762042728",
-        "line": 30
+        "line": 31
       },
       {
         "statement": "b *\u003d b / a;",
         "enclosingClass": "SimpleTest",
         "enclosingMethod": "public Double calc()",
         "value": "5.432027061772403E8",
-        "line": 30
+        "line": 31
       },
       {
         "statement": "b *\u003d b / a;",
         "enclosingClass": "SimpleTest",
         "enclosingMethod": "public Double calc()",
         "value": "1.8441823749892324E16",
-        "line": 30
+        "line": 31
       },
       {
         "statement": "b *\u003d b / a;",
         "enclosingClass": "SimpleTest",
         "enclosingMethod": "public Double calc()",
         "value": "2.0005933130711328E31",
-        "line": 30
+        "line": 31
       },
       {
         "statement": "b *\u003d b / a;",
         "enclosingClass": "SimpleTest",
         "enclosingMethod": "public Double calc()",
         "value": "2.2235408912805176E61",
-        "line": 30
+        "line": 31
       },
       {
         "statement": "b *\u003d b / a;",
         "enclosingClass": "SimpleTest",
         "enclosingMethod": "public Double calc()",
         "value": "2.602175839577136E121",
-        "line": 30
+        "line": 31
       },
       {
         "statement": "b *\u003d b / a;",
         "enclosingClass": "SimpleTest",
         "enclosingMethod": "public Double calc()",
         "value": "3.3856595500394866E241",
-        "line": 30
+        "line": 31
       }
     ]
   },
@@ -380,21 +338,49 @@
         "enclosingClass": "SimpleTest",
         "enclosingMethod": "public Double calc()",
         "value": "\"uninitialized\"",
-        "line": 41
+        "line": 43
       },
       {
         "statement": "arrCopy \u003d arr;",
         "enclosingClass": "SimpleTest",
         "enclosingMethod": "public Double calc()",
         "value": "[\n  0,\n  123,\n  0\n]",
-        "line": 42
+        "line": 44
       },
       {
         "statement": "arrCopy[0] \u003d 1000;",
         "enclosingClass": "SimpleTest",
         "enclosingMethod": "public Double calc()",
         "value": "[\n  1000,\n  123,\n  0\n]",
-        "line": 43
+        "line": 45
+      }
+    ]
+  },
+  {
+    "name": "m",
+    "alias": "nickname_for_m",
+    "type": "int[]",
+    "history": [
+      {
+        "statement": "int[] m \u003d ",
+        "enclosingClass": "SimpleTest",
+        "enclosingMethod": "public Double calc()",
+        "value": "[\n  1,\n  2,\n  3\n]",
+        "line": 47
+      },
+      {
+        "statement": "m[0] \u003d 10;",
+        "enclosingClass": "SimpleTest",
+        "enclosingMethod": "public Double calc()",
+        "value": "[\n  10,\n  2,\n  3\n]",
+        "line": 48
+      },
+      {
+        "statement": "m[1] \u003d 11;",
+        "enclosingClass": "SimpleTest",
+        "enclosingMethod": "public Double calc()",
+        "value": "[\n  10,\n  11,\n  3\n]",
+        "line": 49
       }
     ]
   }
