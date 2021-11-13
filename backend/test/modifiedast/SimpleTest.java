@@ -48,11 +48,12 @@ public class SimpleTest {
         int[] arr;
         VariableLogger.log("arr", "uninitialized", 9);
         arr = new int[3];
-        VariableLogger.log("arr[2]", arr[2], 12);
-        VariableLogger.log("arr[1]", arr[1], 11);
-        VariableLogger.log("arr[0]", arr[0], 10);
+        VariableLogger.log("arr", arr, 10);
         arr[1] = 123;
-        VariableLogger.log("arr[1]", arr[1], 13);
+        VariableLogger.log("arr", arr, 11);
+        int[] arrCopy;
+        arrCopy = arr;
+        arrCopy[0] = 1000;
         return a;
     }
 }

@@ -37,6 +37,10 @@ public class SimpleTest {
         arr = new int[3];
         arr[1] = 123;
 
+        int[] arrCopy;
+        arrCopy = arr;
+        arrCopy[0] = 1000;
+
         // cases we don't currently handle:
 //        @Track(a=a)
 //        while (a++ < 30) {
