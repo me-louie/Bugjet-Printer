@@ -7,12 +7,14 @@ import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
+import com.github.javaparser.ast.expr.ArrayCreationExpr;
 import com.github.javaparser.ast.expr.AssignExpr;
 import com.github.javaparser.ast.expr.UnaryExpr;
 import com.github.javaparser.ast.expr.VariableDeclarationExpr;
 import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.ast.visitor.ModifierVisitor;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -27,7 +29,7 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<String, List<Li
                 String value = (vd.getInitializer().isPresent()) ? vd.getInitializer().get().toString() : null;
                 String type = vd.getType().toString();
                 Statement nodeContainingEntireStatement = (Statement) vd.getParentNode().get().getParentNode().get();
-                track(name, value, type, nodeContainingEntireStatement, vd, lineInfo);
+                track(name, value, type, nodeContainingEntireStatement, vd, lineInfo, null);
             }
         }
         return vde;
@@ -48,9 +50,15 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<String, List<Li
             // write down anything about this line that we might want to know
             String name = ae.getTarget().toString();
             String value = name;
-            String type = null; // type info isn't contained in assignment statements
             Statement nodeContainingEntireStatement = (Statement) ae.getParentNode().get();
-            track(name, value, type, nodeContainingEntireStatement, ae, lineInfo);
+            Integer arrSize = null;
+            // we treat array creation expressions differently by adding an entry in the lineInfoMap for each arr index
+            if (ae.getValue() instanceof ArrayCreationExpr) {
+                arrSize =
+                        Integer.parseInt(((ArrayCreationExpr) ae.getValue()).getLevels().get(0).getDimension().get().toString());
+            }
+            track(name, value, null /* type info isn't contained in assign expr*/, nodeContainingEntireStatement, ae,
+                    lineInfo, arrSize);
         }
         return ae;
     }
@@ -62,15 +70,16 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<String, List<Li
         if (lineInfo.containsKey(name)) {
             // write down anything about this line that we might want to know
             String value = name;
-            String type = null; // type info isn't contained in unary expressions
             Statement nodeContainingEntireStatement = (Statement) ue.getParentNode().get();
-            track(name, value, type, nodeContainingEntireStatement, ue, lineInfo);
+            track(name, value, null /* type info isn't contained in unary expressions */,
+                    nodeContainingEntireStatement, ue, lineInfo, null);
         }
         return ue;
     }
 
-    private void track(String name, String value, String type, Statement nodeContainingEntireStatement, Node node, Map<String,
-            List<LineInfo>> lineInfo) {
+    private void track(String name, String value, String type, Statement nodeContainingEntireStatement, Node node,
+                       Map<String,
+                               List<LineInfo>> lineInfo, Integer arrSize) {
         String alias = lineInfo.get(name).get(0).getAlias();
         Integer lineNum = node.getBegin().isPresent() ? node.getBegin().get().line : null;
         String enclosingClass = node.findAncestor(ClassOrInterfaceDeclaration.class).isPresent() ?
@@ -79,15 +88,42 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<String, List<Li
         String enclosingMethod = node.findAncestor(MethodDeclaration.class).isPresent() ?
                 node.findAncestor(MethodDeclaration.class).get().getDeclarationAsString(true, true, true) :
                 null;
-        int uniqueIdentifier = UniqueNumberGenerator.generate();
-        // store all of the info about a statement we might want later
-        lineInfo.get(name).add(new LineInfo(name, alias, type, lineNum, nodeContainingEntireStatement.toString(), enclosingClass, enclosingMethod, uniqueIdentifier));
-        // add logging statement below this line
-        addLoggingStatement(name, value, nodeContainingEntireStatement, node, uniqueIdentifier);
+        if (arrSize == null) {
+            int uniqueIdentifier = UniqueNumberGenerator.generate();
+            // store all of the info about a statement we might want later
+            lineInfo.get(name).add(new LineInfo(name, alias, type, lineNum, nodeContainingEntireStatement.toString(),
+                    enclosingClass, enclosingMethod, uniqueIdentifier));
+            // add logging statement below this line
+            addLoggingStatement(name, value, nodeContainingEntireStatement, node, uniqueIdentifier);
+        } else {
+            trackArr(name, type, nodeContainingEntireStatement, lineNum, enclosingClass,
+                    enclosingMethod, node, lineInfo, arrSize);
+        }
+    }
+
+    private void trackArr(String name, String type, Statement nodeContainingEntireStatement, Integer lineNum,
+                          String enclosingClass, String enclosingMethod, Node node, Map<String,
+            List<LineInfo>> lineInfo, int size) {
+        for (int i = 0; i < size; i++) {
+            int uniqueIdentifier = UniqueNumberGenerator.generate();
+            String currAlias = lineInfo.get(name).get(0).getAlias() + "[" + i + "]";
+            String currName = name + "[" + i + "]";
+            // TODO: remove placeholder when we no longer process lineInfo map by removing first index in Main
+            LineInfo l = new LineInfo("0", "0", "0", 0, "0", "0", "0", 0);
+            lineInfo.put(currName, new ArrayList<>());
+            lineInfo.get(currName).add(l);
+
+            lineInfo.get(currName).add(new LineInfo(currName, currAlias, type, lineNum,
+                    nodeContainingEntireStatement.toString()
+                    , enclosingClass, enclosingMethod, uniqueIdentifier));
+            // add logging statement below this line
+            addLoggingStatement(currName, currName, nodeContainingEntireStatement, node, uniqueIdentifier);
+        }
+
     }
 
     private void addLoggingStatement(String name, String value, Statement statement, Node node, int uniqueIdentifier) {
-        if (value == null){
+        if (value == null) {
             value = "\"uninitialized\"";
         }
         Statement loggingStatement = StaticJavaParser.parseStatement("VariableLogger.log(\"" + name + "\", "

@@ -6,7 +6,10 @@ import com.google.gson.GsonBuilder;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class VariableLogger {
 
@@ -21,8 +24,8 @@ public class VariableLogger {
     public static void logToOutputMap(String variableName, Object variableValue, Integer id) {
         LineInfo lineInfo = lineInfoMap.get(id);
         Output output = (outputMap.containsKey(variableName)) ?
-            outputMap.get(variableName) :
-            new Output(variableName, lineInfo.getAlias(), lineInfo.getType());
+                outputMap.get(variableName) :
+                new Output(variableName, lineInfo.getAlias(), lineInfo.getType());
         output.addMutation(lineInfo.getStatement(), lineInfo.getEnclosingClass(), lineInfo.getEnclosingMethod(),
                 variableValue, lineInfo.getLineNum());
         outputMap.put(variableName, output);
@@ -33,6 +36,7 @@ public class VariableLogger {
         writer.write(gson.toJson(outputMap.values()));
         writer.close();
     }
+
     // TODO: maybe document that we don't handle the tracking of Strings normally, this case is just for handling
     //  null variable values. Alternatively, figure out a better way to handle the nulls.
     protected static void log(String variableName, String variableValue, Integer id) {
@@ -144,7 +148,8 @@ public class VariableLogger {
             history = new ArrayList<>();
         }
 
-        public void addMutation(String statement, String enclosingClass, String enclosingMethod, Object variableValue, int lineNum) {
+        public void addMutation(String statement, String enclosingClass, String enclosingMethod, Object variableValue
+                , int lineNum) {
             history.add(new Mutation(statement, enclosingClass, enclosingMethod, variableValue, lineNum));
         }
 
@@ -153,7 +158,8 @@ public class VariableLogger {
             private String statement, enclosingClass, enclosingMethod, value;
             private int line;
 
-            public Mutation(String statement, String enclosingClass, String enclosingMethod, Object variableValue, int lineNum) {
+            public Mutation(String statement, String enclosingClass, String enclosingMethod, Object variableValue,
+                            int lineNum) {
                 this.statement = statement;
                 this.enclosingClass = enclosingClass;
                 this.enclosingMethod = enclosingMethod;

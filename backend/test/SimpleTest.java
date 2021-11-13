@@ -13,6 +13,7 @@ public class SimpleTest {
 
     @Track(var="a", alias = "alias_for_a")
     @Track(var="b", alias="alias_for_b")
+    @Track(var="arr", alias="alias_for_arr")
     public Double calc() {
         double a;
         double b;
@@ -31,6 +32,10 @@ public class SimpleTest {
         for (int i = 0; i < 10; i++) {
             a = b + 1;
         }
+
+        int[] arr;
+        arr = new int[3];
+        arr[1] = 123;
 
         // cases we don't currently handle:
 //        @Track(a=a)
