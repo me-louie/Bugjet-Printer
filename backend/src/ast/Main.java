@@ -58,10 +58,9 @@ public class Main {
         StringBuilder putStatements = new StringBuilder();
         for (List<LineInfo> lineInfos : lineInfoMap.values()) {
             for (LineInfo lineInfo : lineInfos) {
-                putStatements.append("\t\tput(" + lineInfo.getUniqueIdentifier() + ", new LineInfo(\""
-                        + lineInfo.getName() + "\", \"" + lineInfo.getAlias() + "\", \"" + lineInfo.getType() + "\","
-                        + lineInfo.getLineNum() + ", \"" + lineInfo.getStatement() + "\", \"" + lineInfo.getEnclosingClass()
-                        + "\", \"" + lineInfo.getEnclosingMethod() + "\", " + lineInfo.getUniqueIdentifier() + "));" + "\n");
+                putStatements.append(util.Formatter.generatePutStatement(lineInfo.getUniqueIdentifier(),
+                        lineInfo.getName(), lineInfo.getAlias(), lineInfo.getType(), lineInfo.getLineNum(),
+                        lineInfo.getStatement(), lineInfo.getEnclosingClass(), lineInfo.getEnclosingMethod() ));
             }
         }
         return putStatements.toString();
