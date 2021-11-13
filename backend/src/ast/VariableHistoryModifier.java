@@ -17,6 +17,9 @@ import java.util.Map;
 
 public class VariableHistoryModifier extends ModifierVisitor<Map<String, List<LineInfo>>> {
 
+    /**
+     * Maps variable name to the name of the object it is referencing e.g. int[] arrCopy = arr, "arrCopy" ->"arr".
+     */
     private Map<String, String> aliasMap;
 
     public VariableHistoryModifier() {
