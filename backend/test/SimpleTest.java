@@ -32,6 +32,7 @@ public class SimpleTest {
         }
         for (int i = 0; i < 10; i++) {
             a = b + 1;
+            i+=2;
         }
 
         int[] arr;
@@ -56,11 +57,6 @@ public class SimpleTest {
 //        if (true)
 //            a = 5;
 //        else b = 6;
-
-//        @Track(i=i)
-//        for (int i = 0; i < 10; i++) {
-//            a = b >> 1;
-//        }
         return a;
     }
 }

@@ -127,7 +127,7 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<String, List<Li
             if (forStmt.getBody() instanceof BlockStmt body) {
                 body.addStatement(0, loggingStatement);
             } else if (forStmt.getBody() instanceof ExpressionStmt body) {
-                // todo: handle the case where the body of the for statmement isn't wrapped in curly brackets
+                // todo: handle the case where the body of the for statement isn't wrapped in curly brackets
                 //       also need to handle the case where the thing we're interested in is the body of the
                 //       for statement and it's not in brackets
                 //       same for if blocks
