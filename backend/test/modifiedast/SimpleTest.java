@@ -15,9 +15,10 @@ public class SimpleTest {
         VariableLogger.writeOutputToDisk();
     }
 
-    @Track(var = "a", alias = "alias_for_a")
-    @Track(var = "b", alias = "alias_for_b")
-    @Track(var = "arr", alias = "alias_for_arr")
+    @Track(var = "a", nickname = "nickname_for_a")
+    @Track(var = "b", nickname = "nickname_for_b")
+    @Track(var = "arr", nickname = "nickname_for_arr")
+    @Track(var = "arrCopy", nickname = "nickname_for_arr_copy")
     public Double calc() {
         double a;
         VariableLogger.log("a", "uninitialized", 0);
@@ -52,8 +53,13 @@ public class SimpleTest {
         arr[1] = 123;
         VariableLogger.log("arr", arr, 11);
         int[] arrCopy;
+        VariableLogger.log("arrCopy", "uninitialized", 12);
         arrCopy = arr;
+        VariableLogger.log("arr", arr, 14);
+        VariableLogger.log("arrCopy", arrCopy, 13);
         arrCopy[0] = 1000;
+        VariableLogger.log("arr", arr, 16);
+        VariableLogger.log("arrCopy", arrCopy, 15);
         return a;
     }
 }

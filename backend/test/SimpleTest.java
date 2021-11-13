@@ -11,9 +11,10 @@ public class SimpleTest {
         st.calc();
     }
 
-    @Track(var="a", alias = "alias_for_a")
-    @Track(var="b", alias="alias_for_b")
-    @Track(var="arr", alias="alias_for_arr")
+    @Track(var="a", nickname = "nickname_for_a")
+    @Track(var="b", nickname ="nickname_for_b")
+    @Track(var="arr", nickname ="nickname_for_arr")
+    @Track(var = "arrCopy", nickname = "nickname_for_arr_copy")
     public Double calc() {
         double a;
         double b;

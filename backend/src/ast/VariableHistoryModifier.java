@@ -14,10 +14,17 @@ import com.github.javaparser.ast.expr.VariableDeclarationExpr;
 import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.ast.visitor.ModifierVisitor;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class VariableHistoryModifier extends ModifierVisitor<Map<String, List<LineInfo>>> {
+
+    private Map<String, String> aliasMap;
+
+    public VariableHistoryModifier() {
+        aliasMap = new HashMap<>();
+    }
 
     @Override
     public VariableDeclarationExpr visit(VariableDeclarationExpr vde, Map<String, List<LineInfo>> lineInfo) {
@@ -45,18 +52,31 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<String, List<Li
     @Override
     public AssignExpr visit(AssignExpr ae, Map<String, List<LineInfo>> lineInfo) {
         super.visit(ae, lineInfo);
-        // if making an array access assignment, we want the name of the object only without the square brackets
+        // If making an array access assignment, we want the name of the variable only, without the square brackets
         String name = (ae.getTarget() instanceof ArrayAccessExpr ?
                 ((ArrayAccessExpr) ae.getTarget()).getName().toString() :
                 ae.getTarget().toString());
+
+        String possibleVarReference = ae.getValue().toString();
+        // If Assign Exp is a variable reference assignment, e.g. int[] x = y
+        if (lineInfo.containsKey(possibleVarReference)) {
+            aliasMap.put(name, possibleVarReference);
+        }
+        // Tracking the variable, e.g. @Track(var=x, alias=x) int[] x = y
         if (lineInfo.containsKey(name)) {
             // write down anything about this line that we might want to know
             String value = name;
             Statement nodeContainingEntireStatement = (Statement) ae.getParentNode().get();
-            if (ae.getTarget() instanceof ArrayAccessExpr) {
-
-            }
             track(name, value, null /* type info isn't contained in assign expr*/, nodeContainingEntireStatement, ae,
+                    lineInfo);
+        }
+
+        // Tracking the reference which is being assigned to the variable, e.g. @Track(var=y, alias=y) int[] x = y
+        if (aliasMap.containsKey(name)) {
+            // write down anything about this line that we might want to know
+            String varReference = aliasMap.get(name);
+            Statement nodeContainingEntireStatement = (Statement) ae.getParentNode().get();
+            track(varReference, varReference, null /* type info isn't contained in assign expr*/, nodeContainingEntireStatement, ae,
                     lineInfo);
         }
         return ae;
@@ -95,7 +115,8 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<String, List<Li
         addLoggingStatement(name, value, nodeContainingEntireStatement, node, uniqueIdentifier);
     }
 
-    private void addLoggingStatement(String name, String value, Statement statement, Node node, int uniqueIdentifier) {
+    private void addLoggingStatement(String name, String value, Statement statement, Node node,
+                                     int uniqueIdentifier) {
         if (value == null) {
             value = "\"uninitialized\"";
         }
