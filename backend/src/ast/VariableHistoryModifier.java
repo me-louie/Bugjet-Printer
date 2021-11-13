@@ -150,9 +150,4 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<String, List<Li
                             loggingStatement));
         }
     }
-
-    private String escapeSpecialCharacters(String value) {
-        String s1 = value.replace("\\{", "\\\\\\{");
-        return s1.replace("\\}", "\\\\\\}");
-    }
 }
