@@ -104,35 +104,35 @@ public class VariableLogger {
     }
 
     protected static void log(String variableName, int[][] variableValue, Integer id) {
-        logToOutputMap(variableName, List.of(List.of(variableValue)), id);
+        logToOutputMap(variableName, variableValue, id);
     }
 
     protected static void log(String variableName, boolean[][] variableValue, Integer id) {
-        logToOutputMap(variableName, List.of(List.of(variableValue)), id);
+        logToOutputMap(variableName, variableValue, id);
     }
 
     protected static void log(String variableName, long[][] variableValue, Integer id) {
-        logToOutputMap(variableName, List.of(List.of(variableValue)), id);
+        logToOutputMap(variableName, variableValue, id);
     }
 
     protected static void log(String variableName, char[][] variableValue, Integer id) {
-        logToOutputMap(variableName, List.of(List.of(variableValue)), id);
+        logToOutputMap(variableName, variableValue, id);
     }
 
     protected static void log(String variableName, float[][] variableValue, Integer id) {
-        logToOutputMap(variableName, List.of(List.of(variableValue)), id);
+        logToOutputMap(variableName, variableValue, id);
     }
 
     protected static void log(String variableName, double[][] variableValue, Integer id) {
-        logToOutputMap(variableName, List.of(List.of(variableValue)), id);
+        logToOutputMap(variableName, variableValue, id);
     }
 
     protected static void log(String variableName, short[][] variableValue, Integer id) {
-        logToOutputMap(variableName, List.of(List.of(variableValue)), id);
+        logToOutputMap(variableName, variableValue, id);
     }
 
     protected static void log(String variableName, Object[][] variableValue, Integer id) {
-        logToOutputMap(variableName, List.of(List.of(variableValue)), id);
+        logToOutputMap(variableName, variableValue, id);
     }
 
 
@@ -148,8 +148,8 @@ public class VariableLogger {
             history = new ArrayList<>();
         }
 
-        public void addMutation(String statement, String enclosingClass, String enclosingMethod, Object variableValue
-                , int lineNum) {
+        public void addMutation(String statement, String enclosingClass, String enclosingMethod, Object variableValue,
+                                int lineNum) {
             history.add(new Mutation(statement, enclosingClass, enclosingMethod, variableValue, lineNum));
         }
 
