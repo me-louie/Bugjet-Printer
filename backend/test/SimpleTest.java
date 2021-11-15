@@ -11,11 +11,13 @@ public class SimpleTest {
         st.calc();
     }
 
-    @Track(var="a", nickname = "nickname_for_a")
-    @Track(var="b", nickname ="nickname_for_b")
-    @Track(var="arr", nickname ="nickname_for_arr")
-    @Track(var = "arrCopy", nickname = "nickname_for_arr_copy")
-    @Track(var = "m", nickname = "nickname_for_m")
+//    @Track(var="a", nickname = "nickname_for_a")
+//    @Track(var="b", nickname ="nickname_for_b")
+//    @Track(var="arr", nickname ="nickname_for_arr")
+//    @Track(var = "arrCopy", nickname = "nickname_for_arr_copy")
+//    @Track(var = "m", nickname = "nickname_for_m")
+    @Track(var="x", nickname ="nickname_for_arr")
+    @Track(var = "y", nickname = "nickname_for_arr_copy")
     public Double calc() {
         double a = -1;
         double b;
@@ -36,17 +38,24 @@ public class SimpleTest {
             i+=2;
         }
 
-        int[] arr;
-        arr = new int[3];
-        arr[1] = 123;
+        int[] x = {1, 2, 3};
+        int[] y = x;
+        y[0] = 100;
+        x[1] = 101;
+        int[] z = new int[3];
+        y = z;
 
-        int[] arrCopy;
-        arrCopy = arr;
-        arrCopy[0] = 1000;
+//        int[] arr;
+//        arr = new int[3];
+//        arr[1] = 123;
+//
+//        int[] arrCopy;
+//        arrCopy = arr;
+//        arrCopy[0] = 1000;
 
-        int[] m = {1, 2, 3};
-        m[0] = 10;
-        m[1] = 11;
+//        int[] m = {1, 2, 3};
+//        m[0] = 10;
+//        m[1] = 11;
         // cases we don't currently handle:
 //        @Track(a=a)
 //        while (a++ < 30) {
