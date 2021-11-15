@@ -14,10 +14,12 @@ public class Main {
     private static final String INPUT_FILE_PATH = "backend/test/SimpleTest.java";
     private static final String VARIABLE_LOGGER_FILE_PATH = "backend/src/ast/VariableLogger.java";
     private static final String LINE_INFO_FILE_PATH = "backend/src/ast/LineInfo.java";
+    private static final String VARIABLE_REF_LOGGER_FILE_PATH = "backend/src/ast/VariableReferenceLogger.java";
     private static final String MODIFIED_FILES_PACKAGE_NAME = "modifiedast";
     private static final String MODIFIED_AST_FILE_PATH = "backend/test/modifiedast/SimpleTest.java";
     private static final String MODIFIED_VARIABLE_LOGGER_FILE_PATH = "backend/test/modifiedast/VariableLogger.java";
     private static final String MODIFIED_LINE_INFO_FILE_PATH = "backend/test/modifiedast/LineInfo.java";
+    private static final String MODIFIED_VARIABLE_REF_LOGGER_FILE_PATH = "backend/test/modifiedast/VariableReferenceLogger.java";
 
     public static void main(String[] args) throws IOException {
         // get ast
@@ -50,6 +52,7 @@ public class Main {
         }
         writeModifiedProgram(cu);
         writeModifiedVariableLogger(lineInfoMap);
+        writeModifiedVariableReferenceLogger();
         writeModifiedLineInfo();
         // todo: send output.json to frontend
     }
@@ -97,6 +100,14 @@ public class Main {
     private static void writeModifiedLineInfo() throws IOException {
         BufferedWriter writer = new BufferedWriter(new FileWriter(MODIFIED_LINE_INFO_FILE_PATH));
         CompilationUnit lineInfoCU = StaticJavaParser.parse(new File(LINE_INFO_FILE_PATH));
+        lineInfoCU.setPackageDeclaration(MODIFIED_FILES_PACKAGE_NAME);
+        writer.write(lineInfoCU.toString());
+        writer.close();
+    }
+
+    private static void writeModifiedVariableReferenceLogger() throws IOException {
+        BufferedWriter writer = new BufferedWriter(new FileWriter(MODIFIED_VARIABLE_REF_LOGGER_FILE_PATH));
+        CompilationUnit lineInfoCU = StaticJavaParser.parse(new File(VARIABLE_REF_LOGGER_FILE_PATH));
         lineInfoCU.setPackageDeclaration(MODIFIED_FILES_PACKAGE_NAME);
         writer.write(lineInfoCU.toString());
         writer.close();

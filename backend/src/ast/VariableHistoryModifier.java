@@ -18,7 +18,7 @@ import java.util.Map;
 public class VariableHistoryModifier extends ModifierVisitor<Map<String, List<LineInfo>>> {
 
     /**
-     * Maps variable name to the name of the object it is referencing e.g. int[] arrCopy = arr, "arrCopy" ->"arr".
+     * Maps variable name to the object pointer (e.g. obj.toString()).
      */
     private Map<String, String> aliasMap;
 
@@ -42,7 +42,9 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<String, List<Li
                 }
                 String type = vd.getType().toString();
                 Statement nodeContainingEntireStatement = (Statement) vd.getParentNode().get().getParentNode().get();
-                track(name, value, type, nodeContainingEntireStatement, vd, lineInfo);
+
+                trackVar(name, value, type, nodeContainingEntireStatement, vd, lineInfo);
+                trackVarReference(name, nodeContainingEntireStatement, vd);
             }
         }
         return vde;
@@ -74,7 +76,7 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<String, List<Li
             // write down anything about this line that we might want to know
             String value = name;
             Statement nodeContainingEntireStatement = (Statement) ae.getParentNode().get();
-            track(name, value, null /* type info isn't contained in assign expr*/, nodeContainingEntireStatement, ae,
+            trackVar(name, value, null /* type info isn't contained in assign expr*/, nodeContainingEntireStatement, ae,
                     lineInfo);
         }
 
@@ -83,7 +85,7 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<String, List<Li
             // write down anything about this line that we might want to know
             String varReference = aliasMap.get(name);
             Statement nodeContainingEntireStatement = (Statement) ae.getParentNode().get();
-            track(varReference, varReference, null /* type info isn't contained in assign expr*/,
+            trackVar(varReference, varReference, null /* type info isn't contained in assign expr*/,
                     nodeContainingEntireStatement, ae,
                     lineInfo);
         }
@@ -98,15 +100,15 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<String, List<Li
             // write down anything about this line that we might want to know
             String value = name;
             Statement nodeContainingEntireStatement = (Statement) ue.getParentNode().get();
-            track(name, value, null /* type info isn't contained in unary expressions */,
+            trackVar(name, value, null /* type info isn't contained in unary expressions */,
                     nodeContainingEntireStatement, ue, lineInfo);
         }
         return ue;
     }
 
-    private void track(String name, String value, String type, Statement nodeContainingEntireStatement, Node node,
-                       Map<String,
-                               List<LineInfo>> lineInfo) {
+    private void trackVar(String name, String value, String type, Statement nodeContainingEntireStatement, Node node,
+                          Map<String,
+                                  List<LineInfo>> lineInfo) {
         String alias = lineInfo.get(name).get(0).getAlias();
         Integer lineNum = node.getBegin().isPresent() ? node.getBegin().get().line : null;
         String enclosingClass = node.findAncestor(ClassOrInterfaceDeclaration.class).isPresent() ?
@@ -120,17 +122,16 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<String, List<Li
         lineInfo.get(name).add(new LineInfo(name, alias, type, lineNum, nodeContainingEntireStatement.toString(),
                 enclosingClass, enclosingMethod, uniqueIdentifier));
         // add logging statement below this line
-        addLoggingStatement(name, value, nodeContainingEntireStatement, node, uniqueIdentifier);
+        Statement loggingStatement = createVariableLoggerStatement(name, value, uniqueIdentifier);
+        addLoggingStatement(nodeContainingEntireStatement, node, loggingStatement);
     }
 
-    private void addLoggingStatement(String name, String value, Statement statement, Node node,
-                                     int uniqueIdentifier) {
-        if (value == null) {
-            value = "\"uninitialized\"";
-        }
-        Statement loggingStatement = StaticJavaParser.parseStatement("VariableLogger.log(\"" + name + "\", "
-                + value + ", "
-                + uniqueIdentifier + ");");
+    private void trackVarReference(String name, Statement nodeContainingEntireStatement, Node node) {
+        Statement varRefLoggerStmt = createVariableRefLoggerStatement(name);
+        addLoggingStatement(nodeContainingEntireStatement, node, varRefLoggerStmt);
+    }
+
+    private void addLoggingStatement(Statement anchorStatement, Node node, Statement loggingStatement) {
         if (node.getParentNode().isPresent() && node.getParentNode().get() instanceof ForStmt forStmt) {
             if (forStmt.getBody() instanceof BlockStmt body) {
                 body.addStatement(0, loggingStatement);
@@ -143,11 +144,27 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<String, List<Li
             }
         } else if (node.findAncestor(SwitchEntry.class).isPresent()) {
             NodeList<Statement> switchBlockStatements = node.findAncestor(SwitchEntry.class).get().getStatements();
-            switchBlockStatements.add(switchBlockStatements.indexOf(statement) + 1, loggingStatement);
+            switchBlockStatements.add(switchBlockStatements.indexOf(anchorStatement) + 1, loggingStatement);
         } else {
             node.findAncestor(BlockStmt.class)
-                    .ifPresent(block -> block.addStatement(1 + block.getStatements().indexOf(statement),
+                    .ifPresent(block -> block.addStatement(1 + block.getStatements().indexOf(anchorStatement),
                             loggingStatement));
         }
+    }
+
+    private Statement createVariableLoggerStatement(String name, String value, int uniqueIdentifier) {
+        if (value == null) {
+            value = "\"uninitialized\"";
+        }
+        return StaticJavaParser.parseStatement("VariableLogger.log(\""
+                + name + "\", "
+                + value + ", "
+                + uniqueIdentifier + ");");
+    }
+
+    private Statement createVariableRefLoggerStatement(String obj) {
+        return StaticJavaParser.parseStatement("VariableReferenceLogger.refToVarMap.put("
+                + obj + ", "
+                + obj + ".toString()" + ");");
     }
 }

@@ -37,8 +37,10 @@ public class SimpleTest {
             i += 2;
         }
         int[] x = { 1, 2, 3 };
+        VariableReferenceLogger.refToVarMap.put(x, x.toString());
         VariableLogger.log("x", x, 0);
         int[] y = x;
+        VariableReferenceLogger.refToVarMap.put(y, y.toString());
         VariableLogger.log("y", x, 1);
         y[0] = 100;
         VariableLogger.log("y", y, 2);
