@@ -71,17 +71,13 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<String, List<Li
             String enclosingMethod = ae.findAncestor(MethodDeclaration.class).isPresent() ?
                     ae.findAncestor(MethodDeclaration.class).get().getDeclarationAsString(true, true, true) :
                     null;
-//
 
             int uniqueNum = UniqueNumberGenerator.generate();
             LineInfo li = new LineInfo(name, alias, null, lineNum, nodeContainingEntireStatement.toString(), enclosingClass,
                     enclosingMethod, uniqueNum);
 
-            Statement refToVarMapChecks = StatementCreator.createRefToVarMapChecks(name, uniqueNum);
+            Statement refToVarMapChecks = StatementCreator.createRefToVarMapChecks(name, li, uniqueNum);
             addLoggingStatement(nodeContainingEntireStatement, ae, refToVarMapChecks);
-
-            Statement lineInfoPut = StatementCreator.lineInfoMapPut(li);
-            addLoggingStatement(nodeContainingEntireStatement, ae, lineInfoPut);
 
             Statement varToRefMapChecks = StatementCreator.createVarToRefMapChecks(name);
             addLoggingStatement(nodeContainingEntireStatement, ae, varToRefMapChecks);

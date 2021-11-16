@@ -41,9 +41,11 @@ public class SimpleTest {
             System.out.println("todo update references in both maps");
         else
             ;
-        VariableLogger.lineInfoMap.put(4, new LineInfo("y", "y", "null", 21, "y[0] = 200;", "SimpleTest", "public Double calc()", 4));
         if (VariableReferenceLogger.refToVarMap.containsKey(y.toString()))
-            for (String var : VariableReferenceLogger.refToVarMap.get(y.toString())) VariableLogger.log(var, y, 4);
+            for (String var : VariableReferenceLogger.refToVarMap.get(y.toString())) {
+                VariableLogger.lineInfoMap.put(4, new LineInfo("y", "y", "null", 21, "y[0] = 200;", "SimpleTest", "public Double calc()", 4));
+                VariableLogger.log(var, y, 4);
+            }
         else
             ;
         x[1] = 300;
@@ -51,9 +53,11 @@ public class SimpleTest {
             System.out.println("todo update references in both maps");
         else
             ;
-        VariableLogger.lineInfoMap.put(5, new LineInfo("x", "x", "null", 22, "x[1] = 300;", "SimpleTest", "public Double calc()", 5));
         if (VariableReferenceLogger.refToVarMap.containsKey(x.toString()))
-            for (String var : VariableReferenceLogger.refToVarMap.get(x.toString())) VariableLogger.log(var, x, 5);
+            for (String var : VariableReferenceLogger.refToVarMap.get(x.toString())) {
+                VariableLogger.lineInfoMap.put(5, new LineInfo("x", "x", "null", 22, "x[1] = 300;", "SimpleTest", "public Double calc()", 5));
+                VariableLogger.log(var, x, 5);
+            }
         else
             ;
         return a;
