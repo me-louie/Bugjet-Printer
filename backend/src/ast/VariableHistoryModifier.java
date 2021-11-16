@@ -60,9 +60,6 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<String, List<Li
             // write down anything about this line that we might want to know
             String value = name;
             Statement nodeContainingEntireStatement = (Statement) ae.getParentNode().get();
-//            trackVar(name, value, null /* type info isn't contained in assign expr*/, nodeContainingEntireStatement, ae,
-//                    lineInfo);
-
             String alias = lineInfo.get(name).get(0).getAlias();
             Integer lineNum = ae.getBegin().isPresent() ? ae.getBegin().get().line : null;
             String enclosingClass = ae.findAncestor(ClassOrInterfaceDeclaration.class).isPresent() ?
@@ -73,10 +70,12 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<String, List<Li
                     null;
 
             int uniqueNum = UniqueNumberGenerator.generate();
-            LineInfo li = new LineInfo(name, alias, null, lineNum, nodeContainingEntireStatement.toString(), enclosingClass,
+            LineInfo li = new LineInfo(name, alias, null, lineNum, nodeContainingEntireStatement.toString(),
+                    enclosingClass,
                     enclosingMethod, uniqueNum);
 
-            Statement refToVarMapChecks = StatementCreator.createRefToVarMapChecks(name, li, uniqueNum);
+            lineInfo.get(name).add(li);
+            Statement refToVarMapChecks = StatementCreator.createRefToVarMapChecks(name, uniqueNum);
             addLoggingStatement(nodeContainingEntireStatement, ae, refToVarMapChecks);
 
             Statement varToRefMapChecks = StatementCreator.createVarToRefMapChecks(name);
@@ -85,7 +84,6 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<String, List<Li
 
         return ae;
     }
-
 
 
     @Override

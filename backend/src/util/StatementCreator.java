@@ -1,6 +1,5 @@
 package util;
 
-import ast.LineInfo;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.stmt.*;
@@ -48,9 +47,8 @@ public final class StatementCreator {
 
     }
 
-    public static Statement createForLoopBlkStmt(String var, LineInfo lineInfo, int uniqueIdentifier) {
+    public static Statement createForLoop(String var, int uniqueIdentifier) {
         NodeList<Statement> stmts = new NodeList<>();
-        stmts.add(lineInfoMapPut(lineInfo));
         stmts.add(StaticJavaParser.parseStatement("VariableLogger.log(var,"
                 + var + ", "
                 + uniqueIdentifier + ");"));
@@ -61,25 +59,12 @@ public final class StatementCreator {
     }
 
 
-    public static Statement createRefToVarMapChecks(String var, LineInfo lineInfo, int uniqueIdentifier) {
-        Statement forLoop = createForLoopBlkStmt(var, lineInfo, uniqueIdentifier);
+    public static Statement createRefToVarMapChecks(String var, int uniqueIdentifier) {
+        Statement forLoop = createForLoop(var, uniqueIdentifier);
         return new IfStmt(
                 StaticJavaParser.parseExpression("VariableReferenceLogger.refToVarMap.containsKey(" + var +
                         ".toString())"), forLoop, emptyElse());
 
-    }
-
-    public static Statement lineInfoMapPut(LineInfo lineInfo) {
-        return StaticJavaParser.parseStatement("VariableLogger.lineInfoMap.put("
-                + lineInfo.getUniqueIdentifier() + ", new LineInfo(\""
-                + lineInfo.getName() + "\", \""
-                + lineInfo.getAlias() + "\", \""
-                + lineInfo.getType() + "\", "
-                + lineInfo.getLineNum() + ", \""
-                + lineInfo.getStatement() + "\", \""
-                + lineInfo.getEnclosingClass() + "\", \""
-                + lineInfo.getEnclosingMethod() + "\", "
-                + lineInfo.getUniqueIdentifier() + "));");
     }
 
     // TODO: figure out how to actually generate an empty else blk

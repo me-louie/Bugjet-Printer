@@ -37,7 +37,6 @@ public class Main {
         variableHistoryModifier.visit(cu, lineInfoMap);
         // this is super hacky, in order to get the alias info to the visit methods the first item in the list is a
         // LineInfo with only the name and alias. Since it's not a real LineInfo we delete it here. I'll fix this at a later date
-        System.out.println(lineInfoMap);
         lineInfoMap.values().forEach(statementList -> statementList.remove(0));
         // add a call to VariableLogger.writeOutputToDisk() to write output after execution is complete
         try {
