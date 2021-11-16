@@ -72,6 +72,7 @@ public class Main {
     private static void writeModifiedProgram(CompilationUnit cu) throws IOException {
         BufferedWriter writer = new BufferedWriter(new FileWriter(MODIFIED_AST_FILE_PATH));
         cu.setPackageDeclaration(MODIFIED_FILES_PACKAGE_NAME);
+        cu.addImport("com.google.common.collect.Sets");
         writer.write(cu.toString());
         writer.close();
     }
