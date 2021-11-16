@@ -15,12 +15,13 @@ public class VariableLogger {
 
     private static final String FILE_PATH = "out/output.json";
     // uniqueId -> LineInfo for a line that causes variable mutation
-    private static Map<Integer, LineInfo> lineInfoMap = new HashMap<>() {{
-		put(0, new LineInfo("x", "nickname_for_arr", "int[]",41, "int[] x = ", "SimpleTest", "public Double calc()", 0));
-		put(3, new LineInfo("x", "nickname_for_arr", "null",44, "x[1] = 101;", "SimpleTest", "public Double calc()", 3));
-		put(1, new LineInfo("y", "nickname_for_arr_copy", "int[]",42, "int[] y = x;", "SimpleTest", "public Double calc()", 1));
-		put(2, new LineInfo("y", "nickname_for_arr_copy", "null",43, "y[0] = 100;", "SimpleTest", "public Double calc()", 2));
-		put(4, new LineInfo("y", "nickname_for_arr_copy", "null",46, "y = z;", "SimpleTest", "public Double calc()", 4));
+    public static Map<Integer, LineInfo> lineInfoMap = new HashMap<>() {{
+		put(0, new LineInfo("x", "x", "int[]",19, "int[] x = ", "SimpleTest", "public Double calc()", 0));
+		put(1, new LineInfo("x", "x", "null",19, "int[] x = ", "SimpleTest", "public Double calc()", 1));
+		put(6, new LineInfo("x", "x", "null",22, "x[1] = 300;", "SimpleTest", "public Double calc()", 6));
+		put(2, new LineInfo("y", "y", "int[]",20, "int[] y = x;", "SimpleTest", "public Double calc()", 2));
+		put(3, new LineInfo("y", "y", "null",20, "int[] y = x;", "SimpleTest", "public Double calc()", 3));
+		put(4, new LineInfo("y", "y", "null",21, "y[0] = 200;", "SimpleTest", "public Double calc()", 4));
     }};
     // variable name -> Output object containing all info tracked about variable
     private static Map<String, Output> outputMap = new HashMap<>();

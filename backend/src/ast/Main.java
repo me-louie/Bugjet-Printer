@@ -37,6 +37,7 @@ public class Main {
         variableHistoryModifier.visit(cu, lineInfoMap);
         // this is super hacky, in order to get the alias info to the visit methods the first item in the list is a
         // LineInfo with only the name and alias. Since it's not a real LineInfo we delete it here. I'll fix this at a later date
+        System.out.println(lineInfoMap);
         lineInfoMap.values().forEach(statementList -> statementList.remove(0));
         // add a call to VariableLogger.writeOutputToDisk() to write output after execution is complete
         try {
@@ -72,7 +73,7 @@ public class Main {
     private static void writeModifiedProgram(CompilationUnit cu) throws IOException {
         BufferedWriter writer = new BufferedWriter(new FileWriter(MODIFIED_AST_FILE_PATH));
         cu.setPackageDeclaration(MODIFIED_FILES_PACKAGE_NAME);
-        cu.addImport("com.google.common.collect.Sets");
+        cu.addImport("java.util.HashSet");
         writer.write(cu.toString());
         writer.close();
     }
@@ -89,7 +90,7 @@ public class Main {
                 line = "package " + MODIFIED_FILES_PACKAGE_NAME + ";";
             }
             variableLoggerString.append(line).append("\n");
-            if (line.contains("private static Map<Integer, LineInfo> lineInfoMap = new HashMap<>() {{")) {
+            if (line.contains("public static Map<Integer, LineInfo> lineInfoMap = new HashMap<>() {{")) {
                 // take lineInfoMap from above and stick it into lineInfoMap in VariableLogger
                 variableLoggerString.append(populateLineInfoMap(lineInfoMap));
             }

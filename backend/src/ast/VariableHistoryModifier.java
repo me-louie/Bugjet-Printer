@@ -1,6 +1,5 @@
 package ast;
 
-import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
@@ -10,6 +9,7 @@ import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.ast.visitor.ModifierVisitor;
+import util.StatementCreator;
 
 import java.util.List;
 import java.util.Map;
@@ -34,7 +34,7 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<String, List<Li
                 Statement nodeContainingEntireStatement = (Statement) vd.getParentNode().get().getParentNode().get();
 
                 trackVar(name, value, type, nodeContainingEntireStatement, vd, lineInfo);
-                trackVarReference(name, nodeContainingEntireStatement, vd);
+                trackVarReference(name, nodeContainingEntireStatement, vd, lineInfo);
             }
         }
         return vde;
@@ -56,7 +56,6 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<String, List<Li
                 ((ArrayAccessExpr) ae.getTarget()).getName().toString() :
                 ae.getTarget().toString());
 
-        // Tracking the variable, e.g. @Track(var=x, alias=x) int[] x = y
         if (lineInfo.containsKey(name)) {
             // write down anything about this line that we might want to know
             String value = name;
@@ -64,15 +63,34 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<String, List<Li
             trackVar(name, value, null /* type info isn't contained in assign expr*/, nodeContainingEntireStatement, ae,
                     lineInfo);
 
-            Statement s = createVarToRefMapChecks(name);
-            addLoggingStatement(nodeContainingEntireStatement, ae, s);
+//            String alias = lineInfo.get(name).get(0).getAlias();
+//            Integer lineNum = ae.getBegin().isPresent() ? ae.getBegin().get().line : null;
+//            String enclosingClass = ae.findAncestor(ClassOrInterfaceDeclaration.class).isPresent() ?
+//                    ae.findAncestor(ClassOrInterfaceDeclaration.class).get().getNameAsString() :
+//                    null;
+//            String enclosingMethod = ae.findAncestor(MethodDeclaration.class).isPresent() ?
+//                    ae.findAncestor(MethodDeclaration.class).get().getDeclarationAsString(true, true, true) :
+//                    null;
+//
 
-            Statement s1 = createRefToVarMapChecks(name);
-            addLoggingStatement(nodeContainingEntireStatement, ae, s1);
+            int uniqueNum = UniqueNumberGenerator.generate();
+//            LineInfo li = new LineInfo(name, alias, null, lineNum, nodeContainingEntireStatement.toString(), enclosingClass,
+//                    enclosingMethod, uniqueNum);
+
+            Statement refToVarMapChecks = StatementCreator.createRefToVarMapChecks(name, uniqueNum);
+            addLoggingStatement(nodeContainingEntireStatement, ae, refToVarMapChecks);
+
+            Statement lineInfoPut = StatementCreator.lineInfoMapPut(name, uniqueNum);
+            addLoggingStatement(nodeContainingEntireStatement, ae, lineInfoPut);
+
+            Statement varToRefMapChecks = StatementCreator.createVarToRefMapChecks(name);
+            addLoggingStatement(nodeContainingEntireStatement, ae, varToRefMapChecks);
         }
 
         return ae;
     }
+
+
 
     @Override
     public UnaryExpr visit(UnaryExpr ue, Map<String, List<LineInfo>> lineInfo) {
@@ -104,16 +122,32 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<String, List<Li
         lineInfo.get(name).add(new LineInfo(name, alias, type, lineNum, nodeContainingEntireStatement.toString(),
                 enclosingClass, enclosingMethod, uniqueIdentifier));
         // add logging statement below this line
-        Statement loggingStatement = createVariableLoggerStatement(name, value, uniqueIdentifier);
-        addLoggingStatement(nodeContainingEntireStatement, node, loggingStatement);
+        Statement variableLoggerLog = StatementCreator.logVariable(name, value, uniqueIdentifier);
+        addLoggingStatement(nodeContainingEntireStatement, node, variableLoggerLog);
     }
 
-    private void trackVarReference(String name, Statement nodeContainingEntireStatement, Node node) {
-        Statement varRefLoggerStmt = createVariableRefLoggerStatement(name);
-        addLoggingStatement(nodeContainingEntireStatement, node, varRefLoggerStmt);
+    private void trackVarReference(String name, Statement nodeContainingEntireStatement, Node node, Map<String,
+            List<LineInfo>> lineInfo) {
+        String alias = lineInfo.get(name).get(0).getAlias();
+        Integer lineNum = node.getBegin().isPresent() ? node.getBegin().get().line : null;
+        String enclosingClass = node.findAncestor(ClassOrInterfaceDeclaration.class).isPresent() ?
+                node.findAncestor(ClassOrInterfaceDeclaration.class).get().getNameAsString() :
+                null;
+        String enclosingMethod = node.findAncestor(MethodDeclaration.class).isPresent() ?
+                node.findAncestor(MethodDeclaration.class).get().getDeclarationAsString(true, true, true) :
+                null;
+        int uniqueIdentifier = UniqueNumberGenerator.generate();
+        lineInfo.get(name).add(new LineInfo(name, alias, null, lineNum, nodeContainingEntireStatement.toString(),
+                enclosingClass, enclosingMethod, uniqueIdentifier));
 
-        Statement referenceStmt = createReferenceMapPutStatement(name);
-        addLoggingStatement(nodeContainingEntireStatement, node, referenceStmt);
+        Statement varToRefPut = StatementCreator.putVarInVarToRefMap(name);
+        addLoggingStatement(nodeContainingEntireStatement, node, varToRefPut);
+
+        Statement addVarToRefToVarMap = StatementCreator.addVarToRefToVarMap(name);
+        addLoggingStatement(nodeContainingEntireStatement, node, addVarToRefToVarMap);
+
+        Statement putSetToRefToVar = StatementCreator.putSetToRefToVarMap(name);
+        addLoggingStatement(nodeContainingEntireStatement, node, putSetToRefToVar);
     }
 
     private void addLoggingStatement(Statement anchorStatement, Node node, Statement loggingStatement) {
@@ -137,60 +171,4 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<String, List<Li
         }
     }
 
-    private Statement createVariableLoggerStatement(String name, String value, int uniqueIdentifier) {
-        if (value == null) {
-            value = "\"uninitialized\"";
-        }
-        return StaticJavaParser.parseStatement("VariableLogger.log(\""
-                + name + "\", "
-                + value + ", "
-                + uniqueIdentifier + ");");
-    }
-
-    private Statement createVariableRefLoggerStatement(String obj) {
-        return StaticJavaParser.parseStatement("VariableReferenceLogger.varToRefMap.put("
-                + obj + ", "
-                + obj + ".toString());");
-    }
-
-    private Statement createReferenceMapPutStatement(String obj) {
-        return StaticJavaParser.parseStatement("VariableReferenceLogger.refToVarMap.put("
-                + obj + ".toString(), "
-                + "Sets.newHashSet(\"" + obj + "\"));");
-    }
-
-    private Statement createVarToRefMapChecks(String obj) {
-        Statement ifStmt = new IfStmt(
-                new BinaryExpr(StaticJavaParser.parseExpression("VariableReferenceLogger.varToRefMap.containsKey(" + obj + ")"),
-                        StaticJavaParser.parseExpression("!" + obj + ".toString().equals(VariableReferenceLogger" +
-                                ".varToRefMap.get(" + obj + "))"),
-                        BinaryExpr.Operator.AND),
-                StaticJavaParser.parseStatement(
-                        "System.out" +
-                                ".println" +
-                                "();"), StaticJavaParser.parseStatement("System.out" +
-                ".println" +
-                "();"));
-        return ifStmt;
-    }
-
-    private Statement createForLoopLogging(String obj, int uniqueIdentifier) {
-        Statement forLoop = new ForEachStmt(StaticJavaParser.parseVariableDeclarationExpr("String var"),
-                StaticJavaParser.parseExpression("VariableReferenceLogger.refToVarMap.get(" + obj + ".toString())"),
-                StaticJavaParser.parseStatement("VariableLogger.log(var, var,"
-                        + uniqueIdentifier + ");"));
-        return forLoop;
-    }
-
-    private Statement createRefToVarMapChecks(String obj) {
-        Statement forLoop = createForLoopLogging(obj, 1);
-        Statement ifStmt = new IfStmt(
-                StaticJavaParser.parseExpression("VariableReferenceLogger.refToVarMap.containsKey(" + obj +
-                        ".toString())"), forLoop, StaticJavaParser.parseStatement(
-                "System.out" +
-                        ".println" +
-                        "();"));
-
-        return ifStmt;
-    }
 }

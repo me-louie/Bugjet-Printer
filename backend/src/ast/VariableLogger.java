@@ -15,7 +15,7 @@ public class VariableLogger {
 
     private static final String FILE_PATH = "out/output.json";
     // uniqueId -> LineInfo for a line that causes variable mutation
-    private static Map<Integer, LineInfo> lineInfoMap = new HashMap<>() {{
+    public static Map<Integer, LineInfo> lineInfoMap = new HashMap<>() {{
     }};
     // variable name -> Output object containing all info tracked about variable
     private static Map<String, Output> outputMap = new HashMap<>();
