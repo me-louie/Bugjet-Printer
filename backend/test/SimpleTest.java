@@ -12,7 +12,7 @@ public class SimpleTest {
     }
 
     @Track(var="x", nickname ="x")
-    @Track(var = "y", nickname = "y")
+//    @Track(var = "y", nickname = "y")
     public Double calc() {
         double a = -1;
 

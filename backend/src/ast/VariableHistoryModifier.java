@@ -1,5 +1,6 @@
 package ast;
 
+import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
@@ -20,21 +21,29 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<String, List<Li
     public VariableDeclarationExpr visit(VariableDeclarationExpr vde, Map<String, List<LineInfo>> lineInfo) {
         super.visit(vde, lineInfo);
         for (VariableDeclarator vd : vde.getVariables()) {
+            Statement nodeContainingEntireStatement = (Statement) vd.getParentNode().get().getParentNode().get();
+            String name = vd.getNameAsString();
+            String value;
+            // If initializing arr with an expression, e.g. int[] m = {1, 2, 3} the logging var is the var name (m)
+            if (vd.getInitializer().isPresent() && vd.getInitializer().get() instanceof ArrayInitializerExpr) {
+                value = name;
+            } else {
+                // The logging value is the initializer value or null if variable was not initialized
+                value = (vd.getInitializer().isPresent()) ? vd.getInitializer().get().toString() : null;
+            }
             if (lineInfo.containsKey(vd.getNameAsString())) {
-                String name = vd.getNameAsString();
-                String value;
-                // If initializing arr with an expression, e.g. int[] m = {1, 2, 3} the logging var is the var name (m)
-                if (vd.getInitializer().isPresent() && vd.getInitializer().get() instanceof ArrayInitializerExpr) {
-                    value = name;
-                } else {
-                    // The logging value is the initializer value or null if variable was not initialized
-                    value = (vd.getInitializer().isPresent()) ? vd.getInitializer().get().toString() : null;
-                }
                 String type = vd.getType().toString();
-                Statement nodeContainingEntireStatement = (Statement) vd.getParentNode().get().getParentNode().get();
+//                Statement nodeContainingEntireStatement = (Statement) vd.getParentNode().get().getParentNode().get();
 
                 trackVar(name, value, type, nodeContainingEntireStatement, vd, lineInfo);
                 trackVarReference(name, nodeContainingEntireStatement, vd, lineInfo);
+            } else if (lineInfo.containsKey(vd.getInitializer().get().toString())) {
+                // if value being assigned is tracked
+                Statement addToRefToVarMap = StatementCreator.createRefToVarMapAdd(name, value);
+                addLoggingStatement(nodeContainingEntireStatement, vd, addToRefToVarMap);
+
+                Statement addToVarToRefMap = StatementCreator.createVarToRefMapPut(name);
+                addLoggingStatement(nodeContainingEntireStatement, vd, addToVarToRefMap);
             }
         }
         return vde;
@@ -55,11 +64,13 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<String, List<Li
         String name = (ae.getTarget() instanceof ArrayAccessExpr ?
                 ((ArrayAccessExpr) ae.getTarget()).getName().toString() :
                 ae.getTarget().toString());
+        String value = ae.getValue().toString();
+        Statement nodeContainingEntireStatement = (Statement) ae.getParentNode().get();
 
         if (lineInfo.containsKey(name)) {
             // write down anything about this line that we might want to know
-            String value = name;
-            Statement nodeContainingEntireStatement = (Statement) ae.getParentNode().get();
+//            String value = name;
+//            Statement nodeContainingEntireStatement = (Statement) ae.getParentNode().get();
             String alias = lineInfo.get(name).get(0).getAlias();
             Integer lineNum = ae.getBegin().isPresent() ? ae.getBegin().get().line : null;
             String enclosingClass = ae.findAncestor(ClassOrInterfaceDeclaration.class).isPresent() ?

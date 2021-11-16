@@ -67,6 +67,16 @@ public final class StatementCreator {
 
     }
 
+    public static Statement createVarToRefMapPut(String name) {
+        return StaticJavaParser.parseStatement("VariableReferenceLogger.varToRefMap.put" +
+                "(" + name + ", " + name + ".toString());");
+    }
+
+    public static Statement createRefToVarMapAdd(String name, String value) {
+        return StaticJavaParser.parseStatement(
+                "VariableReferenceLogger.refToVarMap.get(" + value + ".toString()).add(\"" + name + "\");");
+    }
+
     // TODO: figure out how to actually generate an empty else blk
     private static Statement emptyElse() {
         return new EmptyStmt();
