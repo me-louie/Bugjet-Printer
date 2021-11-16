@@ -60,27 +60,27 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<String, List<Li
             // write down anything about this line that we might want to know
             String value = name;
             Statement nodeContainingEntireStatement = (Statement) ae.getParentNode().get();
-            trackVar(name, value, null /* type info isn't contained in assign expr*/, nodeContainingEntireStatement, ae,
-                    lineInfo);
+//            trackVar(name, value, null /* type info isn't contained in assign expr*/, nodeContainingEntireStatement, ae,
+//                    lineInfo);
 
-//            String alias = lineInfo.get(name).get(0).getAlias();
-//            Integer lineNum = ae.getBegin().isPresent() ? ae.getBegin().get().line : null;
-//            String enclosingClass = ae.findAncestor(ClassOrInterfaceDeclaration.class).isPresent() ?
-//                    ae.findAncestor(ClassOrInterfaceDeclaration.class).get().getNameAsString() :
-//                    null;
-//            String enclosingMethod = ae.findAncestor(MethodDeclaration.class).isPresent() ?
-//                    ae.findAncestor(MethodDeclaration.class).get().getDeclarationAsString(true, true, true) :
-//                    null;
+            String alias = lineInfo.get(name).get(0).getAlias();
+            Integer lineNum = ae.getBegin().isPresent() ? ae.getBegin().get().line : null;
+            String enclosingClass = ae.findAncestor(ClassOrInterfaceDeclaration.class).isPresent() ?
+                    ae.findAncestor(ClassOrInterfaceDeclaration.class).get().getNameAsString() :
+                    null;
+            String enclosingMethod = ae.findAncestor(MethodDeclaration.class).isPresent() ?
+                    ae.findAncestor(MethodDeclaration.class).get().getDeclarationAsString(true, true, true) :
+                    null;
 //
 
             int uniqueNum = UniqueNumberGenerator.generate();
-//            LineInfo li = new LineInfo(name, alias, null, lineNum, nodeContainingEntireStatement.toString(), enclosingClass,
-//                    enclosingMethod, uniqueNum);
+            LineInfo li = new LineInfo(name, alias, null, lineNum, nodeContainingEntireStatement.toString(), enclosingClass,
+                    enclosingMethod, uniqueNum);
 
             Statement refToVarMapChecks = StatementCreator.createRefToVarMapChecks(name, uniqueNum);
             addLoggingStatement(nodeContainingEntireStatement, ae, refToVarMapChecks);
 
-            Statement lineInfoPut = StatementCreator.lineInfoMapPut(name, uniqueNum);
+            Statement lineInfoPut = StatementCreator.lineInfoMapPut(li);
             addLoggingStatement(nodeContainingEntireStatement, ae, lineInfoPut);
 
             Statement varToRefMapChecks = StatementCreator.createVarToRefMapChecks(name);

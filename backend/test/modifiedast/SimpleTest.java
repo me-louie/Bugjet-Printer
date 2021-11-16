@@ -41,23 +41,21 @@ public class SimpleTest {
             System.out.println("todo update references in both maps");
         else
             ;
-        VariableLogger.lineInfoMap.put(5, new LineInfo(y.toString(), "TODO", "TODO", 0, "TODO", "TODO", "TODO", 5));
+        VariableLogger.lineInfoMap.put(4, new LineInfo("y", "y", "null", 21, "y[0] = 200;", "SimpleTest", "public Double calc()", 4));
         if (VariableReferenceLogger.refToVarMap.containsKey(y.toString()))
-            for (String var : VariableReferenceLogger.refToVarMap.get(y.toString())) VariableLogger.log(var, y, 5);
+            for (String var : VariableReferenceLogger.refToVarMap.get(y.toString())) VariableLogger.log(var, y, 4);
         else
             ;
-        VariableLogger.log("y", y, 4);
         x[1] = 300;
         if (!x.toString().equals(VariableReferenceLogger.varToRefMap.get(x)))
             System.out.println("todo update references in both maps");
         else
             ;
-        VariableLogger.lineInfoMap.put(7, new LineInfo(x.toString(), "TODO", "TODO", 0, "TODO", "TODO", "TODO", 7));
+        VariableLogger.lineInfoMap.put(5, new LineInfo("x", "x", "null", 22, "x[1] = 300;", "SimpleTest", "public Double calc()", 5));
         if (VariableReferenceLogger.refToVarMap.containsKey(x.toString()))
-            for (String var : VariableReferenceLogger.refToVarMap.get(x.toString())) VariableLogger.log(var, x, 7);
+            for (String var : VariableReferenceLogger.refToVarMap.get(x.toString())) VariableLogger.log(var, x, 5);
         else
             ;
-        VariableLogger.log("x", x, 6);
         return a;
     }
 }

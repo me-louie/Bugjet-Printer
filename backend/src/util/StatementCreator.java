@@ -1,5 +1,6 @@
 package util;
 
+import ast.LineInfo;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.stmt.EmptyStmt;
 import com.github.javaparser.ast.stmt.ForEachStmt;
@@ -65,32 +66,18 @@ public final class StatementCreator {
 
     }
 
-    public static Statement lineInfoMapPut(String name, int uniqueIdentifier) {
+    public static Statement lineInfoMapPut(LineInfo lineInfo) {
         return StaticJavaParser.parseStatement("VariableLogger.lineInfoMap.put("
-                + uniqueIdentifier + ", new LineInfo("
-                + name + ".toString(), "
-                + "\"TODO\", "
-                + "\"TODO\", "
-                + 000 + ", "
-                + "\"TODO\", "
-                + "\"TODO\", "
-                + "\"TODO\", "
-                + uniqueIdentifier + "));");
+                + lineInfo.getUniqueIdentifier() + ", new LineInfo(\""
+                + lineInfo.getName() + "\", \""
+                + lineInfo.getAlias() + "\", \""
+                + lineInfo.getType() +  "\", "
+                + lineInfo.getLineNum() + ", \""
+                + lineInfo.getStatement() + "\", \""
+                + lineInfo.getEnclosingClass() + "\", \""
+                + lineInfo.getEnclosingMethod() + "\", "
+                + lineInfo.getUniqueIdentifier() + "));");
     }
-
-    // TODO: fix parsing errors so the below works
-//    public static Statement lineInfoMapPut(LineInfo lineInfo) {
-//        return StaticJavaParser.parseStatement("VariableLogger.lineInfoMap.put("
-//                + lineInfo.getUniqueIdentifier() + ", new LineInfo("
-//                + lineInfo.getName() + ", "
-//                + lineInfo.getAlias() +  ", "
-//                + lineInfo.getType() + ", "
-//                + lineInfo.getLineNum() + ", "
-//                + lineInfo.getStatement() + ", "
-//                + lineInfo.getEnclosingClass() + ", "
-//                + lineInfo.getEnclosingMethod() +  ", "
-//                + lineInfo.getUniqueIdentifier() + "));");
-//    }
 
     // TODO: figure out how to actually generate an empty else blk
     private static Statement emptyElse() {
