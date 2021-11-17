@@ -1,6 +1,5 @@
 package ast;
 
-import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
@@ -31,18 +30,17 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<String, List<Li
                 // The logging value is the initializer value or null if variable was not initialized
                 value = (vd.getInitializer().isPresent()) ? vd.getInitializer().get().toString() : null;
             }
+            // The declared variable is tracked
             if (lineInfo.containsKey(vd.getNameAsString())) {
                 String type = vd.getType().toString();
-//                Statement nodeContainingEntireStatement = (Statement) vd.getParentNode().get().getParentNode().get();
-
                 trackVar(name, value, type, nodeContainingEntireStatement, vd, lineInfo);
                 trackVarReference(name, nodeContainingEntireStatement, vd, lineInfo);
             } else if (lineInfo.containsKey(vd.getInitializer().get().toString())) {
-                // if value being assigned is tracked
+                // The value that is being assigned to the declared variable is tracked
                 Statement addToRefToVarMap = StatementCreator.createRefToVarMapAdd(name, value);
                 addLoggingStatement(nodeContainingEntireStatement, vd, addToRefToVarMap);
 
-                Statement addToVarToRefMap = StatementCreator.createVarToRefMapPut(name);
+                Statement addToVarToRefMap = StatementCreator.varToRefMapPut(name);
                 addLoggingStatement(nodeContainingEntireStatement, vd, addToVarToRefMap);
             }
         }
@@ -66,20 +64,18 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<String, List<Li
                 ae.getTarget().toString());
         String value = ae.getValue().toString();
         Statement nodeContainingEntireStatement = (Statement) ae.getParentNode().get();
+        Integer lineNum = ae.getBegin().isPresent() ? ae.getBegin().get().line : null;
+        String enclosingClass = ae.findAncestor(ClassOrInterfaceDeclaration.class).isPresent() ?
+                ae.findAncestor(ClassOrInterfaceDeclaration.class).get().getNameAsString() :
+                null;
+        String enclosingMethod = ae.findAncestor(MethodDeclaration.class).isPresent() ?
+                ae.findAncestor(MethodDeclaration.class).get().getDeclarationAsString(true, true, true) :
+                null;
 
+        // Assignment to a variable which is tracked
         if (lineInfo.containsKey(name)) {
             // write down anything about this line that we might want to know
-//            String value = name;
-//            Statement nodeContainingEntireStatement = (Statement) ae.getParentNode().get();
             String alias = lineInfo.get(name).get(0).getAlias();
-            Integer lineNum = ae.getBegin().isPresent() ? ae.getBegin().get().line : null;
-            String enclosingClass = ae.findAncestor(ClassOrInterfaceDeclaration.class).isPresent() ?
-                    ae.findAncestor(ClassOrInterfaceDeclaration.class).get().getNameAsString() :
-                    null;
-            String enclosingMethod = ae.findAncestor(MethodDeclaration.class).isPresent() ?
-                    ae.findAncestor(MethodDeclaration.class).get().getDeclarationAsString(true, true, true) :
-                    null;
-
             int uniqueNum = UniqueNumberGenerator.generate();
             LineInfo li = new LineInfo(name, alias, null, lineNum, nodeContainingEntireStatement.toString(),
                     enclosingClass,
@@ -91,8 +87,17 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<String, List<Li
 
             Statement varToRefMapChecks = StatementCreator.createVarToRefMapChecks(name);
             addLoggingStatement(nodeContainingEntireStatement, ae, varToRefMapChecks);
+        } else {
+            // Assignment to a variable which is not explicitly tracked, but the variable may be pointing to an object
+            // which is tracked. Therefore, we need to add additional logging to determine whether we need to log
+            // changes to this variable as well.
+            int uniqueNum = UniqueNumberGenerator.generate();
+            // TODO: does name/alias matter here?
+            LineInfo li = new LineInfo("", "", null, lineNum, nodeContainingEntireStatement.toString(),
+                    enclosingClass, enclosingMethod, uniqueNum);
+            Statement s = StatementCreator.createReferencedVarLogging(name, li, uniqueNum);
+            addLoggingStatement(nodeContainingEntireStatement, ae, s);
         }
-
         return ae;
     }
 
@@ -145,13 +150,13 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<String, List<Li
         lineInfo.get(name).add(new LineInfo(name, alias, null, lineNum, nodeContainingEntireStatement.toString(),
                 enclosingClass, enclosingMethod, uniqueIdentifier));
 
-        Statement varToRefPut = StatementCreator.putVarInVarToRefMap(name);
+        Statement varToRefPut = StatementCreator.varToRefMapPut(name);
         addLoggingStatement(nodeContainingEntireStatement, node, varToRefPut);
 
-        Statement addVarToRefToVarMap = StatementCreator.addVarToRefToVarMap(name);
+        Statement addVarToRefToVarMap = StatementCreator.refToVarMapAdd(name);
         addLoggingStatement(nodeContainingEntireStatement, node, addVarToRefToVarMap);
 
-        Statement putSetToRefToVar = StatementCreator.putSetToRefToVarMap(name);
+        Statement putSetToRefToVar = StatementCreator.refToVarMapNewPut(name);
         addLoggingStatement(nodeContainingEntireStatement, node, putSetToRefToVar);
     }
 

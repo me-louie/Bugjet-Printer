@@ -1,7 +1,9 @@
 package util;
 
+import ast.LineInfo;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.NodeList;
+import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.stmt.*;
 
 public final class StatementCreator {
@@ -10,28 +12,17 @@ public final class StatementCreator {
         if (value == null) {
             value = "\"uninitialized\"";
         }
-        return StaticJavaParser.parseStatement("VariableLogger.log(\""
-                + name + "\", "
-                + value + ", "
-                + uniqueIdentifier + ");");
+        return log(name, value, uniqueIdentifier);
     }
 
-    public static Statement putVarInVarToRefMap(String var) {
-        return StaticJavaParser.parseStatement("VariableReferenceLogger.varToRefMap.put("
-                + var + ", "
-                + var + ".toString());");
-    }
-
-    public static Statement putSetToRefToVarMap(String var) {
+    public static Statement refToVarMapNewPut(String var) {
         return
-                new IfStmt(StaticJavaParser.parseExpression("!VariableReferenceLogger.refToVarMap.containsKey(" + var +
-                        ".toString())"),
-                        StaticJavaParser.parseStatement("VariableReferenceLogger.refToVarMap.put("
-                                + var + ".toString(), new HashSet<>());"),
+                new IfStmt(refToVarMapDoesNotContainKey(var),
+                        refToVarMapPutNewHashSet(var),
                         emptyElse());
     }
 
-    public static Statement addVarToRefToVarMap(String var) {
+    public static Statement refToVarMapAdd(String var) {
         return StaticJavaParser.parseStatement("VariableReferenceLogger.refToVarMap.get("
                 + var + ".toString()).add(\"" + var + "\");");
     }
@@ -47,29 +38,26 @@ public final class StatementCreator {
 
     }
 
-    public static Statement createForLoop(String var, int uniqueIdentifier) {
-        NodeList<Statement> stmts = new NodeList<>();
-        stmts.add(StaticJavaParser.parseStatement("VariableLogger.log(var,"
-                + var + ", "
-                + uniqueIdentifier + ");"));
+    public static Statement createForLoopLog(String value, String iterable, int uniqueIdentifier) {
+        NodeList<Statement> statements = new NodeList<>();
+        statements.add(logVar(value, uniqueIdentifier));
         return new ForEachStmt(StaticJavaParser.parseVariableDeclarationExpr("String var"),
-                "VariableReferenceLogger.refToVarMap.get(" + var + ".toString())",
-                new BlockStmt(stmts));
-
+                iterable,
+                new BlockStmt(statements));
     }
 
 
     public static Statement createRefToVarMapChecks(String var, int uniqueIdentifier) {
-        Statement forLoop = createForLoop(var, uniqueIdentifier);
+        String iterable = refToVarMapGetName(var);
+        Statement forLoop = createForLoopLog(var, iterable, uniqueIdentifier);
         return new IfStmt(
-                StaticJavaParser.parseExpression("VariableReferenceLogger.refToVarMap.containsKey(" + var +
-                        ".toString())"), forLoop, emptyElse());
+                refToVarMapContainsKeyString(var), forLoop, emptyElse());
 
     }
 
-    public static Statement createVarToRefMapPut(String name) {
+    public static Statement varToRefMapPut(String name) {
         return StaticJavaParser.parseStatement("VariableReferenceLogger.varToRefMap.put" +
-                "(" + name + ", " + name + ".toString());");
+                "(\"" + name + "\", " + name + ".toString());");
     }
 
     public static Statement createRefToVarMapAdd(String name, String value) {
@@ -77,8 +65,78 @@ public final class StatementCreator {
                 "VariableReferenceLogger.refToVarMap.get(" + value + ".toString()).add(\"" + name + "\");");
     }
 
-    // TODO: figure out how to actually generate an empty else blk
+    public static Statement lineInfoMapPut(LineInfo lineInfo) {
+        return StaticJavaParser.parseStatement("VariableLogger.lineInfoMap.put("
+                + lineInfo.getUniqueIdentifier() + ", new LineInfo(\""
+                + lineInfo.getName() + "\", \""
+                + lineInfo.getAlias() + "\", \""
+                + lineInfo.getType() + "\", "
+                + lineInfo.getLineNum() + ", \""
+                + lineInfo.getStatement() + "\", \""
+                + lineInfo.getEnclosingClass() + "\", \""
+                + lineInfo.getEnclosingMethod() + "\", "
+                + lineInfo.getUniqueIdentifier() + "));");
+    }
+
+    public static Statement createReferencedVarLogging(String name, LineInfo lineInfo, int uniqueIdentifier) {
+        NodeList<Statement> statements = new NodeList<>();
+
+        statements.add(getObjAddress(name));
+        statements.add(getReferencedVars());
+        statements.add(lineInfoMapPut(lineInfo));
+        statements.add(createForLoopLog(name, "referencedVars", uniqueIdentifier));
+
+        return new IfStmt(varToRefMapContainsKey(name), new BlockStmt(statements), emptyElse());
+
+    }
+
     private static Statement emptyElse() {
         return new EmptyStmt();
+    }
+
+    private static Statement log(String name, String value, int id) {
+        return StaticJavaParser.parseStatement("VariableLogger.log(\""
+                + name + "\", "
+                + value + ", "
+                + id + ");");
+    }
+
+    private static Statement logVar(String value, int id) {
+        return StaticJavaParser.parseStatement("VariableLogger.log(var,"
+                + value + ", "
+                + id + ");");
+    }
+
+    private static Statement getObjAddress(String name) {
+        return StaticJavaParser.parseStatement("String objAddress = VariableReferenceLogger.varToRefMap.get" +
+                "(\"" + name + "\");");
+    }
+
+    private static Statement getReferencedVars() {
+        return StaticJavaParser.parseStatement("Set<String> referencedVars = VariableReferenceLogger" +
+                ".refToVarMap.get(objAddress);");
+    }
+
+    private static Expression varToRefMapContainsKey(String name) {
+        return StaticJavaParser.parseExpression("VariableReferenceLogger.varToRefMap.containsKey(\"" + name + "\")");
+    }
+
+    private static Expression refToVarMapContainsKeyString(String name) {
+        return StaticJavaParser.parseExpression("VariableReferenceLogger.refToVarMap.containsKey(" + name +
+                ".toString())");
+    }
+
+    private static Expression refToVarMapDoesNotContainKey(String name) {
+        return StaticJavaParser.parseExpression("!VariableReferenceLogger.refToVarMap.containsKey(" + name +
+                ".toString())");
+    }
+
+    private static Statement refToVarMapPutNewHashSet(String name) {
+        return StaticJavaParser.parseStatement("VariableReferenceLogger.refToVarMap.put("
+                + name + ".toString(), new HashSet<>());");
+    }
+
+    private static String refToVarMapGetName(String name) {
+        return "VariableReferenceLogger.refToVarMap.get(" + name + ".toString())";
     }
 }

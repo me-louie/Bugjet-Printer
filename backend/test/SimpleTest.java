@@ -12,14 +12,16 @@ public class SimpleTest {
     }
 
     @Track(var="x", nickname ="x")
-//    @Track(var = "y", nickname = "y")
+    @Track(var = "y", nickname = "y")
     public Double calc() {
         double a = -1;
 
         int[] x = {1, 2, 3};
         int[] y = x;
+        int[] z = x;
         y[0] = 200;
         x[1] = 300;
+        z[2] = 400;
 //        y[0] = 100;
 //        x[1] = 101;
 //        int[] z = new int[3];

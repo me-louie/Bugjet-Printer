@@ -73,6 +73,7 @@ public class Main {
         BufferedWriter writer = new BufferedWriter(new FileWriter(MODIFIED_AST_FILE_PATH));
         cu.setPackageDeclaration(MODIFIED_FILES_PACKAGE_NAME);
         cu.addImport("java.util.HashSet");
+        cu.addImport("java.util.Set");
         writer.write(cu.toString());
         writer.close();
     }

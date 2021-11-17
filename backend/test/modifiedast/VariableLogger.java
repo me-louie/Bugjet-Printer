@@ -18,7 +18,10 @@ public class VariableLogger {
     public static Map<Integer, LineInfo> lineInfoMap = new HashMap<>() {{
 		put(0, new LineInfo("x", "x", "int[]",19, "int[] x = ", "SimpleTest", "public Double calc()", 0));
 		put(1, new LineInfo("x", "x", "null",19, "int[] x = ", "SimpleTest", "public Double calc()", 1));
-		put(2, new LineInfo("x", "x", "null",22, "x[1] = 300;", "SimpleTest", "public Double calc()", 2));
+		put(5, new LineInfo("x", "x", "null",23, "x[1] = 300;", "SimpleTest", "public Double calc()", 5));
+		put(2, new LineInfo("y", "y", "int[]",20, "int[] y = x;", "SimpleTest", "public Double calc()", 2));
+		put(3, new LineInfo("y", "y", "null",20, "int[] y = x;", "SimpleTest", "public Double calc()", 3));
+		put(4, new LineInfo("y", "y", "null",22, "y[0] = 200;", "SimpleTest", "public Double calc()", 4));
     }};
     // variable name -> Output object containing all info tracked about variable
     private static Map<String, Output> outputMap = new HashMap<>();
