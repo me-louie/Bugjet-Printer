@@ -8,6 +8,7 @@ import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.stmt.*;
+import com.github.javaparser.ast.type.ReferenceType;
 import com.github.javaparser.ast.visitor.ModifierVisitor;
 import util.StatementCreator;
 
@@ -34,7 +35,9 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<String, List<Li
             if (lineInfo.containsKey(vd.getNameAsString())) {
                 String type = vd.getType().toString();
                 trackVar(name, value, type, nodeContainingEntireStatement, vd, lineInfo);
-                trackVarReference(name, nodeContainingEntireStatement, vd, lineInfo);
+                if (vd.getType() instanceof ReferenceType) {
+                    trackVarReference(name, nodeContainingEntireStatement, vd, lineInfo);
+                }
             } else if (lineInfo.containsKey(vd.getInitializer().get().toString())) {
                 // The value that is being assigned to the declared variable is tracked
                 Statement addToRefToVarMap = StatementCreator.createRefToVarMapAdd(name, value);

@@ -14,6 +14,7 @@ public class SimpleTest {
     public static void main(String[] args) throws IOException {
         SimpleTest st = new SimpleTest();
         st.calc();
+        st.helloWorld();
         VariableLogger.writeOutputToDisk();
     }
 
@@ -66,12 +67,22 @@ public class SimpleTest {
         if (VariableReferenceLogger.varToRefMap.containsKey("z")) {
             String objAddress = VariableReferenceLogger.varToRefMap.get("z");
             Set<String> referencedVars = VariableReferenceLogger.refToVarMap.get(objAddress);
-            VariableLogger.lineInfoMap.put(6, new LineInfo("", "", "null", 24, "z[2] = 400;", "SimpleTest", "public Double calc()", 6));
+            VariableLogger.lineInfoMap.put(6, new LineInfo("", "", "null", 25, "z[2] = 400;", "SimpleTest", "public Double calc()", 6));
             for (String var : referencedVars) {
                 VariableLogger.log(var, z, 6);
             }
         } else
             ;
         return a;
+    }
+
+    @Track(var = "m", nickname = "m")
+    public void helloWorld() {
+        int m = 100;
+        VariableLogger.log("m", 100, 7);
+        for (int i = 0; i < 3; i++) {
+            m++;
+            VariableLogger.log("m", m, 8);
+        }
     }
 }

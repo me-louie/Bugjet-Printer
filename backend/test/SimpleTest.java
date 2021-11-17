@@ -9,6 +9,7 @@ public class SimpleTest {
     public static void main(String[] args) {
         SimpleTest st = new SimpleTest();
         st.calc();
+        st.helloWorld();
     }
 
     @Track(var="x", nickname ="x")
@@ -39,5 +40,13 @@ public class SimpleTest {
 //        m[0] = 10;
 //        m[1] = 11;
         return a;
+    }
+
+    @Track(var="m", nickname="m")
+    public void helloWorld() {
+        int m = 100;
+        for (int i = 0; i < 3; i++) {
+            m++;
+        }
     }
 }
