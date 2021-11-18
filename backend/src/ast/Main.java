@@ -12,9 +12,12 @@ import java.util.*;
 public class Main {
 
     private static final String INPUT_FILE_PATH = "backend/test/SimpleTest.java";
-    private static final String MODIFIED_AST_FILE_PATH = "backend/test/modifiedasts/SimpleTest.java";
     private static final String VARIABLE_LOGGER_FILE_PATH = "backend/src/ast/VariableLogger.java";
     private static final String LINE_INFO_FILE_PATH = "backend/src/ast/LineInfo.java";
+    private static final String MODIFIED_FILES_PACKAGE_NAME = "modifiedast";
+    private static final String MODIFIED_AST_FILE_PATH = "backend/test/modifiedast/SimpleTest.java";
+    private static final String MODIFIED_VARIABLE_LOGGER_FILE_PATH = "backend/test/modifiedast/VariableLogger.java";
+    private static final String MODIFIED_LINE_INFO_FILE_PATH = "backend/test/modifiedast/LineInfo.java";
 
     public static void main(String[] args) throws IOException {
         // get ast
@@ -37,39 +40,17 @@ public class Main {
         try {
             MethodDeclaration mainMethod = cu.findFirst(MethodDeclaration.class, methodDeclaration ->
                     methodDeclaration.getDeclarationAsString().contains("public static void main(String[] args)")).get();
+            IOException e = new IOException();
+            mainMethod.addThrownException(e.getClass());
             mainMethod.getBody().get().addStatement("VariableLogger.writeOutputToDisk();");
         } catch (NoSuchElementException e) {
             System.out.println("File does not contain a main method");
             // todo: we'll probably want to return this error to the frontend to display to user
             System.exit(1);
         }
-        // write modified ast back to file
-        BufferedWriter writer = new BufferedWriter(new FileWriter(MODIFIED_AST_FILE_PATH));
-        writer.write(cu.toString());
-        // append VariableLogger class to bottom of file
-        BufferedReader reader = new BufferedReader(new FileReader(VARIABLE_LOGGER_FILE_PATH));
-        String line;
-        StringBuilder variableLoggerString = new StringBuilder();
-        while ((line = reader.readLine()) != null) {
-            variableLoggerString.append(line).append("\n");
-            if (line.contains("private static Map<Integer, LineInfo> lineInfoMap = new HashMap<>() {{")) {
-                // take lineInfoMap from above and stick it into lineInfoMap in VariableLogger
-                variableLoggerString.append(populateLineInfoMap(lineInfoMap));
-            }
-        }
-        writer.write(variableLoggerString.toString());
-        // VariableLogger uses LineInfo, write that as well
-        reader = new BufferedReader(new FileReader(LINE_INFO_FILE_PATH));
-        StringBuilder lineInfoString = new StringBuilder();
-        while ((line = reader.readLine()) != null) {
-            lineInfoString.append(line).append("\n");
-        }
-        writer.write(lineInfoString.toString());
-        writer.close();
-        // todo: run modified code, which will write output to out/output.json
-        //       we need to ensure that
-        //          1. the classes that will call VariableLogger.log() will be able to see the declaration
-        //          2. VariableLogger will be able to see its own dependencies (concerned about the Gson dependency)
+        writeModifiedProgram(cu);
+        writeModifiedVariableLogger(lineInfoMap);
+        writeModifiedLineInfo();
         // todo: send output.json to frontend
     }
 
@@ -77,12 +58,47 @@ public class Main {
         StringBuilder putStatements = new StringBuilder();
         for (List<LineInfo> lineInfos : lineInfoMap.values()) {
             for (LineInfo lineInfo : lineInfos) {
-                putStatements.append("\t\tput(" + lineInfo.getUniqueIdentifier() + ", new LineInfo(\""
-                        + lineInfo.getName() + "\", \"" + lineInfo.getAlias() + "\", \"" + lineInfo.getType() + "\", \""
-                        + lineInfo.getLineNum() + "\", \"" + lineInfo.getStatement() + "\", \"" + lineInfo.getEnclosingClass()
-                        + "\", \"" + lineInfo.getEnclosingMethod() + "\", \"" + lineInfo.getUniqueIdentifier() + "\");" + "\n");
+                putStatements.append(util.Formatter.generatePutStatement(lineInfo.getUniqueIdentifier(),
+                        lineInfo.getName(), lineInfo.getAlias(), lineInfo.getType(), lineInfo.getLineNum(),
+                        lineInfo.getStatement(), lineInfo.getEnclosingClass(), lineInfo.getEnclosingMethod() ));
             }
         }
         return putStatements.toString();
+    }
+
+    private static void writeModifiedProgram(CompilationUnit cu) throws IOException {
+        BufferedWriter writer = new BufferedWriter(new FileWriter(MODIFIED_AST_FILE_PATH));
+        cu.setPackageDeclaration(MODIFIED_FILES_PACKAGE_NAME);
+        writer.write(cu.toString());
+        writer.close();
+    }
+
+    private static void writeModifiedVariableLogger(Map<String, List<LineInfo>> lineInfoMap) throws IOException {
+        BufferedWriter writer = new BufferedWriter(new FileWriter(MODIFIED_VARIABLE_LOGGER_FILE_PATH));
+        BufferedReader reader = new BufferedReader(new FileReader(VARIABLE_LOGGER_FILE_PATH));
+        String line;
+        StringBuilder variableLoggerString = new StringBuilder();
+
+        while ((line = reader.readLine()) != null) {
+            // TODO: fix this hacky way to chance the package name
+            if (line.contains("package ast")){
+                line = "package " + MODIFIED_FILES_PACKAGE_NAME + ";";
+            }
+            variableLoggerString.append(line).append("\n");
+            if (line.contains("private static Map<Integer, LineInfo> lineInfoMap = new HashMap<>() {{")) {
+                // take lineInfoMap from above and stick it into lineInfoMap in VariableLogger
+                variableLoggerString.append(populateLineInfoMap(lineInfoMap));
+            }
+        }
+        writer.write(variableLoggerString.toString());
+        writer.close();
+    }
+
+    private static void writeModifiedLineInfo() throws IOException {
+        BufferedWriter writer = new BufferedWriter(new FileWriter(MODIFIED_LINE_INFO_FILE_PATH));
+        CompilationUnit lineInfoCU = StaticJavaParser.parse(new File(LINE_INFO_FILE_PATH));
+        lineInfoCU.setPackageDeclaration(MODIFIED_FILES_PACKAGE_NAME);
+        writer.write(lineInfoCU.toString());
+        writer.close();
     }
 }

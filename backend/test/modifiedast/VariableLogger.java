@@ -1,4 +1,4 @@
-package ast;
+package modifiedast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -13,6 +13,18 @@ public class VariableLogger {
     private static final String FILE_PATH = "out/output.json";
     // uniqueId -> LineInfo for a line that causes variable mutation
     private static Map<Integer, LineInfo> lineInfoMap = new HashMap<>() {{
+		put(0, new LineInfo("a", "alias_for_a", "double",18, "double a;", "SimpleTest", "public Double calc()", 0));
+		put(2, new LineInfo("a", "alias_for_a", "null",20, "a = 5;", "SimpleTest", "public Double calc()", 2));
+		put(6, new LineInfo("a", "alias_for_a", "null",28, "a++;", "SimpleTest", "public Double calc()", 6));
+		put(8, new LineInfo("a", "alias_for_a", "null",33, "a = b + 1;", "SimpleTest", "public Double calc()", 8));
+		put(1, new LineInfo("b", "alias_for_b", "double",19, "double b;", "SimpleTest", "public Double calc()", 1));
+		put(3, new LineInfo("b", "alias_for_b", "null",21, "b = 6;", "SimpleTest", "public Double calc()", 3));
+		put(4, new LineInfo("b", "alias_for_b", "null",25, "b--;", "SimpleTest", "public Double calc()", 4));
+		put(5, new LineInfo("b", "alias_for_b", "null",23, "b++;", "SimpleTest", "public Double calc()", 5));
+		put(7, new LineInfo("b", "alias_for_b", "null",29, "b *= b / a;", "SimpleTest", "public Double calc()", 7));
+		put(9, new LineInfo("i", "alias_for_i", "null",34, "i += 2;", "SimpleTest", "public Double calc()", 9));
+		put(10, new LineInfo("i", "alias_for_i", "int",32, "for (int i = 0; i < 10; i++) ", "SimpleTest", "public Double calc()", 10));
+		put(11, new LineInfo("i", "alias_for_i", "null",32, "for (int i = 0; i < 10; i++) ", "SimpleTest", "public Double calc()", 11));
     }};
     // variable name -> Output object containing all info tracked about variable
     private static Map<String, Output> outputMap = new HashMap<>();
