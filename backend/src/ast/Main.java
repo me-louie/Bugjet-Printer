@@ -93,7 +93,7 @@ public class Main {
 
         while ((line = reader.readLine()) != null) {
             // TODO: fix this hacky way to change the package name
-            if (line.contains("package ast")){
+            if (line.contains("package ast")) {
                 line = "package " + MODIFIED_FILES_PACKAGE_NAME + ";";
             }
             variableLoggerString.append(line).append("\n");
