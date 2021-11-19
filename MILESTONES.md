@@ -17,7 +17,7 @@ Now that we have implemented the variable tracking, we can get feedback on the f
     * Add support so that locally defined variables we track are restricted to the scope of that method (deals with the case where 2 methods have the same locally declared variable)
     * Add support so that global variables we track can be distinguished from local variables (deals with the case where a local variable in class A has the same name as a global variable in class B
     * If we do the above this only leaves the case where 2 classes each have a global variable with the same name
-*Possible support tracking method arguments. (Currently our implementation assumes that we'll see a variable get declared)  
+* Possibly support tracking method arguments. (Currently our implementation assumes that we'll see a variable get declared)  
 
 **FrontEnd TODOs:**  
 * Add the backend and frontend connection.
