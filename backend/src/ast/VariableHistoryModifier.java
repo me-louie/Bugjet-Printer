@@ -8,44 +8,36 @@ import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.stmt.*;
-import com.github.javaparser.ast.type.ReferenceType;
 import com.github.javaparser.ast.visitor.ModifierVisitor;
 import util.StatementCreator;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public class VariableHistoryModifier extends ModifierVisitor<Map<String, List<LineInfo>>> {
 
     @Override
-    public VariableDeclarationExpr visit(VariableDeclarationExpr vde, Map<String, List<LineInfo>> lineInfo) {
-        super.visit(vde, lineInfo);
+    public VariableDeclarationExpr visit(VariableDeclarationExpr vde, Map<String, List<LineInfo>> lineInfoMap) {
+        super.visit(vde, lineInfoMap);
         for (VariableDeclarator vd : vde.getVariables()) {
-            Statement nodeContainingEntireStatement = (Statement) vd.getParentNode().get().getParentNode().get();
             String name = vd.getNameAsString();
-            String value;
-            // If initializing arr with an expression, e.g. int[] m = {1, 2, 3} the logging var is the var name (m)
-            if (vd.getInitializer().isPresent() && vd.getInitializer().get() instanceof ArrayInitializerExpr) {
-                value = name;
+            if (!isTrackedVariable(name, lineInfoMap)) {
+                continue;
+            }
+            Statement nodeContainingEntireStatement = (Statement) vd.getParentNode().get().getParentNode().get();
+            String type = vd.getType().toString();
+            int id = UniqueNumberGenerator.generate();
+            if (isDeclaredButNotInitialized(vd)) {
+                injectCodeOnNextLine(nodeContainingEntireStatement, vd,
+                        StatementCreator.evaluateVarDeclarationWithoutInitializerStatement(name));
+                injectCodeOnNextLine(nodeContainingEntireStatement, vd,
+                        StatementCreator.logVariable(name, null, id));
             } else {
-                // The logging value is the initializer value or null if variable was not initialized
-                value = (vd.getInitializer().isPresent()) ? vd.getInitializer().get().toString() : null;
+                injectCodeOnNextLine(nodeContainingEntireStatement, vd,
+                        StatementCreator.evaluateVarDeclarationStatement(name, id));
             }
-            // The declared variable is tracked
-            if (lineInfo.containsKey(vd.getNameAsString())) {
-                String type = vd.getType().toString();
-                trackVar(name, value, type, nodeContainingEntireStatement, vd, lineInfo);
-                if (vd.getType() instanceof ReferenceType) {
-                    trackVarReference(name, nodeContainingEntireStatement, vd, lineInfo);
-                }
-            } else if (lineInfo.containsKey(vd.getInitializer().get().toString())) {
-                // The value that is being assigned to the declared variable is tracked
-                Statement addToRefToVarMap = StatementCreator.createRefToVarMapAdd(name, value);
-                addLoggingStatement(nodeContainingEntireStatement, vd, addToRefToVarMap);
-
-                Statement addToVarToRefMap = StatementCreator.varToRefMapPut(name);
-                addLoggingStatement(nodeContainingEntireStatement, vd, addToVarToRefMap);
-            }
+            addToLineInfoMap(name, type, nodeContainingEntireStatement, vd, lineInfoMap, id);
         }
         return vde;
     }
@@ -59,111 +51,66 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<String, List<Li
     }
 
     @Override
-    public AssignExpr visit(AssignExpr ae, Map<String, List<LineInfo>> lineInfo) {
-        super.visit(ae, lineInfo);
-        // If making an array access assignment, we want the name of the variable only, without the square brackets
-        String name = (ae.getTarget() instanceof ArrayAccessExpr ?
+    public AssignExpr visit(AssignExpr ae, Map<String, List<LineInfo>> lineInfoMap) {
+        super.visit(ae, lineInfoMap);
+        // If making an array access assignment we want the name of the variable without the square brackets
+        String name = (isArrayAccessAssignment(ae)) ?
                 ((ArrayAccessExpr) ae.getTarget()).getName().toString() :
-                ae.getTarget().toString());
-        String value = ae.getValue().toString();
+                ae.getTarget().toString();
         Statement nodeContainingEntireStatement = (Statement) ae.getParentNode().get();
-        Integer lineNum = ae.getBegin().isPresent() ? ae.getBegin().get().line : null;
-        String enclosingClass = ae.findAncestor(ClassOrInterfaceDeclaration.class).isPresent() ?
-                ae.findAncestor(ClassOrInterfaceDeclaration.class).get().getNameAsString() :
-                null;
-        String enclosingMethod = ae.findAncestor(MethodDeclaration.class).isPresent() ?
-                ae.findAncestor(MethodDeclaration.class).get().getDeclarationAsString(true, true, true) :
-                null;
-
-        // Assignment to a variable which is tracked
-        if (lineInfo.containsKey(name)) {
-            // write down anything about this line that we might want to know
-            String alias = lineInfo.get(name).get(0).getAlias();
-            int uniqueNum = UniqueNumberGenerator.generate();
-            LineInfo li = new LineInfo(name, alias, null, lineNum, nodeContainingEntireStatement.toString(),
-                    enclosingClass,
-                    enclosingMethod, uniqueNum);
-
-            lineInfo.get(name).add(li);
-            Statement refToVarMapChecks = StatementCreator.createRefToVarMapChecks(name, uniqueNum);
-            addLoggingStatement(nodeContainingEntireStatement, ae, refToVarMapChecks);
-
-            Statement varToRefMapChecks = StatementCreator.createVarToRefMapChecks(name);
-            addLoggingStatement(nodeContainingEntireStatement, ae, varToRefMapChecks);
-        } else {
-            // Assignment to a variable which is not explicitly tracked, but the variable may be pointing to an object
-            // which is tracked. Therefore, we need to add additional logging to determine whether we need to log
-            // changes to this variable as well.
-            int uniqueNum = UniqueNumberGenerator.generate();
-            // TODO: does name/alias matter here?
-            LineInfo li = new LineInfo("", "", null, lineNum, nodeContainingEntireStatement.toString(),
-                    enclosingClass, enclosingMethod, uniqueNum);
-            Statement s = StatementCreator.createReferencedVarLogging(name, li, uniqueNum);
-            addLoggingStatement(nodeContainingEntireStatement, ae, s);
-        }
+        trackVariableMutation(name, nodeContainingEntireStatement, ae, lineInfoMap);
         return ae;
     }
 
-
     @Override
-    public UnaryExpr visit(UnaryExpr ue, Map<String, List<LineInfo>> lineInfo) {
-        super.visit(ue, lineInfo);
+    public UnaryExpr visit(UnaryExpr ue, Map<String, List<LineInfo>> lineInfoMap) {
+        super.visit(ue, lineInfoMap);
         String name = ue.getExpression().toString();
-        if (lineInfo.containsKey(name)) {
-            // write down anything about this line that we might want to know
-            String value = name;
+        if (isTrackedVariable(name, lineInfoMap)) {
             Statement nodeContainingEntireStatement = (Statement) ue.getParentNode().get();
-            trackVar(name, value, null /* type info isn't contained in unary expressions */,
-                    nodeContainingEntireStatement, ue, lineInfo);
+            trackVariableMutation(name, nodeContainingEntireStatement, ue, lineInfoMap);
         }
         return ue;
     }
 
-    private void trackVar(String name, String value, String type, Statement nodeContainingEntireStatement, Node node,
-                          Map<String,
-                                  List<LineInfo>> lineInfo) {
-        String alias = lineInfo.get(name).get(0).getAlias();
-        Integer lineNum = node.getBegin().isPresent() ? node.getBegin().get().line : null;
-        String enclosingClass = node.findAncestor(ClassOrInterfaceDeclaration.class).isPresent() ?
-                node.findAncestor(ClassOrInterfaceDeclaration.class).get().getNameAsString() :
-                null;
-        String enclosingMethod = node.findAncestor(MethodDeclaration.class).isPresent() ?
-                node.findAncestor(MethodDeclaration.class).get().getDeclarationAsString(true, true, true) :
-                null;
-        int uniqueIdentifier = UniqueNumberGenerator.generate();
-        // store all of the info about a statement we might want later
-        lineInfo.get(name).add(new LineInfo(name, alias, type, lineNum, nodeContainingEntireStatement.toString(),
-                enclosingClass, enclosingMethod, uniqueIdentifier));
-        // add logging statement below this line
-        Statement variableLoggerLog = StatementCreator.logVariable(name, value, uniqueIdentifier);
-        addLoggingStatement(nodeContainingEntireStatement, node, variableLoggerLog);
+    private void trackVariableMutation(String name, Statement nodeContainingEntireStatement, Node node, Map<String,
+            List<LineInfo>> lineInfoMap) {
+        int id = UniqueNumberGenerator.generate();
+        addToLineInfoMap(name, null, nodeContainingEntireStatement, node, lineInfoMap, id);
+        Statement injectedLine = StatementCreator.evaluateAssignmentStatement(name, id);
+        injectCodeOnNextLine(nodeContainingEntireStatement, node, injectedLine);
     }
 
-    private void trackVarReference(String name, Statement nodeContainingEntireStatement, Node node, Map<String,
-            List<LineInfo>> lineInfo) {
-        String alias = lineInfo.get(name).get(0).getAlias();
-        Integer lineNum = node.getBegin().isPresent() ? node.getBegin().get().line : null;
-        String enclosingClass = node.findAncestor(ClassOrInterfaceDeclaration.class).isPresent() ?
-                node.findAncestor(ClassOrInterfaceDeclaration.class).get().getNameAsString() :
-                null;
-        String enclosingMethod = node.findAncestor(MethodDeclaration.class).isPresent() ?
-                node.findAncestor(MethodDeclaration.class).get().getDeclarationAsString(true, true, true) :
-                null;
-        int uniqueIdentifier = UniqueNumberGenerator.generate();
-        lineInfo.get(name).add(new LineInfo(name, alias, null, lineNum, nodeContainingEntireStatement.toString(),
-                enclosingClass, enclosingMethod, uniqueIdentifier));
-
-        Statement varToRefPut = StatementCreator.varToRefMapPut(name);
-        addLoggingStatement(nodeContainingEntireStatement, node, varToRefPut);
-
-        Statement addVarToRefToVarMap = StatementCreator.refToVarMapAdd(name);
-        addLoggingStatement(nodeContainingEntireStatement, node, addVarToRefToVarMap);
-
-        Statement putSetToRefToVar = StatementCreator.refToVarMapNewPut(name);
-        addLoggingStatement(nodeContainingEntireStatement, node, putSetToRefToVar);
+    private void addToLineInfoMap(String name, String type, Statement nodeContainingEntireStatement, Node node,
+                                  Map<String, List<LineInfo>> lineInfoMap, int id) {
+        String nickname = isTrackedVariable(name, lineInfoMap) ? lineInfoMap.get(name).get(0).getNickname() : null;
+        Integer lineNum = getLineNum(node);
+        String enclosingClass = getEnclosingClass(node);
+        String enclosingMethod = getEnclosingMethod(node);
+        if (!isTrackedVariable(name, lineInfoMap)) {
+            lineInfoMap.put(name, new ArrayList<>(List.of(new LineInfo()))); // add with a dummy item to make nickname hack work
+        }
+        lineInfoMap.get(name).add(new LineInfo(name, nickname, type, lineNum, nodeContainingEntireStatement.toString(),
+                enclosingClass, enclosingMethod, id));
     }
 
-    private void addLoggingStatement(Statement anchorStatement, Node node, Statement loggingStatement) {
+    private Integer getLineNum(Node node) {
+        return node.getBegin().isPresent() ? node.getBegin().get().line : null;
+    }
+
+    private String getEnclosingClass(Node node) {
+        return node.findAncestor(ClassOrInterfaceDeclaration.class).isPresent() ?
+                node.findAncestor(ClassOrInterfaceDeclaration.class).get().getNameAsString() :
+                null;
+    }
+
+    private String getEnclosingMethod(Node node) {
+        return node.findAncestor(MethodDeclaration.class).isPresent() ?
+                node.findAncestor(MethodDeclaration.class).get().getDeclarationAsString(true, true, true) :
+                null;
+    }
+
+    private void injectCodeOnNextLine(Statement anchorStatement, Node node, Statement loggingStatement) {
         if (node.getParentNode().isPresent() && node.getParentNode().get() instanceof ForStmt forStmt) {
             if (forStmt.getBody() instanceof BlockStmt body) {
                 body.addStatement(0, loggingStatement);
@@ -182,6 +129,18 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<String, List<Li
                     .ifPresent(block -> block.addStatement(1 + block.getStatements().indexOf(anchorStatement),
                             loggingStatement));
         }
+    }
+
+    private boolean isArrayAccessAssignment(AssignExpr ae) {
+        return ae.getTarget() instanceof ArrayAccessExpr;
+    }
+
+    private boolean isTrackedVariable(String name, Map<String, List<LineInfo>> lineInfoMap) {
+        return lineInfoMap.containsKey(name);
+    }
+
+    private boolean isDeclaredButNotInitialized(VariableDeclarator vd) {
+        return vd.getInitializer().isEmpty();
     }
 
 }

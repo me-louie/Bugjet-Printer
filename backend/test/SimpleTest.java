@@ -14,32 +14,29 @@ public class SimpleTest {
 
     @Track(var="x", nickname ="x")
     @Track(var = "y", nickname = "y")
+    @Track(var = "a", nickname = "a")
     public Double calc() {
         double a = -1;
+        a = 4;
 
-        int[] x = {1, 2, 3};
+        int x[];
+        x = null;
+        x = new int[]{1, 2, 3};
         int[] y = x;
-        int[] z = x;
+        int[] z = y;
+        x = y;
         y[0] = 200;
         x[1] = 300;
         z[2] = 400;
-//        y[0] = 100;
-//        x[1] = 101;
-//        int[] z = new int[3];
-//        y = z;
-
-//        int[] arr;
-//        arr = new int[3];
-//        arr[1] = 123;
-//
-//        int[] arrCopy;
-//        arrCopy = arr;
-//        arrCopy[0] = 1000;
-
-//        int[] m = {1, 2, 3};
-//        m[0] = 10;
-//        m[1] = 11;
+        x = new int[]{4, 5, 6};
+        y = new int[]{7, 8, 9};
+        nestedMethod(x);
         return a;
+    }
+
+    private void nestedMethod(int[] alias) {
+        alias[0] = -1;
+        alias = new int[2];
     }
 
     @Track(var="m", nickname="m")

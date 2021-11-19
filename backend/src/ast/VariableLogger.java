@@ -21,11 +21,11 @@ public class VariableLogger {
     private static Map<String, Output> outputMap = new HashMap<>();
     private static Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
 
-    public static void logToOutputMap(String variableName, Object variableValue, Integer id) {
+    public static void log(String variableName, Object variableValue, Integer id) {
         LineInfo lineInfo = lineInfoMap.get(id);
         Output output = (outputMap.containsKey(variableName)) ?
                 outputMap.get(variableName) :
-                new Output(variableName, lineInfo.getAlias(), lineInfo.getType());
+                new Output(variableName, lineInfo.getNickname(), lineInfo.getType());
         output.addMutation(lineInfo.getStatement(), lineInfo.getEnclosingClass(), lineInfo.getEnclosingMethod(),
                 variableValue, lineInfo.getLineNum());
         outputMap.put(variableName, output);
@@ -37,113 +37,14 @@ public class VariableLogger {
         writer.close();
     }
 
-    // TODO: maybe document that we don't handle the tracking of Strings normally, this case is just for handling
-    //  null variable values. Alternatively, figure out a better way to handle the nulls.
-    protected static void log(String variableName, String variableValue, Integer id) {
-        logToOutputMap(variableName, variableValue, id);
-    }
-
-    protected static void log(String variableName, boolean variableValue, Integer id) {
-        logToOutputMap(variableName, (Boolean) variableValue, id);
-    }
-
-    protected static void log(String variableName, int variableValue, Integer id) {
-        logToOutputMap(variableName, (Integer) variableValue, id);
-    }
-
-    protected static void log(String variableName, long variableValue, Integer id) {
-        logToOutputMap(variableName, (Long) variableValue, id);
-    }
-
-    protected static void log(String variableName, char variableValue, Integer id) {
-        logToOutputMap(variableName, (Character) variableValue, id);
-    }
-
-    protected static void log(String variableName, float variableValue, Integer id) {
-        logToOutputMap(variableName, (Float) variableValue, id);
-    }
-
-    protected static void log(String variableName, double variableValue, Integer id) {
-        logToOutputMap(variableName, (Double) variableValue, id);
-    }
-
-    protected static void log(String variableName, short variableValue, Integer id) {
-        logToOutputMap(variableName, (Short) variableValue, id);
-    }
-
-    protected static void log(String variableName, int[] variableValue, Integer id) {
-        logToOutputMap(variableName, variableValue, id);
-    }
-
-    protected static void log(String variableName, boolean[] variableValue, Integer id) {
-        logToOutputMap(variableName, variableValue, id);
-    }
-
-    protected static void log(String variableName, long[] variableValue, Integer id) {
-        logToOutputMap(variableName, variableValue, id);
-    }
-
-    protected static void log(String variableName, char[] variableValue, Integer id) {
-        logToOutputMap(variableName, variableValue, id);
-    }
-
-    protected static void log(String variableName, float[] variableValue, Integer id) {
-        logToOutputMap(variableName, variableValue, id);
-    }
-
-    protected static void log(String variableName, double[] variableValue, Integer id) {
-        logToOutputMap(variableName, variableValue, id);
-    }
-
-    protected static void log(String variableName, short[] variableValue, Integer id) {
-        logToOutputMap(variableName, variableValue, id);
-    }
-
-    protected static void log(String variableName, Object[] variableValue, Integer id) {
-        logToOutputMap(variableName, variableValue, id);
-    }
-
-    protected static void log(String variableName, int[][] variableValue, Integer id) {
-        logToOutputMap(variableName, variableValue, id);
-    }
-
-    protected static void log(String variableName, boolean[][] variableValue, Integer id) {
-        logToOutputMap(variableName, variableValue, id);
-    }
-
-    protected static void log(String variableName, long[][] variableValue, Integer id) {
-        logToOutputMap(variableName, variableValue, id);
-    }
-
-    protected static void log(String variableName, char[][] variableValue, Integer id) {
-        logToOutputMap(variableName, variableValue, id);
-    }
-
-    protected static void log(String variableName, float[][] variableValue, Integer id) {
-        logToOutputMap(variableName, variableValue, id);
-    }
-
-    protected static void log(String variableName, double[][] variableValue, Integer id) {
-        logToOutputMap(variableName, variableValue, id);
-    }
-
-    protected static void log(String variableName, short[][] variableValue, Integer id) {
-        logToOutputMap(variableName, variableValue, id);
-    }
-
-    protected static void log(String variableName, Object[][] variableValue, Integer id) {
-        logToOutputMap(variableName, variableValue, id);
-    }
-
-
     private static class Output {
 
-        private String name, alias, type;
+        private String name, nickname, type;
         private List<Mutation> history;
 
-        public Output(String name, String alias, String type) {
+        public Output(String name, String nickname, String type) {
             this.name = name;
-            this.alias = alias;
+            this.nickname = nickname;
             this.type = type;
             history = new ArrayList<>();
         }

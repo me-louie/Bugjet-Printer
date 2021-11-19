@@ -20,69 +20,52 @@ public class SimpleTest {
 
     @Track(var = "x", nickname = "x")
     @Track(var = "y", nickname = "y")
+    @Track(var = "a", nickname = "a")
     public Double calc() {
         double a = -1;
-        int[] x = { 1, 2, 3 };
-        if (!VariableReferenceLogger.refToVarMap.containsKey(x.toString()))
-            VariableReferenceLogger.refToVarMap.put(x.toString(), new HashSet<>());
-        else
-            ;
-        VariableReferenceLogger.refToVarMap.get(x.toString()).add("x");
-        VariableReferenceLogger.varToRefMap.put("x", x.toString());
-        VariableLogger.log("x", x, 0);
+        VariableReferenceLogger.evaluateVarDeclaration(a, "a", 0);
+        a = 4;
+        VariableReferenceLogger.evaluateAssignment(a, "a", 1);
+        int[] x;
+        VariableLogger.log("x", "uninitialized", 2);
+        VariableReferenceLogger.evaluateVarDeclarationWithoutInitializer("x");
+        x = null;
+        VariableReferenceLogger.evaluateAssignment(x, "x", 3);
+        x = new int[] { 1, 2, 3 };
+        VariableReferenceLogger.evaluateAssignment(x, "x", 4);
         int[] y = x;
-        if (!VariableReferenceLogger.refToVarMap.containsKey(y.toString()))
-            VariableReferenceLogger.refToVarMap.put(y.toString(), new HashSet<>());
-        else
-            ;
-        VariableReferenceLogger.refToVarMap.get(y.toString()).add("y");
-        VariableReferenceLogger.varToRefMap.put("y", y.toString());
-        VariableLogger.log("y", x, 2);
-        int[] z = x;
-        VariableReferenceLogger.varToRefMap.put("z", z.toString());
-        VariableReferenceLogger.refToVarMap.get(x.toString()).add("z");
+        VariableReferenceLogger.evaluateVarDeclaration(y, "y", 5);
+        int[] z = y;
+        x = y;
+        VariableReferenceLogger.evaluateAssignment(x, "x", 6);
         y[0] = 200;
-        if (!y.toString().equals(VariableReferenceLogger.varToRefMap.get(y)))
-            System.out.println("todo update references in both maps");
-        else
-            ;
-        if (VariableReferenceLogger.refToVarMap.containsKey(y.toString()))
-            for (String var : VariableReferenceLogger.refToVarMap.get(y.toString())) {
-                VariableLogger.log(var, y, 4);
-            }
-        else
-            ;
+        VariableReferenceLogger.evaluateAssignment(y, "y", 7);
         x[1] = 300;
-        if (!x.toString().equals(VariableReferenceLogger.varToRefMap.get(x)))
-            System.out.println("todo update references in both maps");
-        else
-            ;
-        if (VariableReferenceLogger.refToVarMap.containsKey(x.toString()))
-            for (String var : VariableReferenceLogger.refToVarMap.get(x.toString())) {
-                VariableLogger.log(var, x, 5);
-            }
-        else
-            ;
+        VariableReferenceLogger.evaluateAssignment(x, "x", 8);
         z[2] = 400;
-        if (VariableReferenceLogger.varToRefMap.containsKey("z")) {
-            String objAddress = VariableReferenceLogger.varToRefMap.get("z");
-            Set<String> referencedVars = VariableReferenceLogger.refToVarMap.get(objAddress);
-            VariableLogger.lineInfoMap.put(6, new LineInfo("", "", "null", 25, "z[2] = 400;", "SimpleTest", "public Double calc()", 6));
-            for (String var : referencedVars) {
-                VariableLogger.log(var, z, 6);
-            }
-        } else
-            ;
+        VariableReferenceLogger.evaluateAssignment(z, "z", 9);
+        x = new int[] { 4, 5, 6 };
+        VariableReferenceLogger.evaluateAssignment(x, "x", 10);
+        y = new int[] { 7, 8, 9 };
+        VariableReferenceLogger.evaluateAssignment(y, "y", 11);
+        nestedMethod(x);
         return a;
+    }
+
+    private void nestedMethod(int[] alias) {
+        alias[0] = -1;
+        VariableReferenceLogger.evaluateAssignment(alias, "alias", 12);
+        alias = new int[2];
+        VariableReferenceLogger.evaluateAssignment(alias, "alias", 13);
     }
 
     @Track(var = "m", nickname = "m")
     public void helloWorld() {
         int m = 100;
-        VariableLogger.log("m", 100, 7);
+        VariableReferenceLogger.evaluateVarDeclaration(m, "m", 14);
         for (int i = 0; i < 3; i++) {
             m++;
-            VariableLogger.log("m", m, 8);
+            VariableReferenceLogger.evaluateAssignment(m, "m", 15);
         }
     }
 }

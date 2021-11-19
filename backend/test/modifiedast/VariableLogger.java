@@ -16,24 +16,32 @@ public class VariableLogger {
     private static final String FILE_PATH = "out/output.json";
     // uniqueId -> LineInfo for a line that causes variable mutation
     public static Map<Integer, LineInfo> lineInfoMap = new HashMap<>() {{
-		put(0, new LineInfo("x", "x", "int[]",20, "int[] x = ", "SimpleTest", "public Double calc()", 0));
-		put(1, new LineInfo("x", "x", "null",20, "int[] x = ", "SimpleTest", "public Double calc()", 1));
-		put(5, new LineInfo("x", "x", "null",24, "x[1] = 300;", "SimpleTest", "public Double calc()", 5));
-		put(2, new LineInfo("y", "y", "int[]",21, "int[] y = x;", "SimpleTest", "public Double calc()", 2));
-		put(3, new LineInfo("y", "y", "null",21, "int[] y = x;", "SimpleTest", "public Double calc()", 3));
-		put(4, new LineInfo("y", "y", "null",23, "y[0] = 200;", "SimpleTest", "public Double calc()", 4));
-		put(7, new LineInfo("m", "m", "int",47, "int m = 100;", "SimpleTest", "public void helloWorld()", 7));
-		put(8, new LineInfo("m", "m", "null",49, "m++;", "SimpleTest", "public void helloWorld()", 8));
+		put(0, new LineInfo("a", "a", "double",19, "double a = -1;", "SimpleTest", "public Double calc()", 0));
+		put(1, new LineInfo("a", "a", "null",20, "a = 4;", "SimpleTest", "public Double calc()", 1));
+		put(2, new LineInfo("x", "x", "int[]",22, "int[] x;", "SimpleTest", "public Double calc()", 2));
+		put(3, new LineInfo("x", "x", "null",23, "x = null;", "SimpleTest", "public Double calc()", 3));
+		put(4, new LineInfo("x", "x", "null",24, "x = new int[] ", "SimpleTest", "public Double calc()", 4));
+		put(6, new LineInfo("x", "x", "null",27, "x = y;", "SimpleTest", "public Double calc()", 6));
+		put(8, new LineInfo("x", "x", "null",29, "x[1] = 300;", "SimpleTest", "public Double calc()", 8));
+		put(10, new LineInfo("x", "x", "null",31, "x = new int[] ", "SimpleTest", "public Double calc()", 10));
+		put(5, new LineInfo("y", "y", "int[]",25, "int[] y = x;", "SimpleTest", "public Double calc()", 5));
+		put(7, new LineInfo("y", "y", "null",28, "y[0] = 200;", "SimpleTest", "public Double calc()", 7));
+		put(11, new LineInfo("y", "y", "null",32, "y = new int[] ", "SimpleTest", "public Double calc()", 11));
+		put(12, new LineInfo("alias", "null", "null",38, "alias[0] = -1;", "SimpleTest", "private void nestedMethod(int[] alias)", 12));
+		put(13, new LineInfo("alias", "null", "null",39, "alias = new int[2];", "SimpleTest", "private void nestedMethod(int[] alias)", 13));
+		put(9, new LineInfo("z", "null", "null",30, "z[2] = 400;", "SimpleTest", "public Double calc()", 9));
+		put(14, new LineInfo("m", "m", "int",44, "int m = 100;", "SimpleTest", "public void helloWorld()", 14));
+		put(15, new LineInfo("m", "m", "null",46, "m++;", "SimpleTest", "public void helloWorld()", 15));
     }};
     // variable name -> Output object containing all info tracked about variable
     private static Map<String, Output> outputMap = new HashMap<>();
     private static Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
 
-    public static void logToOutputMap(String variableName, Object variableValue, Integer id) {
+    public static void log(String variableName, Object variableValue, Integer id) {
         LineInfo lineInfo = lineInfoMap.get(id);
         Output output = (outputMap.containsKey(variableName)) ?
                 outputMap.get(variableName) :
-                new Output(variableName, lineInfo.getAlias(), lineInfo.getType());
+                new Output(variableName, lineInfo.getNickname(), lineInfo.getType());
         output.addMutation(lineInfo.getStatement(), lineInfo.getEnclosingClass(), lineInfo.getEnclosingMethod(),
                 variableValue, lineInfo.getLineNum());
         outputMap.put(variableName, output);
@@ -45,113 +53,14 @@ public class VariableLogger {
         writer.close();
     }
 
-    // TODO: maybe document that we don't handle the tracking of Strings normally, this case is just for handling
-    //  null variable values. Alternatively, figure out a better way to handle the nulls.
-    protected static void log(String variableName, String variableValue, Integer id) {
-        logToOutputMap(variableName, variableValue, id);
-    }
-
-    protected static void log(String variableName, boolean variableValue, Integer id) {
-        logToOutputMap(variableName, (Boolean) variableValue, id);
-    }
-
-    protected static void log(String variableName, int variableValue, Integer id) {
-        logToOutputMap(variableName, (Integer) variableValue, id);
-    }
-
-    protected static void log(String variableName, long variableValue, Integer id) {
-        logToOutputMap(variableName, (Long) variableValue, id);
-    }
-
-    protected static void log(String variableName, char variableValue, Integer id) {
-        logToOutputMap(variableName, (Character) variableValue, id);
-    }
-
-    protected static void log(String variableName, float variableValue, Integer id) {
-        logToOutputMap(variableName, (Float) variableValue, id);
-    }
-
-    protected static void log(String variableName, double variableValue, Integer id) {
-        logToOutputMap(variableName, (Double) variableValue, id);
-    }
-
-    protected static void log(String variableName, short variableValue, Integer id) {
-        logToOutputMap(variableName, (Short) variableValue, id);
-    }
-
-    protected static void log(String variableName, int[] variableValue, Integer id) {
-        logToOutputMap(variableName, variableValue, id);
-    }
-
-    protected static void log(String variableName, boolean[] variableValue, Integer id) {
-        logToOutputMap(variableName, variableValue, id);
-    }
-
-    protected static void log(String variableName, long[] variableValue, Integer id) {
-        logToOutputMap(variableName, variableValue, id);
-    }
-
-    protected static void log(String variableName, char[] variableValue, Integer id) {
-        logToOutputMap(variableName, variableValue, id);
-    }
-
-    protected static void log(String variableName, float[] variableValue, Integer id) {
-        logToOutputMap(variableName, variableValue, id);
-    }
-
-    protected static void log(String variableName, double[] variableValue, Integer id) {
-        logToOutputMap(variableName, variableValue, id);
-    }
-
-    protected static void log(String variableName, short[] variableValue, Integer id) {
-        logToOutputMap(variableName, variableValue, id);
-    }
-
-    protected static void log(String variableName, Object[] variableValue, Integer id) {
-        logToOutputMap(variableName, variableValue, id);
-    }
-
-    protected static void log(String variableName, int[][] variableValue, Integer id) {
-        logToOutputMap(variableName, variableValue, id);
-    }
-
-    protected static void log(String variableName, boolean[][] variableValue, Integer id) {
-        logToOutputMap(variableName, variableValue, id);
-    }
-
-    protected static void log(String variableName, long[][] variableValue, Integer id) {
-        logToOutputMap(variableName, variableValue, id);
-    }
-
-    protected static void log(String variableName, char[][] variableValue, Integer id) {
-        logToOutputMap(variableName, variableValue, id);
-    }
-
-    protected static void log(String variableName, float[][] variableValue, Integer id) {
-        logToOutputMap(variableName, variableValue, id);
-    }
-
-    protected static void log(String variableName, double[][] variableValue, Integer id) {
-        logToOutputMap(variableName, variableValue, id);
-    }
-
-    protected static void log(String variableName, short[][] variableValue, Integer id) {
-        logToOutputMap(variableName, variableValue, id);
-    }
-
-    protected static void log(String variableName, Object[][] variableValue, Integer id) {
-        logToOutputMap(variableName, variableValue, id);
-    }
-
-
     private static class Output {
 
-        private String name, alias, type;
+        private String name, nickname, type;
         private List<Mutation> history;
 
-        public Output(String name, String alias, String type) {
+        public Output(String name, String nickname, String type) {
             this.name = name;
-            this.alias = alias;
+            this.nickname = nickname;
             this.type = type;
             history = new ArrayList<>();
         }
