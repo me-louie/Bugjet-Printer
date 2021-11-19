@@ -1,0 +1,135 @@
+[
+  {
+    "name": "x",
+    "alias": "x",
+    "type": "int[]",
+    "history": [
+      {
+        "statement": "int[] x \u003d ",
+        "enclosingClass": "SimpleTest",
+        "enclosingMethod": "public Double calc()",
+        "value": "[\n  1,\n  2,\n  3\n]",
+        "line": 20
+      },
+      {
+        "statement": "y[0] \u003d 200;",
+        "enclosingClass": "SimpleTest",
+        "enclosingMethod": "public Double calc()",
+        "value": "[\n  200,\n  2,\n  3\n]",
+        "line": 23
+      },
+      {
+        "statement": "x[1] \u003d 300;",
+        "enclosingClass": "SimpleTest",
+        "enclosingMethod": "public Double calc()",
+        "value": "[\n  200,\n  300,\n  3\n]",
+        "line": 24
+      },
+      {
+        "statement": "z[2] \u003d 400;",
+        "enclosingClass": "SimpleTest",
+        "enclosingMethod": "public Double calc()",
+        "value": "[\n  200,\n  300,\n  400\n]",
+        "line": 25
+      }
+    ]
+  },
+  {
+    "name": "y",
+    "alias": "y",
+    "type": "int[]",
+    "history": [
+      {
+        "statement": "int[] y \u003d x;",
+        "enclosingClass": "SimpleTest",
+        "enclosingMethod": "public Double calc()",
+        "value": "[\n  1,\n  2,\n  3\n]",
+        "line": 21
+      },
+      {
+        "statement": "y[0] \u003d 200;",
+        "enclosingClass": "SimpleTest",
+        "enclosingMethod": "public Double calc()",
+        "value": "[\n  200,\n  2,\n  3\n]",
+        "line": 23
+      },
+      {
+        "statement": "x[1] \u003d 300;",
+        "enclosingClass": "SimpleTest",
+        "enclosingMethod": "public Double calc()",
+        "value": "[\n  200,\n  300,\n  3\n]",
+        "line": 24
+      },
+      {
+        "statement": "z[2] \u003d 400;",
+        "enclosingClass": "SimpleTest",
+        "enclosingMethod": "public Double calc()",
+        "value": "[\n  200,\n  300,\n  400\n]",
+        "line": 25
+      }
+    ]
+  },
+  {
+    "name": "z",
+    "alias": "y",
+    "type": "null",
+    "history": [
+      {
+        "statement": "y[0] \u003d 200;",
+        "enclosingClass": "SimpleTest",
+        "enclosingMethod": "public Double calc()",
+        "value": "[\n  200,\n  2,\n  3\n]",
+        "line": 23
+      },
+      {
+        "statement": "x[1] \u003d 300;",
+        "enclosingClass": "SimpleTest",
+        "enclosingMethod": "public Double calc()",
+        "value": "[\n  200,\n  300,\n  3\n]",
+        "line": 24
+      },
+      {
+        "statement": "z[2] \u003d 400;",
+        "enclosingClass": "SimpleTest",
+        "enclosingMethod": "public Double calc()",
+        "value": "[\n  200,\n  300,\n  400\n]",
+        "line": 25
+      }
+    ]
+  },
+  {
+    "name": "m",
+    "alias": "m",
+    "type": "int",
+    "history": [
+      {
+        "statement": "int m \u003d 100;",
+        "enclosingClass": "SimpleTest",
+        "enclosingMethod": "public void helloWorld()",
+        "value": "100",
+        "line": 47
+      },
+      {
+        "statement": "m++;",
+        "enclosingClass": "SimpleTest",
+        "enclosingMethod": "public void helloWorld()",
+        "value": "101",
+        "line": 49
+      },
+      {
+        "statement": "m++;",
+        "enclosingClass": "SimpleTest",
+        "enclosingMethod": "public void helloWorld()",
+        "value": "102",
+        "line": 49
+      },
+      {
+        "statement": "m++;",
+        "enclosingClass": "SimpleTest",
+        "enclosingMethod": "public void helloWorld()",
+        "value": "103",
+        "line": 49
+      }
+    ]
+  }
+]

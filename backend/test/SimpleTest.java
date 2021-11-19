@@ -9,45 +9,41 @@ public class SimpleTest {
     public static void main(String[] args) {
         SimpleTest st = new SimpleTest();
         st.calc();
+        st.helloWorld();
     }
 
-    @Track(var="a", alias = "alias_for_a")
-    @Track(var="b", alias="alias_for_b")
-    @Track(var="i", alias="alias_for_i")
+    @Track(var="x", nickname ="x")
+    @Track(var = "y", nickname = "y")
+    @Track(var = "a", nickname = "a")
     public Double calc() {
-        double a;
-        double b;
-        a = 5;
-        b = 6;
-        if (a < 10) {
-            b++;
-        } else {
-            b--;
-        }
-        while (a < 20) {
-            a++;
-            b *= b / a;
-            System.out.println("hello world");
-        }
-        for (int i = 0; i < 10; i++) {
-            a = b + 1;
-            i+=2;
-        }
+        double a = -1;
+        a = 4;
 
-        // cases we don't currently handle:
-//        @Track(a=a)
-//        while (a++ < 30) {
-//            System.out.println("do nothing");
-//        }
-//
-//        @Track(a=a)
-//        for (int i = 0; i < 10; i++)
-//            a = b >> 1;
-//
-//        @Track(a=a)
-//        if (true)
-//            a = 5;
-//        else b = 6;
+        int x[];
+        x = null;
+        x = new int[]{1, 2, 3};
+        int[] y = x;
+        int[] z = y;
+        x = y;
+        y[0] = 200;
+        x[1] = 300;
+        z[2] = 400;
+        x = new int[]{4, 5, 6};
+        y = new int[]{7, 8, 9};
+        nestedMethod(x);
         return a;
+    }
+
+    private void nestedMethod(int[] alias) {
+        alias[0] = -1;
+        alias = new int[2];
+    }
+
+    @Track(var="m", nickname="m")
+    public void helloWorld() {
+        int m = 100;
+        for (int i = 0; i < 3; i++) {
+            m++;
+        }
     }
 }

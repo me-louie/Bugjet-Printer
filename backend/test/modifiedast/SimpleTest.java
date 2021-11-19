@@ -2,6 +2,8 @@ package modifiedast;
 
 import annotation.Track;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 public class SimpleTest {
 
@@ -12,43 +14,58 @@ public class SimpleTest {
     public static void main(String[] args) throws IOException {
         SimpleTest st = new SimpleTest();
         st.calc();
+        st.helloWorld();
         VariableLogger.writeOutputToDisk();
     }
 
-    @Track(var = "a", alias = "alias_for_a")
-    @Track(var = "b", alias = "alias_for_b")
-    @Track(var = "i", alias = "alias_for_i")
+    @Track(var = "x", nickname = "x")
+    @Track(var = "y", nickname = "y")
+    @Track(var = "a", nickname = "a")
     public Double calc() {
-        double a;
-        VariableLogger.log("a", "uninitialized", 0);
-        double b;
-        VariableLogger.log("b", "uninitialized", 1);
-        a = 5;
-        VariableLogger.log("a", a, 2);
-        b = 6;
-        VariableLogger.log("b", b, 3);
-        if (a < 10) {
-            b++;
-            VariableLogger.log("b", b, 5);
-        } else {
-            b--;
-            VariableLogger.log("b", b, 4);
-        }
-        while (a < 20) {
-            a++;
-            VariableLogger.log("a", a, 6);
-            b *= b / a;
-            VariableLogger.log("b", b, 7);
-            System.out.println("hello world");
-        }
-        for (int i = 0; i < 10; i++) {
-            VariableLogger.log("i", i, 11);
-            a = b + 1;
-            VariableLogger.log("a", a, 8);
-            i += 2;
-            VariableLogger.log("i", i, 9);
-        }
-        VariableLogger.log("i", 0, 10);
+        double a = -1;
+        VariableReferenceLogger.evaluateVarDeclaration(a, "a", 0);
+        a = 4;
+        VariableReferenceLogger.evaluateAssignment(a, "a", 1);
+        int[] x;
+        VariableLogger.log("x", "uninitialized", 2);
+        VariableReferenceLogger.evaluateVarDeclarationWithoutInitializer("x");
+        x = null;
+        VariableReferenceLogger.evaluateAssignment(x, "x", 3);
+        x = new int[] { 1, 2, 3 };
+        VariableReferenceLogger.evaluateAssignment(x, "x", 4);
+        int[] y = x;
+        VariableReferenceLogger.evaluateVarDeclaration(y, "y", 5);
+        int[] z = y;
+        x = y;
+        VariableReferenceLogger.evaluateAssignment(x, "x", 6);
+        y[0] = 200;
+        VariableReferenceLogger.evaluateAssignment(y, "y", 7);
+        x[1] = 300;
+        VariableReferenceLogger.evaluateAssignment(x, "x", 8);
+        z[2] = 400;
+        VariableReferenceLogger.evaluateAssignment(z, "z", 9);
+        x = new int[] { 4, 5, 6 };
+        VariableReferenceLogger.evaluateAssignment(x, "x", 10);
+        y = new int[] { 7, 8, 9 };
+        VariableReferenceLogger.evaluateAssignment(y, "y", 11);
+        nestedMethod(x);
         return a;
+    }
+
+    private void nestedMethod(int[] alias) {
+        alias[0] = -1;
+        VariableReferenceLogger.evaluateAssignment(alias, "alias", 12);
+        alias = new int[2];
+        VariableReferenceLogger.evaluateAssignment(alias, "alias", 13);
+    }
+
+    @Track(var = "m", nickname = "m")
+    public void helloWorld() {
+        int m = 100;
+        VariableReferenceLogger.evaluateVarDeclaration(m, "m", 14);
+        for (int i = 0; i < 3; i++) {
+            m++;
+            VariableReferenceLogger.evaluateAssignment(m, "m", 15);
+        }
     }
 }
