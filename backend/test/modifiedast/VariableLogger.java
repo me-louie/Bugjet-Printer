@@ -32,8 +32,8 @@ public class VariableLogger {
 		put(9, new LineInfo("z", "null", "null",30, "z[2] = 400;", "SimpleTest", "public Double calc()", 9));
 		put(14, new LineInfo("m", "m", "int",44, "int m;", "SimpleTest", "public void helloWorld()", 14));
 		put(15, new LineInfo("m", "m", "null",46, "m++;", "SimpleTest", "public void helloWorld()", 15));
-		put(16, new LineInfo("m", "m", "null",45, "for (m = 100; m < 103; m++) {\r    m++;\r}", "SimpleTest", "public void helloWorld()", 16));
-		put(17, new LineInfo("m", "m", "null",45, "for (m = 100; m < 103; m++) {\r    m++;\r}", "SimpleTest", "public void helloWorld()", 17));
+		put(16, new LineInfo("m", "m", "null",45, "", "SimpleTest", "public void helloWorld()", 16));
+		put(17, new LineInfo("m", "m", "null",45, "", "SimpleTest", "public void helloWorld()", 17));
     }};
     // variable name -> Output object containing all info tracked about variable
     private static Map<String, Output> outputMap = new HashMap<>();

@@ -18,7 +18,7 @@ public final class Formatter {
     }
 
     private static String parseStatement(String statement) {
-        if (statement.contains("VariableReferenceLogger") || statement.contains("for")) {
+        if (containsLoggingStatements(statement) || shouldAsParseCodeBlock(statement)) {
             String escapedStatement = statement
                     .replaceAll("\n", "\\\\n")
                     .replaceAll("\r", "\\\\r")
@@ -26,12 +26,21 @@ public final class Formatter {
             String[] parsed = escapedStatement.split("\\\\n");
             StringBuilder sb = new StringBuilder();
             for (String s : parsed) {
-                if (!s.contains("VariableReferenceLogger")) {
+                if (!containsLoggingStatements(statement)) {
                     sb.append(s);
                 }
             }
             return sb.toString();
         }
         return statement;
+    }
+
+    private static boolean containsLoggingStatements(String statement){
+        return statement.contains("VariableReferenceLogger") || statement.contains("VariableLogger");
+    }
+
+    // TODO: add other cases as needed
+    private static boolean shouldAsParseCodeBlock(String statement){
+        return statement.contains("for");
     }
 }
