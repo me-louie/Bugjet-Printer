@@ -18,7 +18,7 @@ public final class Formatter {
     }
 
     private static String parseStatement(String statement) {
-        if (containsLoggingStatements(statement) || shouldParseMultiLines(statement)) {
+        if (containsLoggingStatements(statement) || hasSpecialChars(statement)) {
             String escapedStatement = statement
                     .replaceAll("\n", "\\\\n")
                     .replaceAll("\r", "\\\\r")
@@ -39,8 +39,9 @@ public final class Formatter {
         return statement.contains("VariableReferenceLogger") || statement.contains("VariableLogger");
     }
 
-    // TODO: add other cases as needed
-    private static boolean shouldParseMultiLines(String statement){
-        return statement.contains("for");
+    private static boolean hasSpecialChars(String statement){
+        return statement.contains("\n")
+                || statement.contains("\r")
+                || statement.contains("\"");
     }
 }
