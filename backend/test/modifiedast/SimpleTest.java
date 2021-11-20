@@ -61,9 +61,12 @@ public class SimpleTest {
 
     @Track(var = "m", nickname = "m")
     public void helloWorld() {
-        int m = 100;
-        VariableReferenceLogger.evaluateVarDeclaration(m, "m", 14);
-        for (int i = 0; i < 3; i++) {
+        int m;
+        VariableLogger.log("m", "uninitialized", 14);
+        VariableReferenceLogger.evaluateVarDeclarationWithoutInitializer("m");
+        for (m = 100; m < 103; m++) {
+            VariableReferenceLogger.evaluateAssignment(m, "m", 17);
+            VariableReferenceLogger.evaluateAssignment(m, "m", 16);
             m++;
             VariableReferenceLogger.evaluateAssignment(m, "m", 15);
         }
