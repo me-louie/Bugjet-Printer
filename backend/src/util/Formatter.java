@@ -18,7 +18,7 @@ public final class Formatter {
     }
 
     private static String parseStatement(String statement) {
-        if (containsLoggingStatements(statement) || shouldAsParseCodeBlock(statement)) {
+        if (containsLoggingStatements(statement) || shouldParseMultiLines(statement)) {
             String escapedStatement = statement
                     .replaceAll("\n", "\\\\n")
                     .replaceAll("\r", "\\\\r")
@@ -40,7 +40,7 @@ public final class Formatter {
     }
 
     // TODO: add other cases as needed
-    private static boolean shouldAsParseCodeBlock(String statement){
+    private static boolean shouldParseMultiLines(String statement){
         return statement.contains("for");
     }
 }
