@@ -1,0 +1,107 @@
+[
+  {
+    "name": "i",
+    "nickname": "i",
+    "type": "int",
+    "history": [
+      {
+        "statement": "for (int i \u003d 100; i \u003c 103; i++) {    i++;}",
+        "enclosingClass": "SimpleTest",
+        "enclosingMethod": "public void helloWorldNoDec()",
+        "value": "100",
+        "line": 52
+      },
+      {
+        "statement": "i++;",
+        "enclosingClass": "SimpleTest",
+        "enclosingMethod": "public void helloWorldNoDec()",
+        "value": "101",
+        "line": 53
+      },
+      {
+        "statement": "for (int i \u003d 100; i \u003c 103; i++) {    i++;}",
+        "enclosingClass": "SimpleTest",
+        "enclosingMethod": "public void helloWorldNoDec()",
+        "value": "102",
+        "line": 52
+      },
+      {
+        "statement": "for (int i \u003d 100; i \u003c 103; i++) {    i++;}",
+        "enclosingClass": "SimpleTest",
+        "enclosingMethod": "public void helloWorldNoDec()",
+        "value": "102",
+        "line": 52
+      },
+      {
+        "statement": "i++;",
+        "enclosingClass": "SimpleTest",
+        "enclosingMethod": "public void helloWorldNoDec()",
+        "value": "103",
+        "line": 53
+      }
+    ]
+  },
+  {
+    "name": "m",
+    "nickname": "m",
+    "type": "int",
+    "history": [
+      {
+        "statement": "int m;",
+        "enclosingClass": "SimpleTest",
+        "enclosingMethod": "public void helloWorld()",
+        "value": "\"uninitialized\"",
+        "line": 44
+      },
+      {
+        "statement": "for (m \u003d 100; m \u003c 103; m++) {    m++;}",
+        "enclosingClass": "SimpleTest",
+        "enclosingMethod": "public void helloWorld()",
+        "value": "100",
+        "line": 45
+      },
+      {
+        "statement": "for (m \u003d 100; m \u003c 103; m++) {    m++;}",
+        "enclosingClass": "SimpleTest",
+        "enclosingMethod": "public void helloWorld()",
+        "value": "100",
+        "line": 45
+      },
+      {
+        "statement": "m++;",
+        "enclosingClass": "SimpleTest",
+        "enclosingMethod": "public void helloWorld()",
+        "value": "101",
+        "line": 46
+      },
+      {
+        "statement": "for (m \u003d 100; m \u003c 103; m++) {    m++;}",
+        "enclosingClass": "SimpleTest",
+        "enclosingMethod": "public void helloWorld()",
+        "value": "102",
+        "line": 45
+      },
+      {
+        "statement": "for (m \u003d 100; m \u003c 103; m++) {    m++;}",
+        "enclosingClass": "SimpleTest",
+        "enclosingMethod": "public void helloWorld()",
+        "value": "102",
+        "line": 45
+      },
+      {
+        "statement": "m++;",
+        "enclosingClass": "SimpleTest",
+        "enclosingMethod": "public void helloWorld()",
+        "value": "103",
+        "line": 46
+      },
+      {
+        "statement": "i++;",
+        "enclosingClass": "SimpleTest",
+        "enclosingMethod": "public void helloWorldNoDec()",
+        "value": "103",
+        "line": 53
+      }
+    ]
+  }
+]
