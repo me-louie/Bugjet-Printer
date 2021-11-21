@@ -29,6 +29,9 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<String, List<Li
             if (isDeclaredButNotInitialized(vd)) {
                 injectCodeOnNextLine(nodeContainingEntireStatement, vd,
                         StatementCreator.evaluateVarDeclarationWithoutInitializerStatement(name, id));
+            } else if (nodeContainingEntireStatement instanceof ForStmt) {
+                injectCodeOnNextLine(nodeContainingEntireStatement, vd,
+                        StatementCreator.evaluateForLoopVarDeclarationStatement(name, id));
             } else {
                 injectCodeOnNextLine(nodeContainingEntireStatement, vd,
                         StatementCreator.evaluateVarDeclarationStatement(name, id));
@@ -94,6 +97,8 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<String, List<Li
         return scope;
     }
 
+
+
     private void trackVariableMutation(String name, Statement nodeContainingEntireStatement, Node node, Map<String,
             List<LineInfo>> lineInfoMap) {
         int id = UniqueNumberGenerator.generate();
@@ -115,7 +120,6 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<String, List<Li
             injectedLine = StatementCreator.evaluateAssignmentStatement("this", id);
             injectCodeOnNextLine(nodeContainingEntireStatement, node, injectedLine);
         }
-
     }
 
     private void addToLineInfoMap(String name, String type, Statement nodeContainingEntireStatement, Node node,
@@ -148,7 +152,9 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<String, List<Li
     }
 
     private void injectCodeOnNextLine(Statement anchorStatement, Node node, Statement loggingStatement) {
-        if (node.getParentNode().isPresent() && node.getParentNode().get() instanceof ForStmt forStmt) {
+        if (anchorStatement instanceof ForStmt forStmt) {
+            // if (node instanceof UnaryExpr || node instanceof AssignExpr){
+            // If it's a for statement, don't include variable declaration (will be reclared each loop)
             if (forStmt.getBody() instanceof BlockStmt body) {
                 body.addStatement(0, loggingStatement);
             } else if (forStmt.getBody() instanceof ExpressionStmt body) {
@@ -197,5 +203,4 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<String, List<Li
                 modifier.getKeyword() == Modifier.Keyword.PROTECTED ||
                 modifier.getKeyword() == Modifier.Keyword.PUBLIC;
     }
-
 }

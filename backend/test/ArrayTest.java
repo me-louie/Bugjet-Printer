@@ -10,6 +10,7 @@ public class ArrayTest {
         ArrayTest st = new ArrayTest();
         st.calc();
         st.helloWorld();
+        st.helloWorldNoDec();
     }
 
     @Track(var="x", nickname ="x")
@@ -40,10 +41,19 @@ public class ArrayTest {
     }
 
     @Track(var="m", nickname="m")
+    @Track(var="i", nickname="i")
     public void helloWorld() {
         int m = 100;
         for (int i = 0; i < 3; i++) {
             m++;
+        }
+    }
+
+    @Track(var="i", nickname="i")
+    public void helloWorldNoDec() {
+        int j = 3;
+        for (int i= 100; i < 103; i++) {
+            j = j + i;
         }
     }
 }
