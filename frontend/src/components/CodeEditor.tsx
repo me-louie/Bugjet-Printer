@@ -6,6 +6,7 @@ import "ace-builds/src-noconflict/mode-java";
 interface Props {
   text?: string;
   readOnly?: boolean;
+  height?: string;
 }
 
 function CodeEditor(props: Props) {
@@ -23,7 +24,7 @@ function CodeEditor(props: Props) {
       placeholder="Write your code here"
       mode="java"
       name="hello"
-      height="100%"
+      height={props.height || "100%"}
       readOnly={props.readOnly}
       value={props.readOnly ? props.text : text}
       onChange={onChange}

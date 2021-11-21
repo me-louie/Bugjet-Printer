@@ -4,15 +4,10 @@ import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import ListSubheader from '@mui/material/ListSubheader';
 import Switch from '@mui/material/Switch';
-
-interface Slice {
-  name: string;
-  program: string;
-  show: boolean;
-}
+import { Output } from '../mocks/output';
 
 interface Props {
-  slices: Slice[];
+  slices: (Output & { show: boolean })[];
   toggleShowSlice: (name: string) => void;
 }
 
@@ -39,11 +34,12 @@ export default function SwitchList(props: Props) {
 
   return (
     <List
-      sx={{ width: "100%", maxWidth: 200, bgcolor: "background.paper" }}
-      subheader={<ListSubheader>Varaible Names:</ListSubheader>}
+      sx={{ width: "100%", maxHeight: 250, bgcolor: "background.paper", margin: "auto",
+            marginBottom: 5, borderRadius: 2, border: '1px solid black', boxSizing: 'border-box', padding: 0 }}
+      subheader={<ListSubheader style={{ borderTopRightRadius: 7, borderTopLeftRadius: 7, backgroundColor: '#1976d2', color: 'white', position: 'relative' }}>Variable Names:</ListSubheader>}
     >
       {props.slices.map((slice => (
-        <ListItem key={slice.name}>
+        <ListItem key={slice.name} style={{ borderTop: '1px solid black' }}>
           <ListItemText id={`switch-list-label-${slice.name}`} primary={slice.name} />
           <Switch
             edge="end"
