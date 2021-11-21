@@ -33,7 +33,10 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<String, List<Li
                         StatementCreator.evaluateVarDeclarationWithoutInitializerStatement(name));
                 injectCodeOnNextLine(nodeContainingEntireStatement, vd,
                         StatementCreator.logVariable(name, null, id));
-            } else {
+            } else if (nodeContainingEntireStatement instanceof ForStmt) {
+                injectCodeOnNextLine(nodeContainingEntireStatement, vd,
+                        StatementCreator.evaluateForLoopVarDeclarationStatement(name, id));
+            }else {
                 injectCodeOnNextLine(nodeContainingEntireStatement, vd,
                         StatementCreator.evaluateVarDeclarationStatement(name, id));
             }
@@ -111,16 +114,18 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<String, List<Li
     }
 
     private void injectCodeOnNextLine(Statement anchorStatement, Node node, Statement loggingStatement) {
-        if (node.getParentNode().isPresent() && node.getParentNode().get() instanceof ForStmt forStmt) {
-            if (forStmt.getBody() instanceof BlockStmt body) {
-                body.addStatement(0, loggingStatement);
-            } else if (forStmt.getBody() instanceof ExpressionStmt body) {
-                // todo: handle the case where the body of the for statement isn't wrapped in curly brackets
-                //       also need to handle the case where the thing we're interested in is the body of the
-                //       for statement and it's not in brackets
-                //       same for if blocks
-                //       also this if/else statement very bad, should try to double dispatch instead
-            }
+        if (anchorStatement instanceof ForStmt forStmt) {
+            // if (node instanceof UnaryExpr || node instanceof AssignExpr){
+                // If it's a for statement, don't include variable declaration (will be reclared each loop)
+                if (forStmt.getBody() instanceof BlockStmt body) {
+                    body.addStatement(0, loggingStatement);
+                } else if (forStmt.getBody() instanceof ExpressionStmt body) {
+                    // todo: handle the case where the body of the for statement isn't wrapped in curly brackets
+                    //       also need to handle the case where the thing we're interested in is the body of the
+                    //       for statement and it's not in brackets
+                    //       same for if blocks
+                    //       also this if/else statement very bad, should try to double dispatch instead
+                }
         } else if (node.findAncestor(SwitchEntry.class).isPresent()) {
             NodeList<Statement> switchBlockStatements = node.findAncestor(SwitchEntry.class).get().getStatements();
             switchBlockStatements.add(switchBlockStatements.indexOf(anchorStatement) + 1, loggingStatement);

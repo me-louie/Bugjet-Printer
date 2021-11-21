@@ -33,6 +33,18 @@ public class VariableReferenceLogger {
         varToRefMap.put(varName, null);
     }
 
+    public static void evaluateForLoopVarDeclaration(Object var, String varName, int lineInfoNum) {
+        // only add for loop variable to VarMap if it isn't already there
+        if (!isTrackedReference(var.toString())) {
+            refToVarMap.put(var.toString(), new HashSet<>());
+            // add this var to the list of vars that point to its reference
+            refToVarMap.get(var.toString()).add(varName);
+            // add an entry for this variable
+            varToRefMap.put(varName, var.toString());
+            VariableLogger.log(varName, var, lineInfoNum);
+        }
+    }
+
     public static void evaluateAssignment(Object var, String varName, int lineInfoNum) {
         if (var == null) {
             evaluateNullAssignment(varName, lineInfoNum);
