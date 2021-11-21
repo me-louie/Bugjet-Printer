@@ -67,7 +67,7 @@ public class Main {
                         lineInfo.getNickname(),
                         lineInfo.getType(),
                         lineInfo.getLineNum(),
-                        lineInfo.getStatement(), // todo: something weird is happening with curly braces, leading int[] x = {1, 2, 3}; to be logged as int[] x =
+                        lineInfo.getStatement(),
                         lineInfo.getEnclosingClass(),
                         lineInfo.getEnclosingMethod()
                 ));

@@ -42,8 +42,8 @@ public class SimpleTest {
     @Track(var="m", nickname="m")
     @Track(var="i", nickname="i")
     public void helloWorld() {
-        int m = 100;
-        for (int i = 0; i < 3; i++) {
+        int m;
+        for (m= 100; m < 103; m++) {
             m++;
         }
     }

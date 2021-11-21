@@ -11,19 +11,29 @@ public final class Formatter {
                 + alias + "\", \""
                 + type + "\","
                 + lineNum + ", \""
-                + parsedStatement  + "\", \""
+                + parsedStatement + "\", \""
                 + enclosingClass + "\", \""
                 + enclosingMethod + "\", "
                 + id + "));" + "\n";
     }
 
-    /**
-     * Returns statement preceding the curly braces if it exists, otherwise returns the original string
-     */
     private static String parseStatement(String statement) {
-        if (statement.contains("{")){
-            return statement.split("\\{")[0];
+        String escapedStatement = statement
+                .replaceAll("\n", "\\\\n")
+                .replaceAll("\r", "\\\\r")
+                .replaceAll("\"", "\\\\\"");
+        String[] parsed = escapedStatement.split("\\\\n");
+        StringBuilder sb = new StringBuilder();
+        for (String s : parsed) {
+            if (!containsLoggingStatements(s)) {
+                sb.append(s);
+            }
         }
-        return statement;
+        return sb.toString();
+
+    }
+
+    private static boolean containsLoggingStatements(String statement) {
+        return statement.contains("VariableReferenceLogger") || statement.contains("VariableLogger");
     }
 }
