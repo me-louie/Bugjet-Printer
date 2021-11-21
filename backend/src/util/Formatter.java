@@ -18,29 +18,22 @@ public final class Formatter {
     }
 
     private static String parseStatement(String statement) {
-        if (containsLoggingStatements(statement) || shouldParseMultiLines(statement)) {
-            String escapedStatement = statement
-                    .replaceAll("\n", "\\\\n")
-                    .replaceAll("\r", "\\\\r")
-                    .replaceAll("\"", "\\\\\"");
-            String[] parsed = escapedStatement.split("\\\\n");
-            StringBuilder sb = new StringBuilder();
-            for (String s : parsed) {
-                if (!containsLoggingStatements(statement)) {
-                    sb.append(s);
-                }
+        String escapedStatement = statement
+                .replaceAll("\n", "\\\\n")
+                .replaceAll("\r", "\\\\r")
+                .replaceAll("\"", "\\\\\"");
+        String[] parsed = escapedStatement.split("\\\\n");
+        StringBuilder sb = new StringBuilder();
+        for (String s : parsed) {
+            if (!containsLoggingStatements(s)) {
+                sb.append(s);
             }
-            return sb.toString();
         }
-        return statement;
+        return sb.toString();
+
     }
 
-    private static boolean containsLoggingStatements(String statement){
+    private static boolean containsLoggingStatements(String statement) {
         return statement.contains("VariableReferenceLogger") || statement.contains("VariableLogger");
-    }
-
-    // TODO: add other cases as needed
-    private static boolean shouldParseMultiLines(String statement){
-        return statement.contains("for");
     }
 }
