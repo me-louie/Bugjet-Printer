@@ -1,13 +1,13 @@
 import annotation.Track;
 
-public class SimpleTest {
+public class ArrayTest {
 
     public static int ONE_BILLION = 1000000000;
 
     private double memory = 0;
 
     public static void main(String[] args) {
-        SimpleTest st = new SimpleTest();
+        ArrayTest st = new ArrayTest();
         st.calc();
         st.helloWorld();
     }
