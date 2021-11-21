@@ -1,28 +1,35 @@
 package ast;
 
+import annotation.Scope;
 import com.github.javaparser.ast.body.MethodDeclaration;
-import com.github.javaparser.ast.expr.NormalAnnotationExpr;
+import com.github.javaparser.ast.expr.AnnotationExpr;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 
 import java.util.Map;
 
-public class VariableAnnotationCollector extends VoidVisitorAdapter<Map<String, String>> {
+public class VariableAnnotationCollector extends VoidVisitorAdapter<Map<Scope, String>> {
 
     @Override
-    public void visit(MethodDeclaration md, Map<String, String> collector) {
+    public void visit(MethodDeclaration md, Map<Scope, String> collector) {
         super.visit(md, collector);
-        System.out.println("here");
-        System.out.println(md.getDeclarationAsString(true, true, true));
-        System.out.println("here");
-    }
-    @Override
-    public void visit(NormalAnnotationExpr nae, Map<String, String> collector) {
-        super.visit(nae, collector);
-        if (nae.getNameAsString().equals("Track")) {
-            // TODO: figure out where these "" are coming from and fix this string hack
-            String var = nae.getPairs().getFirst().get().getValue().toString().replace("\"", "");
-            String alias = nae.getPairs().getLast().get().getValue().toString().replace("\"", "");
-            collector.put(var, alias);
+        String scope = md.getDeclarationAsString(true, true, true);
+        for (AnnotationExpr nae : md.getAnnotations()) {
+            String name = nae.asNormalAnnotationExpr().getPairs().getFirst().get().getValue().toString().replace(
+                    "\"", "");
+            String nickname =
+                    nae.asNormalAnnotationExpr().getPairs().getLast().get().getValue().toString().replace(
+                            "\"", "");
+            collector.put(new Scope(scope, name), nickname);
         }
     }
+//    @Override
+//    public void visit(NormalAnnotationExpr nae, Map<ScopedAnnotation, String> collector) {
+//        super.visit(nae, collector);
+//        if (nae.getNameAsString().equals("Track")) {
+//            // TODO: figure out where these "" are coming from and fix this string hack
+//            String var = nae.getPairs().getFirst().get().getValue().toString().replace("\"", "");
+//            String alias = nae.getPairs().getLast().get().getValue().toString().replace("\"", "");
+//            collector.put(var, alias);
+//        }
+//    }
 }

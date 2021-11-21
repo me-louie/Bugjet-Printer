@@ -39,11 +39,11 @@ public class SimpleTest {
         alias = new int[2];
     }
 
-    @Track(var="m", nickname="m")
+    @Track(var="x", nickname="x")
     public void helloWorld() {
-        int m;
-        for (m= 100; m < 103; m++) {
-            m++;
+        int x;
+        for (x= 100; x < 103; x++) {
+            x++;
         }
     }
 }

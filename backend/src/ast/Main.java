@@ -1,5 +1,6 @@
 package ast;
 
+import annotation.Scope;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.MethodDeclaration;
@@ -20,24 +21,29 @@ public class Main {
     private static final String MODIFIED_AST_FILE_PATH = MODIFIED_FILES_DIRECTORY + "/SimpleTest.java";
     private static final String MODIFIED_VARIABLE_LOGGER_FILE_PATH = MODIFIED_FILES_DIRECTORY + "/VariableLogger.java";
     private static final String MODIFIED_LINE_INFO_FILE_PATH = MODIFIED_FILES_DIRECTORY + "/LineInfo.java";
-    private static final String MODIFIED_VARIABLE_REF_LOGGER_FILE_PATH = MODIFIED_FILES_DIRECTORY + "/VariableReferenceLogger.java";
+    private static final String MODIFIED_VARIABLE_REF_LOGGER_FILE_PATH = MODIFIED_FILES_DIRECTORY +
+            "/VariableReferenceLogger.java";
 
     public static void main(String[] args) throws IOException {
         // get ast
         CompilationUnit cu = StaticJavaParser.parse(new File(INPUT_FILE_PATH));
         // collect names/aliases of variables to track
-        VoidVisitor<Map<String, String>> variableAnnotationCollector = new VariableAnnotationCollector();
-        Map<String, String> variablesToTrack = new HashMap<>(); // map of variable names -> the aliases we'll track them under
+        VoidVisitor<Map<Scope, String>> variableAnnotationCollector = new VariableAnnotationCollector();
+        Map<Scope, String> variablesToTrack = new HashMap<>(); // map of variable names -> the aliases we'll track
+        // them under
         variableAnnotationCollector.visit(cu, variablesToTrack);
         // add logging code to ast
-        ModifierVisitor<Map<String, List<LineInfo>>> variableHistoryModifier = new VariableHistoryModifier();
-        Map<String, List<LineInfo>> lineInfoMap = new HashMap<>(); // map of variable names -> list of LineInfo for each line a mutation occurs
+        ModifierVisitor<Map<Scope, List<LineInfo>>> variableHistoryModifier = new VariableHistoryModifier();
+        // map of scope -> list of LineInfo for each line a mutation occurs
+        Map<Scope, List<LineInfo>> lineInfoMap = new HashMap<>();
         // we add an entry for the first declaration of a variable to pass in the alias
         variablesToTrack.keySet().forEach(var ->
-                lineInfoMap.put(var, new ArrayList<>(List.of(new LineInfo(var, variablesToTrack.get(var))))));
+                lineInfoMap.put(var,
+                        new ArrayList<>(List.of(new LineInfo(var.getVarName(), variablesToTrack.get(var))))));
         variableHistoryModifier.visit(cu, lineInfoMap);
         // this is super hacky, in order to get the alias info to the visit methods the first item in the list is a
-        // LineInfo with only the name and alias. Since it's not a real LineInfo we delete it here. I'll fix this at a later date
+        // LineInfo with only the name and alias. Since it's not a real LineInfo we delete it here. I'll fix this at
+        // a later date
         lineInfoMap.values().forEach(statementList -> statementList.remove(0));
         // add a call to VariableLogger.writeOutputToDisk() to write output after execution is complete
         try {
@@ -58,7 +64,7 @@ public class Main {
         // todo: send output.json to frontend
     }
 
-    private static String populateLineInfoMap(Map<String, List<LineInfo>> lineInfoMap) {
+    private static String populateLineInfoMap(Map<Scope, List<LineInfo>> lineInfoMap) {
         StringBuilder putStatements = new StringBuilder();
         for (List<LineInfo> lineInfos : lineInfoMap.values()) {
             for (LineInfo lineInfo : lineInfos) {
@@ -85,7 +91,7 @@ public class Main {
         writer.close();
     }
 
-    private static void writeModifiedVariableLogger(Map<String, List<LineInfo>> lineInfoMap) throws IOException {
+    private static void writeModifiedVariableLogger(Map<Scope, List<LineInfo>> lineInfoMap) throws IOException {
         BufferedWriter writer = new BufferedWriter(new FileWriter(MODIFIED_VARIABLE_LOGGER_FILE_PATH));
         BufferedReader reader = new BufferedReader(new FileReader(VARIABLE_LOGGER_FILE_PATH));
         String line;

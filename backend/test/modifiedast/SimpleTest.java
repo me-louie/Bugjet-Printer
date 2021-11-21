@@ -59,16 +59,16 @@ public class SimpleTest {
         VariableReferenceLogger.evaluateAssignment(alias, "alias", 13);
     }
 
-    @Track(var = "m", nickname = "m")
+    @Track(var = "x", nickname = "x")
     public void helloWorld() {
-        int m;
-        VariableLogger.log("m", "uninitialized", 14);
-        VariableReferenceLogger.evaluateVarDeclarationWithoutInitializer("m");
-        for (m = 100; m < 103; m++) {
-            VariableReferenceLogger.evaluateAssignment(m, "m", 17);
-            VariableReferenceLogger.evaluateAssignment(m, "m", 16);
-            m++;
-            VariableReferenceLogger.evaluateAssignment(m, "m", 15);
+        int x;
+        VariableLogger.log("x", "uninitialized", 14);
+        VariableReferenceLogger.evaluateVarDeclarationWithoutInitializer("x");
+        for (x = 100; x < 103; x++) {
+            VariableReferenceLogger.evaluateAssignment(x, "x", 17);
+            VariableReferenceLogger.evaluateAssignment(x, "x", 16);
+            x++;
+            VariableReferenceLogger.evaluateAssignment(x, "x", 15);
         }
     }
 }

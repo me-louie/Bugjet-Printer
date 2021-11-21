@@ -1,12 +1,16 @@
 package ast;
 
+import annotation.Scope;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
-import com.github.javaparser.ast.expr.*;
+import com.github.javaparser.ast.expr.ArrayAccessExpr;
+import com.github.javaparser.ast.expr.AssignExpr;
+import com.github.javaparser.ast.expr.UnaryExpr;
+import com.github.javaparser.ast.expr.VariableDeclarationExpr;
 import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.ast.visitor.ModifierVisitor;
 import util.StatementCreator;
@@ -15,14 +19,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class VariableHistoryModifier extends ModifierVisitor<Map<String, List<LineInfo>>> {
+public class VariableHistoryModifier extends ModifierVisitor<Map<Scope, List<LineInfo>>> {
 
     @Override
-    public VariableDeclarationExpr visit(VariableDeclarationExpr vde, Map<String, List<LineInfo>> lineInfoMap) {
+    public VariableDeclarationExpr visit(VariableDeclarationExpr vde, Map<Scope, List<LineInfo>> lineInfoMap) {
         super.visit(vde, lineInfoMap);
         for (VariableDeclarator vd : vde.getVariables()) {
             String name = vd.getNameAsString();
-            if (!isTrackedVariable(name, lineInfoMap)) {
+            String enclosingMethod = getEnclosingMethod(vd);
+            Scope scope = new Scope(enclosingMethod, name);
+            if (!isTrackedVariable(scope, lineInfoMap)) {
                 continue;
             }
             Statement nodeContainingEntireStatement = (Statement) vd.getParentNode().get().getParentNode().get();
@@ -37,13 +43,13 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<String, List<Li
                 injectCodeOnNextLine(nodeContainingEntireStatement, vd,
                         StatementCreator.evaluateVarDeclarationStatement(name, id));
             }
-            addToLineInfoMap(name, type, nodeContainingEntireStatement, vd, lineInfoMap, id);
+            addToLineInfoMap(scope, type, nodeContainingEntireStatement, vd, lineInfoMap, id);
         }
         return vde;
     }
 
     @Override
-    public FieldDeclaration visit(FieldDeclaration fd, Map<String, List<LineInfo>> lineInfo) {
+    public FieldDeclaration visit(FieldDeclaration fd, Map<Scope, List<LineInfo>> lineInfo) {
         super.visit(fd, lineInfo);
         // todo: FieldDeclarations aren't inside of a BlockStatement, which means we can't add a log statement directly
         //       below them. This makes tracking these variables a bit trickier. Leaving it for now
@@ -51,46 +57,54 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<String, List<Li
     }
 
     @Override
-    public AssignExpr visit(AssignExpr ae, Map<String, List<LineInfo>> lineInfoMap) {
+    public AssignExpr visit(AssignExpr ae, Map<Scope, List<LineInfo>> lineInfoMap) {
         super.visit(ae, lineInfoMap);
         // If making an array access assignment we want the name of the variable without the square brackets
         String name = (isArrayAccessAssignment(ae)) ?
                 ((ArrayAccessExpr) ae.getTarget()).getName().toString() :
                 ae.getTarget().toString();
+        String enclosingMethod = getEnclosingMethod(ae);
+        Scope scope = new Scope(enclosingMethod, name);
         Statement nodeContainingEntireStatement = (Statement) ae.getParentNode().get();
-        trackVariableMutation(name, nodeContainingEntireStatement, ae, lineInfoMap);
+        trackVariableMutation(name, scope, nodeContainingEntireStatement, ae, lineInfoMap);
         return ae;
     }
 
     @Override
-    public UnaryExpr visit(UnaryExpr ue, Map<String, List<LineInfo>> lineInfoMap) {
+    public UnaryExpr visit(UnaryExpr ue, Map<Scope, List<LineInfo>> lineInfoMap) {
         super.visit(ue, lineInfoMap);
         String name = ue.getExpression().toString();
-        if (isTrackedVariable(name, lineInfoMap)) {
+        String enclosingMethod = getEnclosingMethod(ue);
+        Scope scope = new Scope(enclosingMethod, name);
+        if (isTrackedVariable(scope, lineInfoMap)) {
             Statement nodeContainingEntireStatement = (Statement) ue.getParentNode().get();
-            trackVariableMutation(name, nodeContainingEntireStatement, ue, lineInfoMap);
+            trackVariableMutation(name, scope, nodeContainingEntireStatement, ue, lineInfoMap);
         }
         return ue;
     }
 
-    private void trackVariableMutation(String name, Statement nodeContainingEntireStatement, Node node, Map<String,
+    private void trackVariableMutation(String name, Scope scope, Statement nodeContainingEntireStatement,
+                                       Node node, Map<Scope,
             List<LineInfo>> lineInfoMap) {
         int id = UniqueNumberGenerator.generate();
-        addToLineInfoMap(name, null, nodeContainingEntireStatement, node, lineInfoMap, id);
+        addToLineInfoMap(scope, null, nodeContainingEntireStatement, node, lineInfoMap, id);
         Statement injectedLine = StatementCreator.evaluateAssignmentStatement(name, id);
         injectCodeOnNextLine(nodeContainingEntireStatement, node, injectedLine);
     }
 
-    private void addToLineInfoMap(String name, String type, Statement nodeContainingEntireStatement, Node node,
-                                  Map<String, List<LineInfo>> lineInfoMap, int id) {
-        String nickname = isTrackedVariable(name, lineInfoMap) ? lineInfoMap.get(name).get(0).getNickname() : null;
+    private void addToLineInfoMap(Scope scope, String type,
+                                  Statement nodeContainingEntireStatement, Node node,
+                                  Map<Scope, List<LineInfo>> lineInfoMap, int id) {
+        String nickname = isTrackedVariable(scope, lineInfoMap) ? lineInfoMap.get(scope).get(0).getNickname() : null;
         Integer lineNum = getLineNum(node);
         String enclosingClass = getEnclosingClass(node);
         String enclosingMethod = getEnclosingMethod(node);
-        if (!isTrackedVariable(name, lineInfoMap)) {
-            lineInfoMap.put(name, new ArrayList<>(List.of(new LineInfo()))); // add with a dummy item to make nickname hack work
+        if (!isTrackedVariable(scope, lineInfoMap)) {
+            lineInfoMap.put(scope, new ArrayList<>(List.of(new LineInfo()))); // add with a dummy item to make nickname
+            // hack work
         }
-        lineInfoMap.get(name).add(new LineInfo(name, nickname, type, lineNum, nodeContainingEntireStatement.toString(),
+        lineInfoMap.get(scope).add(new LineInfo(scope.getVarName(), nickname, type, lineNum,
+                nodeContainingEntireStatement.toString(),
                 enclosingClass, enclosingMethod, id));
     }
 
@@ -135,8 +149,8 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<String, List<Li
         return ae.getTarget() instanceof ArrayAccessExpr;
     }
 
-    private boolean isTrackedVariable(String name, Map<String, List<LineInfo>> lineInfoMap) {
-        return lineInfoMap.containsKey(name);
+    private boolean isTrackedVariable(Scope scope, Map<Scope, List<LineInfo>> lineInfoMap) {
+        return lineInfoMap.containsKey(scope);
     }
 
     private boolean isDeclaredButNotInitialized(VariableDeclarator vd) {
