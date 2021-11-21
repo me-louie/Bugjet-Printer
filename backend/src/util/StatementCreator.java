@@ -47,7 +47,7 @@ public final class StatementCreator {
     }
 
     public static Statement evaluateForLoopVarDeclarationStatement(String name, int uniqueNum) {
-        return StaticJavaParser.parseStatement("VariableReferenceLogger.evaluateVarDeclaration("
+        return StaticJavaParser.parseStatement("VariableReferenceLogger.evaluateForLoopVarDeclaration("
                 + name
                 + ", \""
                 + name

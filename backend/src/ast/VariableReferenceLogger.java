@@ -31,11 +31,14 @@ public class VariableReferenceLogger {
     }
 
     public static void evaluateForLoopVarDeclaration(Object var, String varName, int lineInfoNum) {
-        if (var == null) {
-            varToRefMap.put(varName, null);
-            modifiedast.VariableLogger.log(varName, null, lineInfoNum);
+
+        // only add for loop variable to VarMap if it isn't already there
+        if (!isTrackedReference(var.toString())) {
+            refToVarMap.put(var.toString(), new HashSet<>());
+            refToVarMap.get(var.toString()).add(varName); // add this var to the list of vars that point to its reference
+            varToRefMap.put(varName, var.toString());     // add an entry for this variable
+            VariableLogger.log(varName, var, lineInfoNum);
         }
-        return;
     }
 
     public static void evaluateAssignment(Object var, String varName, int lineInfoNum) {

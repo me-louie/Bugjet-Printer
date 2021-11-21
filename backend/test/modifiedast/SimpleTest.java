@@ -74,13 +74,14 @@ public class SimpleTest {
         }
     }
 
-    @Track(var = "m", nickname = "m")
+    @Track(var = "i", nickname = "i")
     public void helloWorldNoDec() {
-        for (int m = 100; m < 103; m++) {
-            VariableReferenceLogger.evaluateAssignment(m, "m", 20);
-            VariableReferenceLogger.evaluateVarDeclaration(m, "m", 19);
-            m++;
-            VariableReferenceLogger.evaluateAssignment(m, "m", 18);
+        int j = 3;
+        for (int i = 100; i < 103; i++) {
+            VariableReferenceLogger.evaluateAssignment(i, "i", 20);
+            VariableReferenceLogger.evaluateForLoopVarDeclaration(i, "i", 19);
+            j = j + i;
+            VariableReferenceLogger.evaluateAssignment(j, "j", 18);
         }
     }
 }

@@ -27,16 +27,16 @@ public class VariableLogger {
 		put(5, new LineInfo("y", "y", "int[]",26, "int[] y = x;", "SimpleTest", "public Double calc()", 5));
 		put(7, new LineInfo("y", "y", "null",29, "y[0] = 200;", "SimpleTest", "public Double calc()", 7));
 		put(11, new LineInfo("y", "y", "null",33, "y = new int[] { 7, 8, 9 };", "SimpleTest", "public Double calc()", 11));
+		put(19, new LineInfo("i", "i", "int",55, "for (int i = 100; i < 103; i++) {\r    j = j + i;\r}", "SimpleTest", "public void helloWorldNoDec()", 19));
+		put(20, new LineInfo("i", "i", "null",55, "for (int i = 100; i < 103; i++) {\r    j = j + i;\r}", "SimpleTest", "public void helloWorldNoDec()", 20));
 		put(12, new LineInfo("alias", "null", "null",39, "alias[0] = -1;", "SimpleTest", "private void nestedMethod(int[] alias)", 12));
 		put(13, new LineInfo("alias", "null", "null",40, "alias = new int[2];", "SimpleTest", "private void nestedMethod(int[] alias)", 13));
 		put(9, new LineInfo("z", "null", "null",31, "z[2] = 400;", "SimpleTest", "public Double calc()", 9));
+		put(18, new LineInfo("j", "null", "null",56, "j = j + i;", "SimpleTest", "public void helloWorldNoDec()", 18));
 		put(14, new LineInfo("m", "m", "int",46, "int m;", "SimpleTest", "public void helloWorld()", 14));
 		put(15, new LineInfo("m", "m", "null",48, "m++;", "SimpleTest", "public void helloWorld()", 15));
 		put(16, new LineInfo("m", "m", "null",47, "for (m = 100; m < 103; m++) {\r    m++;\r}", "SimpleTest", "public void helloWorld()", 16));
 		put(17, new LineInfo("m", "m", "null",47, "for (m = 100; m < 103; m++) {\r    m++;\r}", "SimpleTest", "public void helloWorld()", 17));
-		put(18, new LineInfo("m", "m", "null",55, "m++;", "SimpleTest", "public void helloWorldNoDec()", 18));
-		put(19, new LineInfo("m", "m", "int",54, "for (int m = 100; m < 103; m++) {\r    m++;\r}", "SimpleTest", "public void helloWorldNoDec()", 19));
-		put(20, new LineInfo("m", "m", "null",54, "for (int m = 100; m < 103; m++) {\r    m++;\r}", "SimpleTest", "public void helloWorldNoDec()", 20));
     }};
     // variable name -> Output object containing all info tracked about variable
     private static Map<String, Output> outputMap = new HashMap<>();
