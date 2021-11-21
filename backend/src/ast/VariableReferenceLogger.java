@@ -30,6 +30,14 @@ public class VariableReferenceLogger {
         varToRefMap.put(varName, null);
     }
 
+    public static void evaluateForLoopVarDeclaration(Object var, String varName, int lineInfoNum) {
+        if (var == null) {
+            varToRefMap.put(varName, null);
+            modifiedast.VariableLogger.log(varName, null, lineInfoNum);
+        }
+        return;
+    }
+
     public static void evaluateAssignment(Object var, String varName, int lineInfoNum) {
         if (var == null) {
             evaluateNullAssignment(varName, lineInfoNum);

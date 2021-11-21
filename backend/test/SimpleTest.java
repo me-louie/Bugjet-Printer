@@ -10,6 +10,7 @@ public class SimpleTest {
         SimpleTest st = new SimpleTest();
         st.calc();
         st.helloWorld();
+        st.helloWorldNoDec();
     }
 
     @Track(var="x", nickname ="x")
@@ -44,6 +45,13 @@ public class SimpleTest {
     public void helloWorld() {
         int m;
         for (m= 100; m < 103; m++) {
+            m++;
+        }
+    }
+
+    @Track(var="m", nickname="m")
+    public void helloWorldNoDec() {
+        for (int m= 100; m < 103; m++) {
             m++;
         }
     }

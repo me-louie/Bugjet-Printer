@@ -45,4 +45,14 @@ public final class StatementCreator {
                 + uniqueNum
                 + ");");
     }
+
+    public static Statement evaluateForLoopVarDeclarationStatement(String name, int uniqueNum) {
+        return StaticJavaParser.parseStatement("VariableReferenceLogger.evaluateVarDeclaration("
+                + name
+                + ", \""
+                + name
+                + "\", "
+                + uniqueNum
+                + ");");
+    }
 }

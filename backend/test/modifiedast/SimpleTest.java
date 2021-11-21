@@ -15,6 +15,7 @@ public class SimpleTest {
         SimpleTest st = new SimpleTest();
         st.calc();
         st.helloWorld();
+        st.helloWorldNoDec();
         VariableLogger.writeOutputToDisk();
     }
 
@@ -60,6 +61,7 @@ public class SimpleTest {
     }
 
     @Track(var = "m", nickname = "m")
+    @Track(var = "i", nickname = "i")
     public void helloWorld() {
         int m;
         VariableLogger.log("m", "uninitialized", 14);
@@ -69,6 +71,16 @@ public class SimpleTest {
             VariableReferenceLogger.evaluateAssignment(m, "m", 16);
             m++;
             VariableReferenceLogger.evaluateAssignment(m, "m", 15);
+        }
+    }
+
+    @Track(var = "m", nickname = "m")
+    public void helloWorldNoDec() {
+        for (int m = 100; m < 103; m++) {
+            VariableReferenceLogger.evaluateAssignment(m, "m", 20);
+            VariableReferenceLogger.evaluateVarDeclaration(m, "m", 19);
+            m++;
+            VariableReferenceLogger.evaluateAssignment(m, "m", 18);
         }
     }
 }
