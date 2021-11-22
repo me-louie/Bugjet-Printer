@@ -24,6 +24,11 @@
   color: white;
 }
 
+.replacement_marker {
+  position: absolute;
+  background-color: #FFFF00;
+}
+
 .App-link {
   color: #61dafb;
 }

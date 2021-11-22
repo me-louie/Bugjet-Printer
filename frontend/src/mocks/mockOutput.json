@@ -289,7 +289,7 @@
   {
     "name": "i",
     "alias": "alias_for_i",
-    "type": "null",
+    "type": "int",
     "history": [
       {
         "statement": "for (int i \u003d 0; i \u003c 10; i++) ",

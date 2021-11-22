@@ -11,78 +11,72 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts';
+import { IMarker } from 'react-ace';
+import { SymbolType } from 'recharts/types/util/types';
 
-// Import these from the JSON
-// const data01 = [
-//   { x: 10, y: 30 },
-//   { x: 30, y: 200 },
-//   { x: 45, y: 100 },
-//   { x: 50, y: 400 },
-//   { x: 70, y: 150 },
-//   { x: 100, y: 250 },
-// ];
-// const data02 = [
-//   { x: 30, y: 20 },
-//   { x: 50, y: 180 },
-//   { x: 75, y: 240 },
-//   { x: 100, y: 100 },
-//   { x: 120, y: 190 },
-// ];
+
+const symbols: SymbolType[] = ['circle', 'cross', 'diamond', 'square', 'star', 'triangle', 'wye'];
 
 interface Props {
   output: Output;
+  setMarker: (arr: IMarker[]) => void;
 }
 
-// const history = mock[0].history;
-
-// // const XAxisCount = history.length;
-
-// // let Axisdata = [];
-
-// const axis2 = history.map((e, idx) => {
-//   return {
-//     x: idx*2,
-//     y: Number(e.value),
-//     ...e,
-//   }
-// });
-
-// console.log("Axis2: "+ axis2);
-
-
-// function makeXAxis(){
-
-//   for (let i = 0; i < XAxisCount; i++){
-//     var x = { x: i*2, y: history[i].value };
-//     Axisdata.push(x);
-//   }
-
-// }
-
-
-const CustomTooltip = ({ active, payload, label }: any) => {
-  if (active && payload && payload.length) {
-    console.log(payload);
-    console.log(label);
-    return (
-      <div className="custom-tooltip" style={{ backgroundColor: 'lightgrey', paddingLeft: 10, paddingRight: 10 }}>
-        <p className="line-number">Line number: {payload[0].payload.line}</p>
-        <p className="value">Value: {payload[1].payload.value}</p>
-        <p className="enclosing-class">Class: {payload[0].payload.enclosingClass}</p>
-        <p className="enclosing-method">Method: {payload[0].payload.enclosingMethod}</p>
-      </div>
-    );
-  }
-  return null;
+interface State {
+  symbol: SymbolType;
+  color: string;
 }
 
-export default class LineChart extends PureComponent<Props> {
+function getRandomColor() {
+  const r = Math.floor(Math.random() * 200);
+  const g = Math.floor(Math.random() * 200);
+  const b = Math.floor(Math.random() * 200);
+  const color = "rgb(" + r + "," + g + "," + b + ")";
+
+  return color;
+}
+
+export default class LineChart extends PureComponent<Props, State> {
   static demoUrl = 'https://codesandbox.io/s/scatter-chart-with-joint-line-2ucid';
+  constructor(props: Props) {
+    super(props);
+
+    this.state = {
+      symbol: symbols[Math.floor(Math.random() * symbols.length)],
+      color: getRandomColor(),
+    };
+  }
+
+  CustomTooltip = ({ active, payload }: any) => {
+    if (active && payload && payload.length) {
+      const line = payload[0].payload.line as number;
+      this.props.setMarker([{
+        startRow: line - 1,
+        endRow: line,
+        startCol: 0,
+        endCol: 0,
+        className: 'replacement_marker',
+        type: 'text'
+      }]);
+
+      return (
+        <div className="custom-tooltip" style={{ backgroundColor: 'lightgrey', paddingLeft: 10, paddingRight: 10 }}>
+          <p className="line-number">Line number: {line}</p>
+          <p className="value">Value: {payload[1].payload.value}</p>
+          <p className="enclosing-class">Class: {payload[0].payload.enclosingClass}</p>
+          <p className="enclosing-method">Method: {payload[0].payload.enclosingMethod}</p>
+        </div>
+      );
+    }
+
+    this.props.setMarker([]);
+    return null;
+  }
 
   render() {
     const axis2 = this.props.output.history.map((e, idx) => {
       return {
-        x: idx*2,
+        x: idx * 2,
         y: Number(e.value),
         ...e,
       }
@@ -101,14 +95,13 @@ export default class LineChart extends PureComponent<Props> {
           }}
         >
           <CartesianGrid />
-          <XAxis type="number" dataKey="x" name="line number"  hide/>
+          <XAxis type="number" dataKey="x" name="line number" hide />
           {/* Maybe want to use unit as double later? */}
           <YAxis type="number" dataKey="y" name="Value" />
           <ZAxis type="number" range={[100]} />
-          <Tooltip cursor={{ strokeDasharray: '3 3' }} content={<CustomTooltip />}/>
+          <Tooltip cursor={{ strokeDasharray: '3 3' }} content={this.CustomTooltip} />
           <Legend />
-          <Scatter name="double a" data={axis2} fill="#8884d8" line shape="cross" />
-          {/* <Scatter name="double b" data={data02} fill="#82ca9d" line shape="diamond" /> */}
+          <Scatter name={`${this.props.output.type} ${this.props.output.name}`} data={axis2} fill={this.state.color} line shape={this.state.symbol} />
         </ScatterChart>
       </ResponsiveContainer>
     );
