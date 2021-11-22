@@ -1,5 +1,6 @@
 package ast;
 
+import annotation.Scope;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -18,17 +19,20 @@ public class VariableLogger {
     public static Map<Integer, LineInfo> lineInfoMap = new HashMap<>() {{
     }};
     // variable name -> Output object containing all info tracked about variable
-    private static Map<String, Output> outputMap = new HashMap<>();
+    private static Map<Scope, Output> outputMap = new HashMap<>();
     private static Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
 
     public static void log(String variableName, Object variableValue, Integer id) {
         LineInfo lineInfo = lineInfoMap.get(id);
-        Output output = (outputMap.containsKey(variableName)) ?
-                outputMap.get(variableName) :
-                new Output(variableName, lineInfo.getNickname(), lineInfo.getType());
+//        String name = lineInfo.getName();
+        String enclosingMethod = lineInfo.getEnclosingMethod();
+        Scope scope = new Scope(enclosingMethod, variableName);
+        Output output = (outputMap.containsKey(scope)) ?
+                outputMap.get(scope) :
+                new Output(variableName, scope, lineInfo.getNickname(), lineInfo.getType());
         output.addMutation(lineInfo.getStatement(), lineInfo.getEnclosingClass(), lineInfo.getEnclosingMethod(),
                 variableValue, lineInfo.getLineNum());
-        outputMap.put(variableName, output);
+        outputMap.put(scope, output);
     }
 
     public static void writeOutputToDisk() throws IOException {
@@ -40,10 +44,12 @@ public class VariableLogger {
     private static class Output {
 
         private String name, nickname, type;
+        private Scope scope;
         private List<Mutation> history;
 
-        public Output(String name, String nickname, String type) {
+        public Output(String name, Scope scope, String nickname, String type) {
             this.name = name;
+            this.scope = scope;
             this.nickname = nickname;
             this.type = type;
             history = new ArrayList<>();

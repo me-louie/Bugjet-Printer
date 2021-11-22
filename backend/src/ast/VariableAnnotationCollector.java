@@ -22,14 +22,4 @@ public class VariableAnnotationCollector extends VoidVisitorAdapter<Map<Scope, S
             collector.put(new Scope(scope, name), nickname);
         }
     }
-//    @Override
-//    public void visit(NormalAnnotationExpr nae, Map<ScopedAnnotation, String> collector) {
-//        super.visit(nae, collector);
-//        if (nae.getNameAsString().equals("Track")) {
-//            // TODO: figure out where these "" are coming from and fix this string hack
-//            String var = nae.getPairs().getFirst().get().getValue().toString().replace("\"", "");
-//            String alias = nae.getPairs().getLast().get().getValue().toString().replace("\"", "");
-//            collector.put(var, alias);
-//        }
-//    }
 }
