@@ -68,7 +68,7 @@ public class VariableLogger {
     }};
     // variable name -> Output object containing all info tracked about variable
     private static Map<String, Output> outputMap = new HashMap<>();
-    private static Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
+    private static Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().disableHtmlEscaping().create();
 
     public static void log(String variableName, Object variableValue, Integer id) {
         LineInfo lineInfo = lineInfoMap.get(id);
