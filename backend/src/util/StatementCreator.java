@@ -13,10 +13,12 @@ public final class StatementCreator {
         return log(name, value, uniqueIdentifier);
     }
 
-    public static Statement evaluateVarDeclarationWithoutInitializerStatement(String name) {
+    public static Statement evaluateVarDeclarationWithoutInitializerStatement(String name, int id) {
         return StaticJavaParser.parseStatement("VariableReferenceLogger.evaluateVarDeclarationWithoutInitializer(\""
                 + name
-                + "\");");
+                + "\","
+                + id
+                + ");");
     }
 
     private static Statement log(String name, String value, int id) {
@@ -38,6 +40,24 @@ public final class StatementCreator {
 
     public static Statement evaluateVarDeclarationStatement(String name, int uniqueNum) {
         return StaticJavaParser.parseStatement("VariableReferenceLogger.evaluateVarDeclaration("
+                + name
+                + ", \""
+                + name
+                + "\", "
+                + uniqueNum
+                + ");");
+    }
+
+    public static Statement checkBaseAndNestedObjectsStatement(String name, int uniqueNum) {
+        return StaticJavaParser.parseStatement("VariableReferenceLogger.checkBaseAndNestedObjects("
+                + name
+                + ", "
+                + uniqueNum
+                + ");");
+    }
+
+    public static Statement evaluateForLoopVarDeclarationStatement(String name, int uniqueNum) {
+        return StaticJavaParser.parseStatement("VariableReferenceLogger.evaluateForLoopVarDeclaration("
                 + name
                 + ", \""
                 + name
