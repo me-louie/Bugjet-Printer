@@ -30,7 +30,7 @@ public class VariableLogger {
         Output output = (outputMap.containsKey(scope)) ?
                 outputMap.get(scope) :
                 new Output(variableName, scope, lineInfo.getNickname(), lineInfo.getType());
-        output.addMutation(lineInfo.getStatement(), lineInfo.getEnclosingClass(), lineInfo.getEnclosingMethod(),
+        output.addMutation(lineInfo.getStatement(), enclosingClass, enclosingMethod,
                 variableValue, lineInfo.getLineNum());
         outputMap.put(scope, output);
     }

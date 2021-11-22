@@ -12,6 +12,7 @@ import com.github.javaparser.ast.expr.VariableDeclarationExpr;
 import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.ast.visitor.ModifierVisitor;
 import util.NodeParser;
+import util.Scoper;
 import util.StatementCreator;
 
 import java.util.ArrayList;
@@ -25,7 +26,7 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<VariableScope, 
         super.visit(vde, lineInfoMap);
         for (VariableDeclarator vd : vde.getVariables()) {
             String name = vd.getNameAsString();
-            VariableScope scope = createVariableScope(name, vd);
+            VariableScope scope = Scoper.createScope(name, vd);
             if (!isTrackedVariable(scope, lineInfoMap)) {
                 continue;
             }
@@ -61,7 +62,7 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<VariableScope, 
         String name = (isArrayAccessAssignment(ae)) ?
                 ((ArrayAccessExpr) ae.getTarget()).getName().toString() :
                 ae.getTarget().toString();
-        VariableScope scope = createVariableScope(name, ae);
+        VariableScope scope = Scoper.createScope(name, ae);
         Statement nodeContainingEntireStatement = (Statement) ae.getParentNode().get();
         trackVariableMutation(name, scope, nodeContainingEntireStatement, ae, lineInfoMap);
         return ae;
@@ -71,7 +72,7 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<VariableScope, 
     public UnaryExpr visit(UnaryExpr ue, Map<VariableScope, List<LineInfo>> lineInfoMap) {
         super.visit(ue, lineInfoMap);
         String name = ue.getExpression().toString();
-        VariableScope scope = createVariableScope(name, ue);
+        VariableScope scope = Scoper.createScope(name, ue);
         if (isTrackedVariable(scope, lineInfoMap)) {
             Statement nodeContainingEntireStatement = (Statement) ue.getParentNode().get();
             trackVariableMutation(name, scope, nodeContainingEntireStatement, ue, lineInfoMap);
@@ -139,11 +140,5 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<VariableScope, 
 
     private boolean isDeclaredButNotInitialized(VariableDeclarator vd) {
         return vd.getInitializer().isEmpty();
-    }
-
-    private VariableScope createVariableScope(String name, Node node) {
-        String enclosingClass = NodeParser.getEnclosingClass(node);
-        String enclosingMethod = NodeParser.getEnclosingMethod(node);
-        return new VariableScope(name, enclosingMethod, enclosingClass);
     }
 }
