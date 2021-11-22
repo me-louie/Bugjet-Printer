@@ -25,9 +25,7 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<VariableScope, 
         super.visit(vde, lineInfoMap);
         for (VariableDeclarator vd : vde.getVariables()) {
             String name = vd.getNameAsString();
-            String enclosingMethod = NodeParser.getEnclosingMethod(vd);
-            String enclosingClass = NodeParser.getEnclosingClass(vd);
-            VariableScope scope = new VariableScope(name, enclosingMethod, enclosingClass);
+            VariableScope scope = createVariableScope(name, vd);
             if (!isTrackedVariable(scope, lineInfoMap)) {
                 continue;
             }
@@ -63,9 +61,7 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<VariableScope, 
         String name = (isArrayAccessAssignment(ae)) ?
                 ((ArrayAccessExpr) ae.getTarget()).getName().toString() :
                 ae.getTarget().toString();
-        String enclosingMethod = NodeParser.getEnclosingMethod(ae);
-        String enclosingClass = NodeParser.getEnclosingClass(ae);
-        VariableScope scope = new VariableScope(name, enclosingMethod, enclosingClass);
+        VariableScope scope = createVariableScope(name, ae);
         Statement nodeContainingEntireStatement = (Statement) ae.getParentNode().get();
         trackVariableMutation(name, scope, nodeContainingEntireStatement, ae, lineInfoMap);
         return ae;
@@ -75,9 +71,7 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<VariableScope, 
     public UnaryExpr visit(UnaryExpr ue, Map<VariableScope, List<LineInfo>> lineInfoMap) {
         super.visit(ue, lineInfoMap);
         String name = ue.getExpression().toString();
-        String enclosingMethod = NodeParser.getEnclosingMethod(ue);
-        String enclosingClass = NodeParser.getEnclosingClass(ue);
-        VariableScope scope = new VariableScope(name, enclosingMethod, enclosingClass);
+        VariableScope scope = createVariableScope(name, ue);
         if (isTrackedVariable(scope, lineInfoMap)) {
             Statement nodeContainingEntireStatement = (Statement) ue.getParentNode().get();
             trackVariableMutation(name, scope, nodeContainingEntireStatement, ue, lineInfoMap);
@@ -147,4 +141,9 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<VariableScope, 
         return vd.getInitializer().isEmpty();
     }
 
+    private VariableScope createVariableScope(String name, Node node) {
+        String enclosingClass = NodeParser.getEnclosingClass(node);
+        String enclosingMethod = NodeParser.getEnclosingMethod(node);
+        return new VariableScope(name, enclosingMethod, enclosingClass);
+    }
 }
