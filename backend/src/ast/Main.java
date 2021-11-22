@@ -1,6 +1,6 @@
 package ast;
 
-import annotation.Scope;
+import annotation.VariableScope;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.MethodDeclaration;
@@ -28,14 +28,14 @@ public class Main {
         // get ast
         CompilationUnit cu = StaticJavaParser.parse(new File(INPUT_FILE_PATH));
         // collect names/aliases of variables to track
-        VoidVisitor<Map<Scope, String>> variableAnnotationCollector = new VariableAnnotationCollector();
-        Map<Scope, String> variablesToTrack = new HashMap<>(); // map of variable names -> the aliases we'll track
+        VoidVisitor<Map<VariableScope, String>> variableAnnotationCollector = new VariableAnnotationCollector();
+        Map<VariableScope, String> variablesToTrack = new HashMap<>(); // map of variable names -> the aliases we'll track
         // them under
         variableAnnotationCollector.visit(cu, variablesToTrack);
         // add logging code to ast
-        ModifierVisitor<Map<Scope, List<LineInfo>>> variableHistoryModifier = new VariableHistoryModifier();
+        ModifierVisitor<Map<VariableScope, List<LineInfo>>> variableHistoryModifier = new VariableHistoryModifier();
         // map of scope -> list of LineInfo for each line a mutation occurs
-        Map<Scope, List<LineInfo>> lineInfoMap = new HashMap<>();
+        Map<VariableScope, List<LineInfo>> lineInfoMap = new HashMap<>();
         // we add an entry for the first declaration of a variable to pass in the alias
         variablesToTrack.keySet().forEach(var ->
                 lineInfoMap.put(var,
@@ -64,7 +64,7 @@ public class Main {
         // todo: send output.json to frontend
     }
 
-    private static String populateLineInfoMap(Map<Scope, List<LineInfo>> lineInfoMap) {
+    private static String populateLineInfoMap(Map<VariableScope, List<LineInfo>> lineInfoMap) {
         StringBuilder putStatements = new StringBuilder();
         for (List<LineInfo> lineInfos : lineInfoMap.values()) {
             for (LineInfo lineInfo : lineInfos) {
@@ -91,7 +91,7 @@ public class Main {
         writer.close();
     }
 
-    private static void writeModifiedVariableLogger(Map<Scope, List<LineInfo>> lineInfoMap) throws IOException {
+    private static void writeModifiedVariableLogger(Map<VariableScope, List<LineInfo>> lineInfoMap) throws IOException {
         BufferedWriter writer = new BufferedWriter(new FileWriter(MODIFIED_VARIABLE_LOGGER_FILE_PATH));
         BufferedReader reader = new BufferedReader(new FileReader(VARIABLE_LOGGER_FILE_PATH));
         String line;

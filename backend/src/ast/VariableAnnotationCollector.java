@@ -1,25 +1,28 @@
 package ast;
 
-import annotation.Scope;
+import annotation.VariableScope;
+import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.expr.AnnotationExpr;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
+import util.NodeParser;
 
 import java.util.Map;
 
-public class VariableAnnotationCollector extends VoidVisitorAdapter<Map<Scope, String>> {
+public class VariableAnnotationCollector extends VoidVisitorAdapter<Map<VariableScope, String>> {
 
     @Override
-    public void visit(MethodDeclaration md, Map<Scope, String> collector) {
+    public void visit(MethodDeclaration md, Map<VariableScope, String> collector) {
         super.visit(md, collector);
-        String scope = md.getDeclarationAsString(true, true, true);
+        String enclosingMethod = NodeParser.getEnclosingMethod(md);
+        String enclosingClass = NodeParser.getEnclosingClass(md);
         for (AnnotationExpr nae : md.getAnnotations()) {
             String name = nae.asNormalAnnotationExpr().getPairs().getFirst().get().getValue().toString().replace(
                     "\"", "");
             String nickname =
                     nae.asNormalAnnotationExpr().getPairs().getLast().get().getValue().toString().replace(
                             "\"", "");
-            collector.put(new Scope(scope, name), nickname);
+            collector.put(new VariableScope(name, enclosingMethod, enclosingClass), nickname);
         }
     }
 }

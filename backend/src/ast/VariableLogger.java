@@ -1,6 +1,6 @@
 package ast;
 
-import annotation.Scope;
+import annotation.VariableScope;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -19,14 +19,14 @@ public class VariableLogger {
     public static Map<Integer, LineInfo> lineInfoMap = new HashMap<>() {{
     }};
     // variable name -> Output object containing all info tracked about variable
-    private static Map<Scope, Output> outputMap = new HashMap<>();
+    private static Map<VariableScope, Output> outputMap = new HashMap<>();
     private static Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
 
     public static void log(String variableName, Object variableValue, Integer id) {
         LineInfo lineInfo = lineInfoMap.get(id);
-//        String name = lineInfo.getName();
         String enclosingMethod = lineInfo.getEnclosingMethod();
-        Scope scope = new Scope(enclosingMethod, variableName);
+        String enclosingClass = lineInfo.getEnclosingClass();
+        VariableScope scope = new VariableScope(variableName, enclosingMethod, enclosingClass);
         Output output = (outputMap.containsKey(scope)) ?
                 outputMap.get(scope) :
                 new Output(variableName, scope, lineInfo.getNickname(), lineInfo.getType());
@@ -44,10 +44,10 @@ public class VariableLogger {
     private static class Output {
 
         private String name, nickname, type;
-        private Scope scope;
+        private VariableScope scope;
         private List<Mutation> history;
 
-        public Output(String name, Scope scope, String nickname, String type) {
+        public Output(String name, VariableScope scope, String nickname, String type) {
             this.name = name;
             this.scope = scope;
             this.nickname = nickname;
