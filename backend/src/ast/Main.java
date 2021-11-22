@@ -6,6 +6,7 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.visitor.ModifierVisitor;
 import com.github.javaparser.ast.visitor.VoidVisitor;
+import util.Formatter;
 
 import java.io.*;
 import java.util.*;
@@ -27,14 +28,13 @@ public class Main {
     public static void main(String[] args) throws IOException {
         // get ast
         CompilationUnit cu = StaticJavaParser.parse(new File(INPUT_FILE_PATH));
-        // collect names/aliases of variables to track
         VoidVisitor<Map<VariableScope, String>> variableAnnotationCollector = new VariableAnnotationCollector();
-        Map<VariableScope, String> variablesToTrack = new HashMap<>(); // map of variable names -> the aliases we'll track
-        // them under
+        // map of variable scope -> the aliases we'll track them under
+        Map<VariableScope, String> variablesToTrack = new HashMap<>();
         variableAnnotationCollector.visit(cu, variablesToTrack);
         // add logging code to ast
         ModifierVisitor<Map<VariableScope, List<LineInfo>>> variableHistoryModifier = new VariableHistoryModifier();
-        // map of scope -> list of LineInfo for each line a mutation occurs
+        // map of variable scope -> list of LineInfo for each line a mutation occurs
         Map<VariableScope, List<LineInfo>> lineInfoMap = new HashMap<>();
         // we add an entry for the first declaration of a variable to pass in the alias
         variablesToTrack.keySet().forEach(var ->
@@ -58,7 +58,7 @@ public class Main {
             System.exit(1);
         }
         writeModifiedProgram(cu);
-        writeModifiedVariableLogger(lineInfoMap);
+        writeModifiedVariableLogger(lineInfoMap, variablesToTrack);
         writeModifiedVariableReferenceLogger();
         writeModifiedLineInfo();
         // todo: send output.json to frontend
@@ -68,7 +68,7 @@ public class Main {
         StringBuilder putStatements = new StringBuilder();
         for (List<LineInfo> lineInfos : lineInfoMap.values()) {
             for (LineInfo lineInfo : lineInfos) {
-                putStatements.append(util.Formatter.generatePutStatement(lineInfo.getUniqueIdentifier(),
+                putStatements.append(Formatter.generatePutStatement(lineInfo.getUniqueIdentifier(),
                         lineInfo.getName(),
                         lineInfo.getNickname(),
                         lineInfo.getType(),
@@ -91,7 +91,8 @@ public class Main {
         writer.close();
     }
 
-    private static void writeModifiedVariableLogger(Map<VariableScope, List<LineInfo>> lineInfoMap) throws IOException {
+    private static void writeModifiedVariableLogger(Map<VariableScope, List<LineInfo>> lineInfoMap,
+                                                    Map<VariableScope, String> variablesToTrack) throws IOException {
         BufferedWriter writer = new BufferedWriter(new FileWriter(MODIFIED_VARIABLE_LOGGER_FILE_PATH));
         BufferedReader reader = new BufferedReader(new FileReader(VARIABLE_LOGGER_FILE_PATH));
         String line;
@@ -106,6 +107,10 @@ public class Main {
             if (line.contains("public static Map<Integer, LineInfo> lineInfoMap = new HashMap<>() {{")) {
                 // take lineInfoMap from above and stick it into lineInfoMap in VariableLogger
                 variableLoggerString.append(populateLineInfoMap(lineInfoMap));
+            }
+            if (line.contains("public static Map<VariableScope, Output> outputMap = new HashMap<>() {{")) {
+                // take lineInfoMap from above and stick it into lineInfoMap in VariableLogger
+                variableLoggerString.append(populateOutputMap(variablesToTrack));
             }
         }
         writer.write(variableLoggerString.toString());
@@ -126,5 +131,13 @@ public class Main {
         lineInfoCU.setPackageDeclaration(MODIFIED_FILES_PACKAGE_NAME);
         writer.write(lineInfoCU.toString());
         writer.close();
+    }
+
+    private static String populateOutputMap(Map<VariableScope, String> variablesToTrack) {
+        StringBuilder putStatements = new StringBuilder();
+        for (VariableScope vs : variablesToTrack.keySet()) {
+            putStatements.append(Formatter.generateOutputMapPut(vs));
+        }
+        return putStatements.toString();
     }
 }

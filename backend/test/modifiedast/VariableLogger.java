@@ -36,8 +36,13 @@ public class VariableLogger {
 		put(17, new LineInfo("x", "x", "null",45, "for (x = 100; x < 103; x++) {\r    x++;\r}", "SimpleTest", "public void helloWorld()", 17));
 		put(9, new LineInfo("z", "null", "null",30, "z[2] = 400;", "SimpleTest", "public Double calc()", 9));
     }};
-    // variable name -> Output object containing all info tracked about variable
-    private static Map<VariableScope, Output> outputMap = new HashMap<>();
+    // variable scope -> Output object containing all info tracked about variable
+    public static Map<VariableScope, Output> outputMap = new HashMap<>() {{
+		put(new VariableScope("x", "public Double calc()", "SimpleTest") , new Output());
+		put(new VariableScope("y", "public Double calc()", "SimpleTest") , new Output());
+		put(new VariableScope("a", "public Double calc()", "SimpleTest") , new Output());
+		put(new VariableScope("x", "public void helloWorld()", "SimpleTest") , new Output());
+    }};
     private static Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
 
     public static void log(String variableName, Object variableValue, Integer id) {
@@ -48,7 +53,7 @@ public class VariableLogger {
         Output output = (outputMap.containsKey(scope)) ?
                 outputMap.get(scope) :
                 new Output(variableName, scope, lineInfo.getNickname(), lineInfo.getType());
-        output.addMutation(lineInfo.getStatement(), lineInfo.getEnclosingClass(), lineInfo.getEnclosingMethod(),
+        output.addMutation(lineInfo.getStatement(), enclosingClass, enclosingMethod,
                 variableValue, lineInfo.getLineNum());
         outputMap.put(scope, output);
     }
@@ -70,6 +75,14 @@ public class VariableLogger {
             this.scope = scope;
             this.nickname = nickname;
             this.type = type;
+            history = new ArrayList<>();
+        }
+
+        public Output(){
+            this.name = null;
+            this.scope = null;
+            this.nickname = null;
+            this.type = null;
             history = new ArrayList<>();
         }
 

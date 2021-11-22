@@ -18,8 +18,9 @@ public class VariableLogger {
     // uniqueId -> LineInfo for a line that causes variable mutation
     public static Map<Integer, LineInfo> lineInfoMap = new HashMap<>() {{
     }};
-    // variable name -> Output object containing all info tracked about variable
-    private static Map<VariableScope, Output> outputMap = new HashMap<>();
+    // variable scope -> Output object containing all info tracked about variable
+    public static Map<VariableScope, Output> outputMap = new HashMap<>() {{
+    }};
     private static Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
 
     public static void log(String variableName, Object variableValue, Integer id) {
@@ -52,6 +53,14 @@ public class VariableLogger {
             this.scope = scope;
             this.nickname = nickname;
             this.type = type;
+            history = new ArrayList<>();
+        }
+
+        public Output(){
+            this.name = null;
+            this.scope = null;
+            this.nickname = null;
+            this.type = null;
             history = new ArrayList<>();
         }
 
