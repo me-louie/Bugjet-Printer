@@ -1,5 +1,7 @@
 package ast;
 
+import annotation.VariableScope;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -8,7 +10,7 @@ public class VariableReferenceLogger {
 
     // maps variable name -> the obj reference that the variable points to
     private static HashMap<String, String> varToRefMap = new HashMap<>();
-    // maps obj reference -> list of names of variables that point to this reference
+    // maps obj reference -> set of names of variables that point to this reference
     private static HashMap<String, Set<String>> refToVarMap = new HashMap<>();
 
     public static void evaluateVarDeclaration(Object var, String varName, int lineInfoNum) {
@@ -20,6 +22,8 @@ public class VariableReferenceLogger {
         // check if this reference already has an entry, it may if another tracked variable also references it
         if (!isTrackedReference(var.toString())) {
             refToVarMap.put(var.toString(), new HashSet<>());
+            // TODO: Should populate refToScopeMap here? Use lineinfo map to get scope info? Maybe delegate this to
+            //  VariableLogger?
         }
         refToVarMap.get(var.toString()).add(varName); // add this var to the list of vars that point to its reference
         varToRefMap.put(varName, var.toString());     // add an entry for this variable
@@ -37,6 +41,7 @@ public class VariableReferenceLogger {
         }
         if (trackedVarReferenceHasChanged(var, varName)) {
             updateMapsWithNewReference(var, varName);
+            // TODO: update reference in refToScopeMap?
         }
         if (isTrackedReference(var.toString())) { // the obj that this var references is referenced by one or more tracked vars
             for (String trackedVariableName : refToVarMap.get(var.toString())) {

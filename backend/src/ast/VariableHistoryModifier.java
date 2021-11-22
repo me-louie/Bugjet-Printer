@@ -38,6 +38,7 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<VariableScope, 
                         StatementCreator.evaluateVarDeclarationWithoutInitializerStatement(name));
                 injectCodeOnNextLine(nodeContainingEntireStatement, vd,
                         StatementCreator.logVariable(name, null, id));
+                //TODO update this statement
             } else {
                 injectCodeOnNextLine(nodeContainingEntireStatement, vd,
                         StatementCreator.evaluateVarDeclarationStatement(name, id));
