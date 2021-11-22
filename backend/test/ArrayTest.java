@@ -1,13 +1,13 @@
 import annotation.Track;
 
-public class SimpleTest {
+public class ArrayTest {
 
     public static int ONE_BILLION = 1000000000;
 
     private double memory = 0;
 
     public static void main(String[] args) {
-        SimpleTest st = new SimpleTest();
+        ArrayTest st = new ArrayTest();
         st.calc();
         st.helloWorld();
         st.helloWorldNoDec();
@@ -43,8 +43,8 @@ public class SimpleTest {
     @Track(var="m", nickname="m")
     @Track(var="i", nickname="i")
     public void helloWorld() {
-        int m;
-        for (m= 100; m < 103; m++) {
+        int m = 100;
+        for (int i = 0; i < 3; i++) {
             m++;
         }
     }

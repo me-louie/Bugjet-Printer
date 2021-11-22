@@ -1,11 +1,9 @@
 package ast;
 
+import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
-import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
-import com.github.javaparser.ast.body.FieldDeclaration;
-import com.github.javaparser.ast.body.MethodDeclaration;
-import com.github.javaparser.ast.body.VariableDeclarator;
+import com.github.javaparser.ast.body.*;
 import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.ast.visitor.ModifierVisitor;
@@ -30,13 +28,11 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<String, List<Li
             int id = UniqueNumberGenerator.generate();
             if (isDeclaredButNotInitialized(vd)) {
                 injectCodeOnNextLine(nodeContainingEntireStatement, vd,
-                        StatementCreator.evaluateVarDeclarationWithoutInitializerStatement(name));
-                injectCodeOnNextLine(nodeContainingEntireStatement, vd,
-                        StatementCreator.logVariable(name, null, id));
+                        StatementCreator.evaluateVarDeclarationWithoutInitializerStatement(name, id));
             } else if (nodeContainingEntireStatement instanceof ForStmt) {
                 injectCodeOnNextLine(nodeContainingEntireStatement, vd,
                         StatementCreator.evaluateForLoopVarDeclarationStatement(name, id));
-            }else {
+            } else {
                 injectCodeOnNextLine(nodeContainingEntireStatement, vd,
                         StatementCreator.evaluateVarDeclarationStatement(name, id));
             }
@@ -48,6 +44,9 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<String, List<Li
     @Override
     public FieldDeclaration visit(FieldDeclaration fd, Map<String, List<LineInfo>> lineInfo) {
         super.visit(fd, lineInfo);
+        // we set all fields to public access so that VariableReferenceLogger.checkBaseAndNestedObjects() can access
+        // each field
+        setAccessToPublic(fd);
         // todo: FieldDeclarations aren't inside of a BlockStatement, which means we can't add a log statement directly
         //       below them. This makes tracking these variables a bit trickier. Leaving it for now
         return fd;
@@ -76,12 +75,51 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<String, List<Li
         return ue;
     }
 
+    @Override
+    public MethodCallExpr visit(MethodCallExpr mce, Map<String, List<LineInfo>> lineInfoMap) {
+        super.visit(mce, lineInfoMap);
+        if (mce.getScope().isPresent()) {
+            NameExpr scope = (NameExpr) getBaseScope(mce.getScope().get());
+            String name = scope.getNameAsString();
+            Statement nodeContainingEntireStatement = (Statement) mce.getParentNode().get();
+            int id = UniqueNumberGenerator.generate();
+            addToLineInfoMap(name, null, nodeContainingEntireStatement, mce, lineInfoMap, id);
+            Statement injectedLine = StatementCreator.checkBaseAndNestedObjectsStatement(name, id);
+            injectCodeOnNextLine(nodeContainingEntireStatement, mce, injectedLine);
+        }
+        return mce;
+    }
+
+    private Expression getBaseScope(Expression scope) {
+        if (scope instanceof FieldAccessExpr scopeAsFAE) {
+            return getBaseScope(scopeAsFAE.getScope());
+        }
+        return scope;
+    }
+
+
+
     private void trackVariableMutation(String name, Statement nodeContainingEntireStatement, Node node, Map<String,
             List<LineInfo>> lineInfoMap) {
         int id = UniqueNumberGenerator.generate();
         addToLineInfoMap(name, null, nodeContainingEntireStatement, node, lineInfoMap, id);
-        Statement injectedLine = StatementCreator.evaluateAssignmentStatement(name, id);
+        String[] subObjects = name.split("\\.");
+        String objName = subObjects[0];
+        Statement injectedLine = StatementCreator.evaluateAssignmentStatement(objName, id);
         injectCodeOnNextLine(nodeContainingEntireStatement, node, injectedLine);
+        for (int i = 1; i < subObjects.length; i++) {
+            objName = objName + "." + subObjects[i];
+            injectedLine = StatementCreator.checkBaseAndNestedObjectsStatement(objName, id);
+            injectCodeOnNextLine(nodeContainingEntireStatement, node, injectedLine);
+        }
+        MethodDeclaration enclosingMethod = node.findAncestor(MethodDeclaration.class).isPresent() ?
+                node.findAncestor(MethodDeclaration.class).get() : null;
+        boolean isEnclosedByConstructor = node.findAncestor(ConstructorDeclaration.class).isPresent();
+        if (isEnclosedByConstructor ||
+                (enclosingMethod != null && !enclosingMethod.isStatic())) {
+            injectedLine = StatementCreator.evaluateAssignmentStatement("this", id);
+            injectCodeOnNextLine(nodeContainingEntireStatement, node, injectedLine);
+        }
     }
 
     private void addToLineInfoMap(String name, String type, Statement nodeContainingEntireStatement, Node node,
@@ -116,16 +154,16 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<String, List<Li
     private void injectCodeOnNextLine(Statement anchorStatement, Node node, Statement loggingStatement) {
         if (anchorStatement instanceof ForStmt forStmt) {
             // if (node instanceof UnaryExpr || node instanceof AssignExpr){
-                // If it's a for statement, don't include variable declaration (will be reclared each loop)
-                if (forStmt.getBody() instanceof BlockStmt body) {
-                    body.addStatement(0, loggingStatement);
-                } else if (forStmt.getBody() instanceof ExpressionStmt body) {
-                    // todo: handle the case where the body of the for statement isn't wrapped in curly brackets
-                    //       also need to handle the case where the thing we're interested in is the body of the
-                    //       for statement and it's not in brackets
-                    //       same for if blocks
-                    //       also this if/else statement very bad, should try to double dispatch instead
-                }
+            // If it's a for statement, don't include variable declaration (will be reclared each loop)
+            if (forStmt.getBody() instanceof BlockStmt body) {
+                body.addStatement(0, loggingStatement);
+            } else if (forStmt.getBody() instanceof ExpressionStmt body) {
+                // todo: handle the case where the body of the for statement isn't wrapped in curly brackets
+                //       also need to handle the case where the thing we're interested in is the body of the
+                //       for statement and it's not in brackets
+                //       same for if blocks
+                //       also this if/else statement very bad, should try to double dispatch instead
+            }
         } else if (node.findAncestor(SwitchEntry.class).isPresent()) {
             NodeList<Statement> switchBlockStatements = node.findAncestor(SwitchEntry.class).get().getStatements();
             switchBlockStatements.add(switchBlockStatements.indexOf(anchorStatement) + 1, loggingStatement);
@@ -148,4 +186,21 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<String, List<Li
         return vd.getInitializer().isEmpty();
     }
 
+    private void setAccessToPublic(FieldDeclaration fd) {
+        NodeList<Modifier> modifiers = fd.getModifiers();
+        for (Modifier modifier : modifiers) {
+            if (isAccessSpecifier(modifier)) {
+                modifiers.replace(modifier, Modifier.publicModifier());
+                return;
+            }
+        }
+        modifiers.add(0, Modifier.publicModifier());
+        fd.setModifiers(modifiers);
+    }
+
+    private boolean isAccessSpecifier(Modifier modifier) {
+        return modifier.getKeyword() == Modifier.Keyword.PRIVATE ||
+                modifier.getKeyword() == Modifier.Keyword.PROTECTED ||
+                modifier.getKeyword() == Modifier.Keyword.PUBLIC;
+    }
 }
