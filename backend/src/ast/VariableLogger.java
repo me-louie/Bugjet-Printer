@@ -3,6 +3,7 @@ package ast;
 import annotation.VariableScope;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import modifiedast.VariableReferenceLogger;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -22,11 +23,9 @@ public class VariableLogger {
 
     public static void log(Object variableValue, String variableName, String enclosingMethod, String enclosingClass,
                            Integer id) {
-        // TODO: When assignment to null, enclosing class is null. Confirm with Ben best way to handle this case
-        if (enclosingClass == null) return;
         LineInfo lineInfo = lineInfoMap.get(id);
         VariableScope scope = new VariableScope(variableName, enclosingMethod, enclosingClass);
-        Set<VariableScope> scopesToLog = !trackedScopes.contains(scope) ?
+        Set<VariableScope> scopesToLog = variableValue!= null && !trackedScopes.contains(scope) ?
                 VariableReferenceLogger.refToScopeMap.get(variableValue.toString()) : Set.of(scope);
         for (VariableScope s: scopesToLog) {
             Output output = (outputMap.containsKey(s)) ?

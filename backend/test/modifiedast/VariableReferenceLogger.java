@@ -16,7 +16,7 @@ public class VariableReferenceLogger {
     // maps variable name -> the obj reference that the variable points to
     private static HashMap<VariableScope, String> varToRefMap = new HashMap<>();
 
-    // maps obj reference -> set of variable scopes that point to this reference
+    // maps obj reference -> set of variable scopes which track this reference
     private static HashMap<String, Set<VariableScope>> refToVarMap = new HashMap<>();
 
     // maps obj reference -> json representation of object after last time it was mutated
@@ -72,9 +72,8 @@ public class VariableReferenceLogger {
         }
         if (trackedVarReferenceHasChanged(var, scope)) {
             // if a tracked var now points to a different ref
-            // update the map to reflect that
+            // update the map to reflect that log for this one tracked var
             updateMapsWithNewReference(var, scope);
-            // log for this one tracked var
             VariableLogger.log(var, varName, enclosingMethod, enclosingClass, lineInfoNum);
         }
         // if the above if block ran then checkBaseAndNestedObjects won't detect any changes since the
@@ -130,8 +129,7 @@ public class VariableReferenceLogger {
             varToRefMap.put(scope, null);
             // we don't add a null entry for refToVarMap here because this will lead to every variable declared as null
             // getting a history entry every time a tracked variable is set to null
-            VariableLogger.log(null, scope.getVarName(), scope.getEnclosingMethod(), scope.getEnclosingClass(),
-                    lineInfoNum);
+            VariableLogger.log(null, scope.getVarName(), scope.getEnclosingMethod(), scope.getEnclosingClass(), lineInfoNum);
         }
     }
 
@@ -141,7 +139,7 @@ public class VariableReferenceLogger {
 
     private static void updateMapsWithNewReference(Object var, VariableScope scope) {
         // grab a copy of varName's old obj ref
-        String oldRef = varToRefMap.get(scope.getVarName());
+        String oldRef = varToRefMap.get(scope);
         String newRef = var.toString();
         removeOldRefEntriesFromMap(scope, oldRef);
         // replace varName's old entry with the new obj ref
@@ -160,9 +158,8 @@ public class VariableReferenceLogger {
 
     private static void removeOldRefEntriesFromMap(VariableScope scope, String oldRef) {
         if (oldRef != null) {
-            // remove varName from the list of variables that point
+            // remove varName from the list of variables that point to oldRef
             refToVarMap.get(oldRef).remove(scope);
-            // to oldRef
             if (refToVarMap.get(oldRef).isEmpty()) {
                 // if no other variables we care about point to oldRef
                 // remove oldRef from both maps that key by reference

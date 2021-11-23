@@ -15,7 +15,7 @@ public class VariableReferenceLogger {
     public static HashMap<String, Set<VariableScope>> refToScopeMap = new HashMap<>();
     // maps variable name -> the obj reference that the variable points to
     private static HashMap<VariableScope, String> varToRefMap = new HashMap<>();
-    // maps obj reference -> set of variable scopes that point to this reference
+    // maps obj reference -> set of variable scopes which track this reference
     private static HashMap<String, Set<VariableScope>> refToVarMap = new HashMap<>();
     // maps obj reference -> json representation of object after last time it was mutated
     private static HashMap<String, String> refToJsonMap = new HashMap<>();
@@ -68,9 +68,8 @@ public class VariableReferenceLogger {
             evaluateNullAssignment(scope, lineInfoNum);
             return;
         }
-        if (trackedVarReferenceHasChanged(var, varName)) { // if a tracked var now points to a different ref
-            updateMapsWithNewReference(var, scope);      // update the map to reflect that
-            // log for this one tracked var
+        if (trackedVarReferenceHasChanged(var, scope)) { // if a tracked var now points to a different ref
+            updateMapsWithNewReference(var, scope);      // update the map to reflect that log for this one tracked var
             VariableLogger.log(var, varName, enclosingMethod, enclosingClass, lineInfoNum);
         }
         // if the above if block ran then checkBaseAndNestedObjects won't detect any changes since the
@@ -117,8 +116,8 @@ public class VariableReferenceLogger {
         return !refToJsonMap.get(var.toString()).equals(gson.toJson(var));
     }
 
-    private static boolean trackedVarReferenceHasChanged(Object var, String varName) {
-        return varToRefMap.containsKey(varName) && !var.toString().equals(varToRefMap.get(varName));
+    private static boolean trackedVarReferenceHasChanged(Object var, VariableScope scope) {
+        return varToRefMap.containsKey(scope) && !var.toString().equals(varToRefMap.get(scope));
     }
 
     private static void evaluateNullAssignment(VariableScope scope, int lineInfoNum) {
@@ -128,7 +127,7 @@ public class VariableReferenceLogger {
             varToRefMap.put(scope, null);
             // we don't add a null entry for refToVarMap here because this will lead to every variable declared as null
             // getting a history entry every time a tracked variable is set to null
-            VariableLogger.log(null, scope.getVarName(), scope.getEnclosingMethod(), scope.getEnclosingMethod(),
+            VariableLogger.log(null, scope.getVarName(), scope.getEnclosingMethod(), scope.getEnclosingClass(),
                     lineInfoNum);
         }
     }
@@ -138,12 +137,12 @@ public class VariableReferenceLogger {
     }
 
     private static void updateMapsWithNewReference(Object var, VariableScope scope) {
-        String oldRef = varToRefMap.get(scope.getVarName());             // grab a copy of varName's old obj ref
+        String oldRef = varToRefMap.get(scope);              // grab a copy of varName's old obj ref
         String newRef = var.toString();
         removeOldRefEntriesFromMap(scope, oldRef);
-        varToRefMap.put(scope, newRef);                     // replace varName's old entry with the new obj ref
-        if (!isTrackedReference(newRef)) {                    // if this var ref doesn't have an entry
-            refToVarMap.put(newRef, new HashSet<>());         // add an entry for the new ref
+        varToRefMap.put(scope, newRef);                      // replace varName's old entry with the new obj ref
+        if (!isTrackedReference(newRef)) {                   // if this var ref doesn't have an entry
+            refToVarMap.put(newRef, new HashSet<>());        // add an entry for the new ref
             refToScopeMap.put(newRef, new HashSet<>());
             refToJsonMap.put(var.toString(), gson.toJson(var));
         }
@@ -153,10 +152,9 @@ public class VariableReferenceLogger {
 
     private static void removeOldRefEntriesFromMap(VariableScope scope, String oldRef) {
         if (oldRef != null) {
-            refToVarMap.get(oldRef).remove(scope);          // remove varName from the list of variables that point
-            // to oldRef
-            if (refToVarMap.get(oldRef).isEmpty()) {          // if no other variables we care about point to oldRef
-                refToVarMap.remove(oldRef);                   // remove oldRef from both maps that key by reference
+            refToVarMap.get(oldRef).remove(scope);     // remove varName from the list of variables that point to oldRef
+            if (refToVarMap.get(oldRef).isEmpty()) {   // if no other variables we care about point to oldRef
+                refToVarMap.remove(oldRef);            // remove oldRef from both maps that key by reference
                 refToScopeMap.remove(oldRef);
                 refToJsonMap.remove(oldRef);
                 // we don't delete the varToRefMap entry because it just gets overwritten

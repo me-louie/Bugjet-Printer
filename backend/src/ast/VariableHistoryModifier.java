@@ -118,8 +118,6 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<VariableScope, 
             List<LineInfo>> lineInfoMap) {
         int id = UniqueNumberGenerator.generate();
         addToLineInfoMap(scope, null, nodeContainingEntireStatement, node, lineInfoMap, id);
-//        Statement injectedLine = StatementCreator.evaluateAssignmentStatement(name, id);
-//        addToLineInfoMap(name, null, nodeContainingEntireStatement, node, lineInfoMap, id);
         String[] subObjects = name.split("\\.");
         String objName = subObjects[0];
         Statement injectedLine = StatementCreator.evaluateAssignmentStatement(objName, scope.getEnclosingMethod(),
@@ -150,8 +148,8 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<VariableScope, 
         String enclosingClass = NodeParser.getEnclosingClass(node);
         String enclosingMethod = NodeParser.getEnclosingMethod(node);
         if (!isTrackedVariable(scope, lineInfoMap)) {
-            lineInfoMap.put(scope, new ArrayList<>(List.of(new LineInfo()))); // add with a dummy item to make nickname
-            // hack work
+            // add with a dummy item to make nickname hack work
+            lineInfoMap.put(scope, new ArrayList<>(List.of(new LineInfo())));
         }
         lineInfoMap.get(scope).add(new LineInfo(scope.getVarName(), nickname, type, lineNum,
                 nodeContainingEntireStatement.toString(),
