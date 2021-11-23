@@ -108,10 +108,9 @@ public class Main {
                 // take lineInfoMap from above and stick it into lineInfoMap in VariableLogger
                 variableLoggerString.append(populateLineInfoMap(lineInfoMap));
             }
-//            if (line.contains("public static Map<VariableScope, Output> outputMap = new HashMap<>() {{")) {
-//                // take lineInfoMap from above and stick it into lineInfoMap in VariableLogger
-//                variableLoggerString.append(populateOutputMap(variablesToTrack));
-//            }
+            if (line.contains("private static Set<VariableScope> trackedScopes = new HashSet<>() {{")) {
+                variableLoggerString.append(populateTrackedScopes(variablesToTrack));
+            }
         }
         writer.write(variableLoggerString.toString());
         writer.close();
@@ -133,11 +132,11 @@ public class Main {
         writer.close();
     }
 
-//    private static String populateOutputMap(Map<VariableScope, String> variablesToTrack) {
-//        StringBuilder putStatements = new StringBuilder();
-//        for (VariableScope vs : variablesToTrack.keySet()) {
-//            putStatements.append(Formatter.generateOutputMapPut(vs));
-//        }
-//        return putStatements.toString();
-//    }
+    private static String populateTrackedScopes(Map<VariableScope, String> variablesToTrack) {
+        StringBuilder putStatements = new StringBuilder();
+        for (VariableScope vs : variablesToTrack.keySet()) {
+            putStatements.append(Formatter.addTrackedScope(vs));
+        }
+        return putStatements.toString();
+    }
 }

@@ -4,13 +4,10 @@ import annotation.VariableScope;
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
+import com.github.javaparser.ast.body.ConstructorDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
+import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
-import com.github.javaparser.ast.expr.ArrayAccessExpr;
-import com.github.javaparser.ast.expr.AssignExpr;
-import com.github.javaparser.ast.expr.UnaryExpr;
-import com.github.javaparser.ast.expr.VariableDeclarationExpr;
-import com.github.javaparser.ast.body.*;
 import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.ast.visitor.ModifierVisitor;
@@ -38,15 +35,18 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<VariableScope, 
             int id = UniqueNumberGenerator.generate();
             if (isDeclaredButNotInitialized(vd)) {
                 injectCodeOnNextLine(nodeContainingEntireStatement, vd,
-                        StatementCreator.evaluateVarDeclarationWithoutInitializerStatement(name, id));
+                        StatementCreator.evaluateVarDeclarationWithoutInitializerStatement(name,
+                                scope.getEnclosingMethod(), scope.getEnclosingClass(), id));
             } else if (nodeContainingEntireStatement instanceof ForStmt) {
                 injectCodeOnNextLine(nodeContainingEntireStatement, vd,
-                        StatementCreator.logVariable(name, null, id));
-                //TODO update this statement
-                        StatementCreator.evaluateForLoopVarDeclarationStatement(name, id));
+                        StatementCreator.logVariable(name, scope.getEnclosingMethod(), scope.getEnclosingClass(),
+                                null, id));
+                StatementCreator.evaluateForLoopVarDeclarationStatement(name, scope.getEnclosingMethod(),
+                        scope.getEnclosingClass(), id);
             } else {
                 injectCodeOnNextLine(nodeContainingEntireStatement, vd,
-                        StatementCreator.evaluateVarDeclarationStatement(name, id));
+                        StatementCreator.evaluateVarDeclarationStatement(name, scope.getEnclosingMethod(),
+                                scope.getEnclosingClass(), id));
             }
             addToLineInfoMap(scope, type, nodeContainingEntireStatement, vd, lineInfoMap, id);
         }
@@ -90,15 +90,17 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<VariableScope, 
     }
 
     @Override
-    public MethodCallExpr visit(MethodCallExpr mce, Map<String, List<LineInfo>> lineInfoMap) {
+    public MethodCallExpr visit(MethodCallExpr mce, Map<VariableScope, List<LineInfo>> lineInfoMap) {
         super.visit(mce, lineInfoMap);
         if (mce.getScope().isPresent()) {
-            NameExpr scope = (NameExpr) getBaseScope(mce.getScope().get());
-            String name = scope.getNameAsString();
+            NameExpr exprScope = (NameExpr) getBaseScope(mce.getScope().get());
+            String name = exprScope.getNameAsString();
+            VariableScope scope = Scoper.createScope(name, mce);
             Statement nodeContainingEntireStatement = (Statement) mce.getParentNode().get();
             int id = UniqueNumberGenerator.generate();
-            addToLineInfoMap(name, null, nodeContainingEntireStatement, mce, lineInfoMap, id);
-            Statement injectedLine = StatementCreator.checkBaseAndNestedObjectsStatement(name, id);
+            addToLineInfoMap(scope, null, nodeContainingEntireStatement, mce, lineInfoMap, id);
+            Statement injectedLine = StatementCreator.checkBaseAndNestedObjectsStatement(name,
+                    scope.getEnclosingMethod(), scope.getEnclosingClass(), id);
             injectCodeOnNextLine(nodeContainingEntireStatement, mce, injectedLine);
         }
         return mce;
@@ -116,15 +118,17 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<VariableScope, 
             List<LineInfo>> lineInfoMap) {
         int id = UniqueNumberGenerator.generate();
         addToLineInfoMap(scope, null, nodeContainingEntireStatement, node, lineInfoMap, id);
-        Statement injectedLine = StatementCreator.evaluateAssignmentStatement(name, id);
-        addToLineInfoMap(name, null, nodeContainingEntireStatement, node, lineInfoMap, id);
+//        Statement injectedLine = StatementCreator.evaluateAssignmentStatement(name, id);
+//        addToLineInfoMap(name, null, nodeContainingEntireStatement, node, lineInfoMap, id);
         String[] subObjects = name.split("\\.");
         String objName = subObjects[0];
-        Statement injectedLine = StatementCreator.evaluateAssignmentStatement(objName, id);
+        Statement injectedLine = StatementCreator.evaluateAssignmentStatement(objName, scope.getEnclosingMethod(),
+                scope.getEnclosingClass(), id);
         injectCodeOnNextLine(nodeContainingEntireStatement, node, injectedLine);
         for (int i = 1; i < subObjects.length; i++) {
             objName = objName + "." + subObjects[i];
-            injectedLine = StatementCreator.checkBaseAndNestedObjectsStatement(objName, id);
+            injectedLine = StatementCreator.checkBaseAndNestedObjectsStatement(objName, scope.getEnclosingMethod(),
+                    scope.getEnclosingClass(), id);
             injectCodeOnNextLine(nodeContainingEntireStatement, node, injectedLine);
         }
         MethodDeclaration enclosingMethod = node.findAncestor(MethodDeclaration.class).isPresent() ?
@@ -132,7 +136,8 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<VariableScope, 
         boolean isEnclosedByConstructor = node.findAncestor(ConstructorDeclaration.class).isPresent();
         if (isEnclosedByConstructor ||
                 (enclosingMethod != null && !enclosingMethod.isStatic())) {
-            injectedLine = StatementCreator.evaluateAssignmentStatement("this", id);
+            injectedLine = StatementCreator.evaluateAssignmentStatement("this", scope.getEnclosingMethod(),
+                    scope.getEnclosingClass(), id);
             injectCodeOnNextLine(nodeContainingEntireStatement, node, injectedLine);
         }
     }

@@ -19,13 +19,12 @@ public final class Formatter {
                 + id + "));" + "\n";
     }
 
-    public static String generateOutputMapPut(VariableScope vs) {
-        return "\t\tput("
+    public static String addTrackedScope(VariableScope vs) {
+        return "\t\tadd("
                 + "new VariableScope(\""
                 + vs.getVarName() + "\", \""
                 + vs.getEnclosingMethod() + "\", \""
-                + vs.getEnclosingClass() + "\") , " +
-                "new Output());" + "\n";
+                + vs.getEnclosingClass() + "\"));" + "\n";
     }
     private static String parseStatement(String statement) {
         String escapedStatement = statement

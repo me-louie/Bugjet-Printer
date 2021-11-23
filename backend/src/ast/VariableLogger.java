@@ -7,10 +7,7 @@ import com.google.gson.GsonBuilder;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class VariableLogger {
 
@@ -18,22 +15,27 @@ public class VariableLogger {
     // uniqueId -> LineInfo for a line that causes variable mutation
     public static Map<Integer, LineInfo> lineInfoMap = new HashMap<>() {{
     }};
-    // variable scope -> Output object containing all info tracked about variable
-    public static Map<VariableScope, Output> outputMap = new HashMap<>() {{
+    private static Map<VariableScope, Output> outputMap = new HashMap<>();
+    private static Set<VariableScope> trackedScopes = new HashSet<>() {{
     }};
     private static Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
 
-    public static void log(String variableName, Object variableValue, Integer id) {
+    public static void log(Object variableValue, String variableName, String enclosingMethod, String enclosingClass,
+                           Integer id) {
+        // TODO: When assignment to null, enclosing class is null. Confirm with Ben best way to handle this case
+        if (enclosingClass == null) return;
         LineInfo lineInfo = lineInfoMap.get(id);
-        String enclosingMethod = lineInfo.getEnclosingMethod();
-        String enclosingClass = lineInfo.getEnclosingClass();
         VariableScope scope = new VariableScope(variableName, enclosingMethod, enclosingClass);
-        Output output = (outputMap.containsKey(scope)) ?
-                outputMap.get(scope) :
-                new Output(variableName, scope, lineInfo.getNickname(), lineInfo.getType());
-        output.addMutation(lineInfo.getStatement(), enclosingClass, enclosingMethod,
-                variableValue, lineInfo.getLineNum());
-        outputMap.put(scope, output);
+        Set<VariableScope> scopesToLog = !trackedScopes.contains(scope) ?
+                VariableReferenceLogger.refToScopeMap.get(variableValue.toString()) : Set.of(scope);
+        for (VariableScope s: scopesToLog) {
+            Output output = (outputMap.containsKey(s)) ?
+                    outputMap.get(s) :
+                    new Output(variableName, s, lineInfo.getNickname(), lineInfo.getType());
+            output.addMutation(lineInfo.getStatement(), enclosingClass, enclosingMethod,
+                    variableValue, lineInfo.getLineNum());
+            outputMap.put(s, output);
+        }
     }
 
     public static void writeOutputToDisk() throws IOException {
@@ -53,14 +55,6 @@ public class VariableLogger {
             this.scope = scope;
             this.nickname = nickname;
             this.type = type;
-            history = new ArrayList<>();
-        }
-
-        public Output(){
-            this.name = null;
-            this.scope = null;
-            this.nickname = null;
-            this.type = null;
             history = new ArrayList<>();
         }
 
