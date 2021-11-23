@@ -11,7 +11,7 @@ public final class StatementCreator {
         if (value == null) {
             value = "\"uninitialized\"";
         }
-        return log(name, enclosingMethod, enclosingClass, value, uniqueIdentifier);
+        return log(value, name, enclosingMethod, enclosingClass, uniqueIdentifier);
     }
 
     public static Statement evaluateVarDeclarationWithoutInitializerStatement(String name, String enclosingMethod,
@@ -23,13 +23,13 @@ public final class StatementCreator {
                 + uniqueNum + ");");
     }
 
-    private static Statement log(String name, String enclosingMethod, String enclosingClass, String value,
+    private static Statement log(String value, String name, String enclosingMethod, String enclosingClass,
                                  int uniqueNum) {
-        return StaticJavaParser.parseStatement("VariableLogger.log(\""
+        return StaticJavaParser.parseStatement("VariableLogger.log("
+                + value + ", \""
                 + name + "\", \""
                 + enclosingMethod + "\", \""
                 + enclosingClass + "\", "
-                + value + ", "
                 + uniqueNum + ");");
     }
 

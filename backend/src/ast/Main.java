@@ -13,13 +13,14 @@ import java.util.*;
 
 public class Main {
 
+    private static final String PROGRAM_FILE_NAME = "/ObjectTest.java";
     private static final String MODIFIED_FILES_DIRECTORY = "backend/test/modifiedast";
-    private static final String INPUT_FILE_PATH = "backend/test/ObjectTest.java";
+    private static final String INPUT_FILE_PATH = "backend/test" + PROGRAM_FILE_NAME;
     private static final String VARIABLE_LOGGER_FILE_PATH = "backend/src/ast/VariableLogger.java";
     private static final String LINE_INFO_FILE_PATH = "backend/src/ast/LineInfo.java";
     private static final String VARIABLE_REF_LOGGER_FILE_PATH = "backend/src/ast/VariableReferenceLogger.java";
     private static final String MODIFIED_FILES_PACKAGE_NAME = "modifiedast";
-    private static final String MODIFIED_AST_FILE_PATH = MODIFIED_FILES_DIRECTORY + "/ObjectTest.java";
+    private static final String MODIFIED_AST_FILE_PATH = MODIFIED_FILES_DIRECTORY + PROGRAM_FILE_NAME;
     private static final String MODIFIED_VARIABLE_LOGGER_FILE_PATH = MODIFIED_FILES_DIRECTORY + "/VariableLogger.java";
     private static final String MODIFIED_LINE_INFO_FILE_PATH = MODIFIED_FILES_DIRECTORY + "/LineInfo.java";
     private static final String MODIFIED_VARIABLE_REF_LOGGER_FILE_PATH = MODIFIED_FILES_DIRECTORY +
