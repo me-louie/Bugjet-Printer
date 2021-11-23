@@ -76,6 +76,29 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<String, List<Li
     }
 
     @Override
+    public MethodDeclaration visit(MethodDeclaration md, Map<String, List<LineInfo>> lineInfoMap) {
+        super.visit(md, lineInfoMap);
+
+
+        for (Parameter p : md.getParameters()) {
+            String name = p.getNameAsString();
+
+            if (!isTrackedVariable(name, lineInfoMap)) {
+                continue;
+            }
+
+            String type = p.getType().toString();
+            int id = UniqueNumberGenerator.generate();
+            Statement body = md.findAll(BlockStmt.class).get(0);
+
+            injectCodeOnNextLine(body, md, StatementCreator.evaluateVarDeclarationStatement(name, id));
+            addToLineInfoMap(name, type, md.getDeclarationAsString(), body, lineInfoMap, id);
+        }
+
+        return md;
+    }
+
+    @Override
     public MethodCallExpr visit(MethodCallExpr mce, Map<String, List<LineInfo>> lineInfoMap) {
         super.visit(mce, lineInfoMap);
         if (mce.getScope().isPresent()) {
@@ -135,6 +158,20 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<String, List<Li
                 enclosingClass, enclosingMethod, id));
     }
 
+
+    private void addToLineInfoMap(String name, String type, String nodeContainingEntireStatement, Node node,
+                                  Map<String, List<LineInfo>> lineInfoMap, int id) {
+        String nickname = isTrackedVariable(name, lineInfoMap) ? lineInfoMap.get(name).get(0).getNickname() : null;
+        Integer lineNum = getLineNum(node);
+        String enclosingClass = getEnclosingClass(node);
+        String enclosingMethod = getEnclosingMethod(node);
+        if (!isTrackedVariable(name, lineInfoMap)) {
+            lineInfoMap.put(name, new ArrayList<>(List.of(new LineInfo()))); // add with a dummy item to make nickname hack work
+        }
+        lineInfoMap.get(name).add(new LineInfo(name, nickname, type, lineNum, nodeContainingEntireStatement,
+                enclosingClass, enclosingMethod, id));
+    }
+
     private Integer getLineNum(Node node) {
         return node.getBegin().isPresent() ? node.getBegin().get().line : null;
     }
@@ -152,7 +189,11 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<String, List<Li
     }
 
     private void injectCodeOnNextLine(Statement anchorStatement, Node node, Statement loggingStatement) {
-        if (anchorStatement instanceof ForStmt forStmt) {
+
+        if (node instanceof MethodDeclaration md && anchorStatement instanceof BlockStmt body) {
+            // Add logging for method arguments
+            body.addStatement(0, loggingStatement);
+        } else if (anchorStatement instanceof ForStmt forStmt) {
             // if (node instanceof UnaryExpr || node instanceof AssignExpr){
             // If it's a for statement, don't include variable declaration (will be reclared each loop)
             if (forStmt.getBody() instanceof BlockStmt body) {
