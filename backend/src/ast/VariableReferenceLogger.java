@@ -11,14 +11,14 @@ import java.util.Set;
 
 public class VariableReferenceLogger {
 
+    // maps obj reference -> set of variable scopes in which the reference should be tracked
+    public static HashMap<String, Set<VariableScope>> refToScopeMap = new HashMap<>();
     // maps variable name -> the obj reference that the variable points to
     private static HashMap<VariableScope, String> varToRefMap = new HashMap<>();
     // maps obj reference -> set of variable scopes that point to this reference
     private static HashMap<String, Set<VariableScope>> refToVarMap = new HashMap<>();
     // maps obj reference -> json representation of object after last time it was mutated
     private static HashMap<String, String> refToJsonMap = new HashMap<>();
-    // maps obj reference -> set of variable scopes in which the reference should be tracked
-    public static HashMap<String, Set<VariableScope>> refToScopeMap = new HashMap<>();
     private static Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
 
 
@@ -128,7 +128,7 @@ public class VariableReferenceLogger {
             varToRefMap.put(scope, null);
             // we don't add a null entry for refToVarMap here because this will lead to every variable declared as null
             // getting a history entry every time a tracked variable is set to null
-            VariableLogger.log(scope.getVarName(), scope.getEnclosingMethod(), scope.getEnclosingMethod(), null,
+            VariableLogger.log(null, scope.getVarName(), scope.getEnclosingMethod(), scope.getEnclosingMethod(),
                     lineInfoNum);
         }
     }
