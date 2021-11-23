@@ -65,6 +65,7 @@ public class VariableLogger {
 		put(18, new LineInfo("notTrackedA.arr", "null", "null",41, "notTrackedA.arr = new int[] { 15, 16, 17 };", "ObjectTest", "public void calc()", 18));
 		put(19, new LineInfo("notTrackedA.arr", "null", "null",42, "notTrackedA.arr[0] = 123;", "ObjectTest", "public void calc()", 19));
     }};
+    // variable name -> Output object containing all info tracked about variable
     private static Map<VariableScope, Output> outputMap = new HashMap<>();
     private static Set<VariableScope> trackedScopes = new HashSet<>() {{
 		add(new VariableScope("a", "public void calc()", "ObjectTest"));

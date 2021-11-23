@@ -16,6 +16,7 @@ public class VariableLogger {
     // uniqueId -> LineInfo for a line that causes variable mutation
     public static Map<Integer, LineInfo> lineInfoMap = new HashMap<>() {{
     }};
+    // variable name -> Output object containing all info tracked about variable
     private static Map<VariableScope, Output> outputMap = new HashMap<>();
     private static Set<VariableScope> trackedScopes = new HashSet<>() {{
     }};
