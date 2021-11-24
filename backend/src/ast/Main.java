@@ -11,13 +11,16 @@ import java.util.*;
 
 public class Main {
 
-    private static final String INPUT_FILE_PATH = "backend/test/SimpleTest.java";
+    private static final String MODIFIED_FILES_DIRECTORY = "backend/test/modifiedast";
+    private static final String INPUT_FILE_PATH = "backend/test/MethodArgsTest.java";
     private static final String VARIABLE_LOGGER_FILE_PATH = "backend/src/ast/VariableLogger.java";
     private static final String LINE_INFO_FILE_PATH = "backend/src/ast/LineInfo.java";
+    private static final String VARIABLE_REF_LOGGER_FILE_PATH = "backend/src/ast/VariableReferenceLogger.java";
     private static final String MODIFIED_FILES_PACKAGE_NAME = "modifiedast";
-    private static final String MODIFIED_AST_FILE_PATH = "backend/test/modifiedast/SimpleTest.java";
-    private static final String MODIFIED_VARIABLE_LOGGER_FILE_PATH = "backend/test/modifiedast/VariableLogger.java";
-    private static final String MODIFIED_LINE_INFO_FILE_PATH = "backend/test/modifiedast/LineInfo.java";
+    private static final String MODIFIED_AST_FILE_PATH = MODIFIED_FILES_DIRECTORY + "/MethodArgsTest.java";
+    private static final String MODIFIED_VARIABLE_LOGGER_FILE_PATH = MODIFIED_FILES_DIRECTORY + "/VariableLogger.java";
+    private static final String MODIFIED_LINE_INFO_FILE_PATH = MODIFIED_FILES_DIRECTORY + "/LineInfo.java";
+    private static final String MODIFIED_VARIABLE_REF_LOGGER_FILE_PATH = MODIFIED_FILES_DIRECTORY + "/VariableReferenceLogger.java";
 
     public static void main(String[] args) throws IOException {
         // get ast
@@ -50,6 +53,7 @@ public class Main {
         }
         writeModifiedProgram(cu);
         writeModifiedVariableLogger(lineInfoMap);
+        writeModifiedVariableReferenceLogger();
         writeModifiedLineInfo();
         // todo: send output.json to frontend
     }
@@ -59,8 +63,14 @@ public class Main {
         for (List<LineInfo> lineInfos : lineInfoMap.values()) {
             for (LineInfo lineInfo : lineInfos) {
                 putStatements.append(util.Formatter.generatePutStatement(lineInfo.getUniqueIdentifier(),
-                        lineInfo.getName(), lineInfo.getAlias(), lineInfo.getType(), lineInfo.getLineNum(),
-                        lineInfo.getStatement(), lineInfo.getEnclosingClass(), lineInfo.getEnclosingMethod() ));
+                        lineInfo.getName(),
+                        lineInfo.getNickname(),
+                        lineInfo.getType(),
+                        lineInfo.getLineNum(),
+                        lineInfo.getStatement(),
+                        lineInfo.getEnclosingClass(),
+                        lineInfo.getEnclosingMethod()
+                ));
             }
         }
         return putStatements.toString();
@@ -69,6 +79,8 @@ public class Main {
     private static void writeModifiedProgram(CompilationUnit cu) throws IOException {
         BufferedWriter writer = new BufferedWriter(new FileWriter(MODIFIED_AST_FILE_PATH));
         cu.setPackageDeclaration(MODIFIED_FILES_PACKAGE_NAME);
+        cu.addImport("java.util.HashSet");
+        cu.addImport("java.util.Set");
         writer.write(cu.toString());
         writer.close();
     }
@@ -80,12 +92,12 @@ public class Main {
         StringBuilder variableLoggerString = new StringBuilder();
 
         while ((line = reader.readLine()) != null) {
-            // TODO: fix this hacky way to chance the package name
-            if (line.contains("package ast")){
+            // TODO: fix this hacky way to change the package name
+            if (line.contains("package ast")) {
                 line = "package " + MODIFIED_FILES_PACKAGE_NAME + ";";
             }
             variableLoggerString.append(line).append("\n");
-            if (line.contains("private static Map<Integer, LineInfo> lineInfoMap = new HashMap<>() {{")) {
+            if (line.contains("public static Map<Integer, LineInfo> lineInfoMap = new HashMap<>() {{")) {
                 // take lineInfoMap from above and stick it into lineInfoMap in VariableLogger
                 variableLoggerString.append(populateLineInfoMap(lineInfoMap));
             }
@@ -97,6 +109,14 @@ public class Main {
     private static void writeModifiedLineInfo() throws IOException {
         BufferedWriter writer = new BufferedWriter(new FileWriter(MODIFIED_LINE_INFO_FILE_PATH));
         CompilationUnit lineInfoCU = StaticJavaParser.parse(new File(LINE_INFO_FILE_PATH));
+        lineInfoCU.setPackageDeclaration(MODIFIED_FILES_PACKAGE_NAME);
+        writer.write(lineInfoCU.toString());
+        writer.close();
+    }
+
+    private static void writeModifiedVariableReferenceLogger() throws IOException {
+        BufferedWriter writer = new BufferedWriter(new FileWriter(MODIFIED_VARIABLE_REF_LOGGER_FILE_PATH));
+        CompilationUnit lineInfoCU = StaticJavaParser.parse(new File(VARIABLE_REF_LOGGER_FILE_PATH));
         lineInfoCU.setPackageDeclaration(MODIFIED_FILES_PACKAGE_NAME);
         writer.write(lineInfoCU.toString());
         writer.close();

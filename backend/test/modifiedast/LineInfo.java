@@ -2,13 +2,13 @@ package modifiedast;
 
 public class LineInfo {
 
-    private String name, alias, type, statement, enclosingClass, enclosingMethod;
+    private String name, nickname, type, statement, enclosingClass, enclosingMethod;
 
     private Integer lineNum, uniqueIdentifier;
 
-    public LineInfo(String name, String alias, String type, Integer lineNum, String statement, String enclosingClass, String enclosingMethod, int uniqueIdentifier) {
+    public LineInfo(String name, String nickname, String type, Integer lineNum, String statement, String enclosingClass, String enclosingMethod, int uniqueIdentifier) {
         this.name = name;
-        this.alias = alias;
+        this.nickname = nickname;
         this.type = type;
         this.lineNum = lineNum;
         this.statement = statement;
@@ -19,7 +19,11 @@ public class LineInfo {
 
     public LineInfo(String name, String alias) {
         this.name = name;
-        this.alias = alias;
+        this.nickname = alias;
+    }
+
+    public LineInfo() {
+        // dummy constructor
     }
 
     public String getName() {
@@ -30,12 +34,12 @@ public class LineInfo {
         this.name = name;
     }
 
-    public String getAlias() {
-        return alias;
+    public String getNickname() {
+        return nickname;
     }
 
-    public void setAlias(String alias) {
-        this.alias = alias;
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
     }
 
     public String getType() {

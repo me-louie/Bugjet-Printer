@@ -1,21 +1,22 @@
 import annotation.Track;
 
-public class SimpleTest {
+public class SimpleTest_primitives {
 
     public static int ONE_BILLION = 1000000000;
 
     private double memory = 0;
 
     public static void main(String[] args) {
-        SimpleTest st = new SimpleTest();
+        SimpleTest_primitives st = new SimpleTest_primitives();
         st.calc();
     }
 
-    @Track(var="a", alias = "alias_for_a")
-    @Track(var="b", alias="alias_for_b")
-    @Track(var="i", alias="alias_for_i")
+    @Track(var="a", nickname = "nickname_for_a")
+    @Track(var="b", nickname ="nickname_for_b")
+    @Track(var="i", nickname="nickname_for_i")
+
     public Double calc() {
-        double a;
+        double a = -1;
         double b;
         a = 5;
         b = 6;

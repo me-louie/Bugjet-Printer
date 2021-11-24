@@ -1,5 +1,32 @@
 # Milestones
 
+## Milestone 4
+
+### Summary Update
+This week the team focused on frontend and backend implementation. The backend currently supports tracking primitive variables and arrays. Additionally, aliasing is supported. After discussions with our TA, we plan to update our current implementation of statement/line tracking to include surrounding control flow/methods when appropriate. Furthermore, rather than supporting non-unique variables, we will change our implementation such that locally defined variables are only tracked within the scope of that method and also add support for globally tracked variables. A basic frontend was also implemented as per our mock up. In terms of frontend inmprovements, our TA also suggested that our original mock up may be too cluttered if the tracked variables undergo many mutations so instead we plan on implementing clickable slices which open into a new window and is expanded.
+
+### Final User Study Plans
+Now that we have implemented the variable tracking, we can get feedback on the functionality and visual representations from users. In the study, we will ask 2-3 users to write a simple program that assigns and reassign variables and then use the program analysis tool. The users will give feedback on how easy and intuitive it was to use and how useful they found it. Additionally, we will write a program with intentional bugs and ask our users to attempt to debug the program using our analysis tool.
+
+### Planned Timeline For Remaining Days
+**Backend TODOs:**
+* Support user-defined objects
+* support the rest of the control flow blocks we haven't done yet (loops/ifs without parentheses, variables declared inside a loop header, unary/assignexprs inside a loop header, etc.)
+* Support tracking of fields
+* Update the statement that we put in the output so that it's not just the actual assignment/declaration, it also contains the surrounding control flow and method (TA asked for this)
+    * Add support so that locally defined variables we track are restricted to the scope of that method (deals with the case where 2 methods have the same locally declared variable)
+    * Add support so that global variables we track can be distinguished from local variables (deals with the case where a local variable in class A has the same name as a global variable in class B
+    * If we do the above this only leaves the case where 2 classes each have a global variable with the same name
+* Possibly support tracking method arguments. (Currently our implementation assumes that we'll see a variable get declared)  
+
+**FrontEnd TODOs:**  
+* Add the backend and frontend connection.
+* Make the frontend code editor be something that dynamically calls the backEnd
+* Implement the slider visualization with different  HTML elements
+* Make the the graphs clickable so you can see them on a new window expanded
+* Support user defined object visualization
+* Start testing after MVP done
+
 ## Milestone 3
 
 ### Summary Update
