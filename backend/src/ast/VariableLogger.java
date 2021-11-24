@@ -20,13 +20,13 @@ public class VariableLogger {
     private static Map<VariableScope, Output> outputMap = new HashMap<>();
     private static Set<VariableScope> trackedScopes = new HashSet<>() {{
     }};
-    private static Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
+    private static Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().disableHtmlEscaping().create();
 
     public static void log(Object variableValue, String variableName, String enclosingMethod, String enclosingClass,
                            Integer id) {
         LineInfo lineInfo = lineInfoMap.get(id);
         VariableScope scope = new VariableScope(variableName, enclosingMethod, enclosingClass);
-        Set<VariableScope> scopesToLog = variableValue!= null && !trackedScopes.contains(scope) ?
+        Set<VariableScope> scopesToLog = variableValue != null && !trackedScopes.contains(scope) ?
                 VariableReferenceLogger.refToScopeMap.get(variableValue.toString()) : Set.of(scope);
         for (VariableScope s: scopesToLog) {
             Output output = (outputMap.containsKey(s)) ?

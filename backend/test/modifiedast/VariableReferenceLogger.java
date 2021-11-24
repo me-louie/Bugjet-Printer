@@ -70,10 +70,9 @@ public class VariableReferenceLogger {
             evaluateNullAssignment(scope, lineInfoNum);
             return;
         }
-        if (trackedVarReferenceHasChanged(var, scope)) {
-            // if a tracked var now points to a different ref
-            // update the map to reflect that log for this one tracked var
-            updateMapsWithNewReference(var, scope);
+        if (trackedVarReferenceHasChanged(var, scope)) {   // if a tracked var now points to a different ref
+            updateMapsWithNewReference(var, scope);        // update the map to reflect that
+            // log for this one tracked var
             VariableLogger.log(var, varName, enclosingMethod, enclosingClass, lineInfoNum);
         }
         // if the above if block ran then checkBaseAndNestedObjects won't detect any changes since the

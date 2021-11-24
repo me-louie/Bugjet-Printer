@@ -39,10 +39,8 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<VariableScope, 
                                 scope.getEnclosingMethod(), scope.getEnclosingClass(), id));
             } else if (nodeContainingEntireStatement instanceof ForStmt) {
                 injectCodeOnNextLine(nodeContainingEntireStatement, vd,
-                        StatementCreator.logVariable(name, scope.getEnclosingMethod(), scope.getEnclosingClass(),
-                                null, id));
-                StatementCreator.evaluateForLoopVarDeclarationStatement(name, scope.getEnclosingMethod(),
-                        scope.getEnclosingClass(), id);
+                        StatementCreator.evaluateForLoopVarDeclarationStatement(name, scope.getEnclosingMethod(),
+                                scope.getEnclosingClass(), id));
             } else {
                 injectCodeOnNextLine(nodeContainingEntireStatement, vd,
                         StatementCreator.evaluateVarDeclarationStatement(name, scope.getEnclosingMethod(),
