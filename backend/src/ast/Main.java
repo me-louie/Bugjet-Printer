@@ -6,9 +6,12 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.visitor.ModifierVisitor;
 import com.github.javaparser.ast.visitor.VoidVisitor;
+import loader.CodeLoader;
 import util.Formatter;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 
 public class Main {
@@ -26,12 +29,26 @@ public class Main {
     private static final String MODIFIED_VARIABLE_REF_LOGGER_FILE_PATH = MODIFIED_FILES_DIRECTORY +
             "/VariableReferenceLogger.java";
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws Exception {
         // get ast
         CompilationUnit cu = StaticJavaParser.parse(new File(INPUT_FILE_PATH));
+        processProgram(cu);
+    }
+    
+    public static String process(String program) throws Exception {
+        CompilationUnit cu = StaticJavaParser.parse(program);
+        return processProgram(cu);
+    }
+
+    public static String processProgram(CompilationUnit cu) throws Exception {
+        // collect names/aliases of variables to track
+//         VoidVisitor<Map<String, String>> variableAnnotationCollector = new VariableAnnotationCollector();
+//         Map<String, String> variablesToTrack = new HashMap<>(); // map of variable names -> the aliases we'll track them under
+
         VoidVisitor<Map<VariableScope, String>> variableAnnotationCollector = new VariableAnnotationCollector();
         // map of variable scope -> the aliases we'll track them under
         Map<VariableScope, String> variablesToTrack = new HashMap<>();
+
         variableAnnotationCollector.visit(cu, variablesToTrack);
         // add logging code to ast
         ModifierVisitor<Map<VariableScope, List<LineInfo>>> variableHistoryModifier = new VariableHistoryModifier();
@@ -58,10 +75,17 @@ public class Main {
             // todo: we'll probably want to return this error to the frontend to display to user
             System.exit(1);
         }
+
+        List<String> className = new ArrayList<>();
+        VoidVisitor<List<String>> classNameVisitor = new ClassNameCollector();
+        classNameVisitor.visit(cu, className);
+
         writeModifiedProgram(cu);
         writeModifiedVariableLogger(lineInfoMap, variablesToTrack);
         writeModifiedVariableReferenceLogger();
         writeModifiedLineInfo();
+        CodeLoader.run(className.get(0));
+        return new String(Files.readAllBytes(Paths.get("out/output.json")));
         // todo: send output.json to frontend
     }
 
