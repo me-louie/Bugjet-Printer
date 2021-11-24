@@ -77,16 +77,12 @@ public class VariableLogger {
                            Integer id) {
         LineInfo lineInfo = lineInfoMap.get(id);
         VariableScope scope = new VariableScope(variableName, enclosingMethod, enclosingClass);
-        Set<VariableScope> scopesToLog = variableValue != null && !trackedScopes.contains(scope) ?
-                VariableReferenceLogger.refToVarMap.get(variableValue.toString()) : Set.of(scope);
-        for (VariableScope s: scopesToLog) {
-            Output output = (outputMap.containsKey(s)) ?
-                    outputMap.get(s) :
-                    new Output(variableName, s, lineInfo.getNickname(), lineInfo.getType());
-            output.addMutation(lineInfo.getStatement(), enclosingClass, enclosingMethod,
-                    variableValue, lineInfo.getLineNum());
-            outputMap.put(s, output);
-        }
+        Output output = (outputMap.containsKey(scope)) ?
+                outputMap.get(scope) :
+                new Output(variableName, scope, lineInfo.getNickname(), lineInfo.getType());
+        output.addMutation(lineInfo.getStatement(), enclosingClass, enclosingMethod,
+                variableValue, lineInfo.getLineNum());
+        outputMap.put(scope, output);
     }
 
     public static void writeOutputToDisk() throws IOException {

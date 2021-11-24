@@ -82,31 +82,31 @@ public class VariableReferenceLogger {
         if (baseObject == null) {
             return;
         }
-        checkObject(baseObject, lineInfoNum, baseObject, scope);
+        checkObject(baseObject, lineInfoNum, baseObject);
         for (Field field : baseObject.getClass().getFields()) {
             try {
                 Object nestedObject = field.get(baseObject);
                 if (nestedObject == null) {
                     continue;
                 }
-                checkObject(baseObject, lineInfoNum, nestedObject, scope);
+                checkObject(baseObject, lineInfoNum, nestedObject);
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             }
         }
     }
 
-    private static void checkObject(Object var, int lineInfoNum, Object nestedObject, VariableScope scope) {
+    private static void checkObject(Object var, int lineInfoNum, Object nestedObject) {
         if (isTrackedReference(nestedObject.toString()) && isObjectModified(nestedObject)) {
             // update the refToJsonMap with the modified object
             refToJsonMap.put(var.toString(), gson.toJson(var));
-            logForAllVariablesThatPointToReference(var, lineInfoNum, scope);
+            logForAllVariablesThatPointToReference(var, lineInfoNum);
         }
     }
 
-    private static void logForAllVariablesThatPointToReference(Object var, int lineInfoNum, VariableScope scope) {
+    private static void logForAllVariablesThatPointToReference(Object var, int lineInfoNum) {
         for (VariableScope trackedVariableScope : refToVarMap.get(var.toString())) {
-            VariableLogger.log(var, trackedVariableScope.getVarName(), scope.getEnclosingMethod(), scope.getEnclosingClass(), lineInfoNum);
+            VariableLogger.log(var, trackedVariableScope.getVarName(), trackedVariableScope.getEnclosingMethod(), trackedVariableScope.getEnclosingClass(), lineInfoNum);
         }
     }
 
