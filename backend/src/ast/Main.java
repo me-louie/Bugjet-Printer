@@ -26,6 +26,7 @@ public class Main {
     private static final String MODIFIED_VARIABLE_REF_LOGGER_FILE_PATH = MODIFIED_FILES_DIRECTORY + "/VariableReferenceLogger.java";
 
     public static void main(String[] args) throws Exception {
+        // get ast
         CompilationUnit cu = StaticJavaParser.parse(new File(INPUT_FILE_PATH));
         processProgram(cu);
     }
@@ -36,9 +37,6 @@ public class Main {
     }
 
     public static String processProgram(CompilationUnit cu) throws Exception {
-        // get ast
-        //  CompilationUnit cu = StaticJavaParser.parse(new File(INPUT_FILE_PATH));
-//        CompilationUnit cu = StaticJavaParser.parse(program);
         // collect names/aliases of variables to track
         VoidVisitor<Map<String, String>> variableAnnotationCollector = new VariableAnnotationCollector();
         Map<String, String> variablesToTrack = new HashMap<>(); // map of variable names -> the aliases we'll track them under
