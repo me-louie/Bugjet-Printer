@@ -1,5 +1,5 @@
 package com.restservice;
 
 public class Request {
-    private String program;
+    public String program;
 }

@@ -10,5 +10,7 @@
     <orderEntry type="library" name="github.javaparser.symbol.solver.core" level="project" />
     <orderEntry type="library" name="google.code.gson" level="project" />
     <orderEntry type="library" name="springframework.boot.spring.starter.web" level="project" />
+    <orderEntry type="module" module-name="backend" />
+    <orderEntry type="module" module-name="frontend" />
   </component>
 </module>

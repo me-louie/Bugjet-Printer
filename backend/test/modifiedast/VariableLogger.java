@@ -16,12 +16,20 @@ public class VariableLogger {
     private static final String FILE_PATH = "out/output.json";
     // uniqueId -> LineInfo for a line that causes variable mutation
     public static Map<Integer, LineInfo> lineInfoMap = new HashMap<>() {{
-		put(5, new LineInfo("arg2", "arg2", "String",12, "public void methodArgs(int arg1, String arg2)", "MethodArgsTest", "public void methodArgs(int arg1, String arg2)", 5));
-		put(0, new LineInfo("mat", "null", "null",7, "mat.methodArgs(5, \"test\");", "MethodArgsTest", "public static void main(String[] args)", 0));
-		put(1, new LineInfo("arg1", "arg1", "null",15, "arg1 = 4;", "MethodArgsTest", "public void methodArgs(int arg1, String arg2)", 1));
-		put(2, new LineInfo("arg1", "arg1", "null",17, "arg1 = 10;", "MethodArgsTest", "public void methodArgs(int arg1, String arg2)", 2));
-		put(3, new LineInfo("arg1", "arg1", "null",19, "arg1 = 33;", "MethodArgsTest", "public void methodArgs(int arg1, String arg2)", 3));
-		put(4, new LineInfo("arg1", "arg1", "int",12, "public void methodArgs(int arg1, String arg2)", "MethodArgsTest", "public void methodArgs(int arg1, String arg2)", 4));
+		put(1, new LineInfo("a", "nickname_for_a", "double",19, "double a = -1;", "SimpleTest_primitives", "public Double calc()", 1));
+		put(3, new LineInfo("a", "nickname_for_a", "null",21, "a = 5;", "SimpleTest_primitives", "public Double calc()", 3));
+		put(7, new LineInfo("a", "nickname_for_a", "null",29, "a++;", "SimpleTest_primitives", "public Double calc()", 7));
+		put(10, new LineInfo("a", "nickname_for_a", "null",34, "a = b + 1;", "SimpleTest_primitives", "public Double calc()", 10));
+		put(0, new LineInfo("st", "null", "null",11, "st.calc();", "SimpleTest_primitives", "public static void main(String[] args)", 0));
+		put(2, new LineInfo("b", "nickname_for_b", "double",20, "double b;", "SimpleTest_primitives", "public Double calc()", 2));
+		put(4, new LineInfo("b", "nickname_for_b", "null",22, "b = 6;", "SimpleTest_primitives", "public Double calc()", 4));
+		put(5, new LineInfo("b", "nickname_for_b", "null",26, "b--;", "SimpleTest_primitives", "public Double calc()", 5));
+		put(6, new LineInfo("b", "nickname_for_b", "null",24, "b++;", "SimpleTest_primitives", "public Double calc()", 6));
+		put(8, new LineInfo("b", "nickname_for_b", "null",30, "b *= b / a;", "SimpleTest_primitives", "public Double calc()", 8));
+		put(11, new LineInfo("i", "nickname_for_i", "null",35, "i += 2;", "SimpleTest_primitives", "public Double calc()", 11));
+		put(12, new LineInfo("i", "nickname_for_i", "int",33, "for (int i = 0; i < 10; i++) {\r    a = b + 1;\r    i += 2;\r}", "SimpleTest_primitives", "public Double calc()", 12));
+		put(13, new LineInfo("i", "nickname_for_i", "null",33, "for (int i = 0; i < 10; i++) {\r    a = b + 1;\r    i += 2;\r}", "SimpleTest_primitives", "public Double calc()", 13));
+		put(9, new LineInfo("System", "null", "null",31, "System.out.println(\"hello world\");", "SimpleTest_primitives", "public Double calc()", 9));
     }};
     // variable name -> Output object containing all info tracked about variable
     private static Map<String, Output> outputMap = new HashMap<>();

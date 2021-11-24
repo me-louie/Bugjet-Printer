@@ -8,12 +8,14 @@ import com.github.javaparser.ast.visitor.VoidVisitor;
 import loader.CodeLoader;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 
 public class Main {
 
     private static final String MODIFIED_FILES_DIRECTORY = "backend/test/modifiedast";
-    private static final String INPUT_FILE_PATH = "backend/test/MethodArgsTest.java";
+    private static final String INPUT_FILE_PATH = "backend/test/SimpleTest_primitives.java";
     private static final String VARIABLE_LOGGER_FILE_PATH = "backend/src/ast/VariableLogger.java";
     private static final String LINE_INFO_FILE_PATH = "backend/src/ast/LineInfo.java";
     private static final String VARIABLE_REF_LOGGER_FILE_PATH = "backend/src/ast/VariableReferenceLogger.java";
@@ -24,8 +26,19 @@ public class Main {
     private static final String MODIFIED_VARIABLE_REF_LOGGER_FILE_PATH = MODIFIED_FILES_DIRECTORY + "/VariableReferenceLogger.java";
 
     public static void main(String[] args) throws Exception {
-        // get ast
         CompilationUnit cu = StaticJavaParser.parse(new File(INPUT_FILE_PATH));
+        processProgram(cu);
+    }
+    
+    public static String process(String program) throws Exception {
+        CompilationUnit cu = StaticJavaParser.parse(program);
+        return processProgram(cu);
+    }
+
+    public static String processProgram(CompilationUnit cu) throws Exception {
+        // get ast
+        //  CompilationUnit cu = StaticJavaParser.parse(new File(INPUT_FILE_PATH));
+//        CompilationUnit cu = StaticJavaParser.parse(program);
         // collect names/aliases of variables to track
         VoidVisitor<Map<String, String>> variableAnnotationCollector = new VariableAnnotationCollector();
         Map<String, String> variablesToTrack = new HashMap<>(); // map of variable names -> the aliases we'll track them under
@@ -62,6 +75,7 @@ public class Main {
         writeModifiedVariableReferenceLogger();
         writeModifiedLineInfo();
         CodeLoader.run(className.get(0));
+        return new String(Files.readAllBytes(Paths.get("out/output.json")));
         // todo: send output.json to frontend
     }
 
