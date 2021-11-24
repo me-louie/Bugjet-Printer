@@ -3,6 +3,11 @@
     "name": "a",
     "nickname": "a",
     "type": "A",
+    "scope": {
+      "varName": "a",
+      "enclosingMethod": "public void calc()",
+      "enclosingClass": "ObjectTest"
+    },
     "history": [
       {
         "statement": "A a = new A(5, new int[] { 1, 2, 3 }, new B());",
@@ -311,6 +316,11 @@
     "name": "anotherA",
     "nickname": "anotherA",
     "type": "A",
+    "scope": {
+      "varName": "anotherA",
+      "enclosingMethod": "public void calc()",
+      "enclosingClass": "ObjectTest"
+    },
     "history": [
       {
         "statement": "A anotherA;",
@@ -346,6 +356,11 @@
     "name": "nestedB",
     "nickname": "nestedB",
     "type": "B",
+    "scope": {
+      "varName": "nestedB",
+      "enclosingMethod": "public void calc()",
+      "enclosingClass": "ObjectTest"
+    },
     "history": [
       {
         "statement": "B nestedB = new B();",

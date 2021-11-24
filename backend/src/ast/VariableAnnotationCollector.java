@@ -1,20 +1,28 @@
 package ast;
 
-import com.github.javaparser.ast.expr.NormalAnnotationExpr;
+import annotation.VariableScope;
+import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
+import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.expr.AnnotationExpr;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
+import util.NodeParser;
 
 import java.util.Map;
 
-public class VariableAnnotationCollector extends VoidVisitorAdapter<Map<String, String>> {
+public class VariableAnnotationCollector extends VoidVisitorAdapter<Map<VariableScope, String>> {
 
     @Override
-    public void visit(NormalAnnotationExpr nae, Map<String, String> collector) {
-        super.visit(nae, collector);
-        if (nae.getNameAsString().equals("Track")) {
-            // TODO: figure out where these "" are coming from and fix this string hack
-            String var = nae.getPairs().getFirst().get().getValue().toString().replace("\"", "");
-            String alias = nae.getPairs().getLast().get().getValue().toString().replace("\"", "");
-            collector.put(var, alias);
+    public void visit(MethodDeclaration md, Map<VariableScope, String> collector) {
+        super.visit(md, collector);
+        String enclosingMethod = NodeParser.getEnclosingMethod(md);
+        String enclosingClass = NodeParser.getEnclosingClass(md);
+        for (AnnotationExpr nae : md.getAnnotations()) {
+            String name = nae.asNormalAnnotationExpr().getPairs().getFirst().get().getValue().toString().replace(
+                    "\"", "");
+            String nickname =
+                    nae.asNormalAnnotationExpr().getPairs().getLast().get().getValue().toString().replace(
+                            "\"", "");
+            collector.put(new VariableScope(name, enclosingMethod, enclosingClass), nickname);
         }
     }
 }
