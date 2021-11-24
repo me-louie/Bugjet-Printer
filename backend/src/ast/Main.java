@@ -5,7 +5,6 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.visitor.ModifierVisitor;
 import com.github.javaparser.ast.visitor.VoidVisitor;
-import loader.CodeLoader;
 
 import java.io.*;
 import java.util.*;
@@ -20,7 +19,7 @@ public class Main {
     private static final String MODIFIED_VARIABLE_LOGGER_FILE_PATH = "backend/test/modifiedast/VariableLogger.java";
     private static final String MODIFIED_LINE_INFO_FILE_PATH = "backend/test/modifiedast/LineInfo.java";
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws IOException {
         // get ast
         CompilationUnit cu = StaticJavaParser.parse(new File(INPUT_FILE_PATH));
         // collect names/aliases of variables to track
@@ -49,15 +48,9 @@ public class Main {
             // todo: we'll probably want to return this error to the frontend to display to user
             System.exit(1);
         }
-
-        List<String> className = new ArrayList<>();
-        VoidVisitor<List<String>> classNameVisitor = new ClassNameCollector();
-        classNameVisitor.visit(cu, className);
-
         writeModifiedProgram(cu);
         writeModifiedVariableLogger(lineInfoMap);
         writeModifiedLineInfo();
-        CodeLoader.run(className.get(0));
         // todo: send output.json to frontend
     }
 
