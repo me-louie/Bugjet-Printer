@@ -3,7 +3,6 @@ package ast;
 import annotation.VariableScope;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import modifiedast.VariableReferenceLogger;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -27,7 +26,7 @@ public class VariableLogger {
         LineInfo lineInfo = lineInfoMap.get(id);
         VariableScope scope = new VariableScope(variableName, enclosingMethod, enclosingClass);
         Set<VariableScope> scopesToLog = variableValue != null && !trackedScopes.contains(scope) ?
-                VariableReferenceLogger.refToScopeMap.get(variableValue.toString()) : Set.of(scope);
+                VariableReferenceLogger.refToVarMap.get(variableValue.toString()) : Set.of(scope);
         for (VariableScope s: scopesToLog) {
             Output output = (outputMap.containsKey(s)) ?
                     outputMap.get(s) :

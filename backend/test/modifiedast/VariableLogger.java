@@ -3,7 +3,6 @@ package modifiedast;
 import annotation.VariableScope;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import modifiedast.VariableReferenceLogger;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -72,14 +71,14 @@ public class VariableLogger {
 		add(new VariableScope("anotherA", "public void calc()", "ObjectTest"));
 		add(new VariableScope("nestedB", "public void calc()", "ObjectTest"));
     }};
-    private static Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
+    private static Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().disableHtmlEscaping().create();
 
     public static void log(Object variableValue, String variableName, String enclosingMethod, String enclosingClass,
                            Integer id) {
         LineInfo lineInfo = lineInfoMap.get(id);
         VariableScope scope = new VariableScope(variableName, enclosingMethod, enclosingClass);
-        Set<VariableScope> scopesToLog = variableValue!= null && !trackedScopes.contains(scope) ?
-                VariableReferenceLogger.refToScopeMap.get(variableValue.toString()) : Set.of(scope);
+        Set<VariableScope> scopesToLog = variableValue != null && !trackedScopes.contains(scope) ?
+                VariableReferenceLogger.refToVarMap.get(variableValue.toString()) : Set.of(scope);
         for (VariableScope s: scopesToLog) {
             Output output = (outputMap.containsKey(s)) ?
                     outputMap.get(s) :

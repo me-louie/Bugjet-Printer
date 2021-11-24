@@ -11,12 +11,10 @@ import java.util.Set;
 
 public class VariableReferenceLogger {
 
-    // maps obj reference -> set of variable scopes in which the reference should be tracked
-    public static HashMap<String, Set<VariableScope>> refToScopeMap = new HashMap<>();
+    // maps obj reference -> set of variable scopes which track this reference
+    public static HashMap<String, Set<VariableScope>> refToVarMap = new HashMap<>();
     // maps variable name -> the obj reference that the variable points to
     private static HashMap<VariableScope, String> varToRefMap = new HashMap<>();
-    // maps obj reference -> set of variable scopes which track this reference
-    private static HashMap<String, Set<VariableScope>> refToVarMap = new HashMap<>();
     // maps obj reference -> json representation of object after last time it was mutated
     private static HashMap<String, String> refToJsonMap = new HashMap<>();
     private static Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
@@ -33,10 +31,8 @@ public class VariableReferenceLogger {
         // check if this reference already has an entry, it may if another tracked variable also references it
         if (!isTrackedReference(var.toString())) {
             refToVarMap.put(var.toString(), new HashSet<>());
-            refToScopeMap.put(var.toString(), new HashSet<>());
         }
         refToVarMap.get(var.toString()).add(scope); // add this var to the list of vars that point to its reference
-        refToScopeMap.get(var.toString()).add(scope);
         varToRefMap.put(scope, var.toString());     // add an entry for this variable
         refToJsonMap.put(var.toString(), gson.toJson(var));
         VariableLogger.log(var, varName, enclosingMethod, enclosingClass, lineInfoNum);
@@ -69,7 +65,8 @@ public class VariableReferenceLogger {
             return;
         }
         if (trackedVarReferenceHasChanged(var, scope)) { // if a tracked var now points to a different ref
-            updateMapsWithNewReference(var, scope);      // update the map to reflect that log for this one tracked var
+            updateMapsWithNewReference(var, scope);      // update the map to reflect that
+            // log for this one tracked var
             VariableLogger.log(var, varName, enclosingMethod, enclosingClass, lineInfoNum);
         }
         // if the above if block ran then checkBaseAndNestedObjects won't detect any changes since the
@@ -143,11 +140,9 @@ public class VariableReferenceLogger {
         varToRefMap.put(scope, newRef);                      // replace varName's old entry with the new obj ref
         if (!isTrackedReference(newRef)) {                   // if this var ref doesn't have an entry
             refToVarMap.put(newRef, new HashSet<>());        // add an entry for the new ref
-            refToScopeMap.put(newRef, new HashSet<>());
             refToJsonMap.put(var.toString(), gson.toJson(var));
         }
         refToVarMap.get(newRef).add(scope);                 // add varName to the list of variables that point to newRef
-        refToScopeMap.get(newRef).add(scope);
     }
 
     private static void removeOldRefEntriesFromMap(VariableScope scope, String oldRef) {
@@ -155,7 +150,6 @@ public class VariableReferenceLogger {
             refToVarMap.get(oldRef).remove(scope);     // remove varName from the list of variables that point to oldRef
             if (refToVarMap.get(oldRef).isEmpty()) {   // if no other variables we care about point to oldRef
                 refToVarMap.remove(oldRef);            // remove oldRef from both maps that key by reference
-                refToScopeMap.remove(oldRef);
                 refToJsonMap.remove(oldRef);
                 // we don't delete the varToRefMap entry because it just gets overwritten
             }
