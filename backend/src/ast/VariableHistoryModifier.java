@@ -111,6 +111,10 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<VariableScope, 
         if (mce.getScope().isPresent()) {
             NameExpr exprScope = (NameExpr) getBaseScope(mce.getScope().get());
             String name = exprScope.getNameAsString();
+            // so we don't track system and similar method calls (e.g. System.out.println(...))
+            if (isJavaDefaultStaticObject(name)) {
+                return mce;
+            }
             VariableScope scope = Scoper.createScope(name, mce);
             Statement nodeContainingEntireStatement = (Statement) mce.getParentNode().get();
             int id = UniqueNumberGenerator.generate();
@@ -120,6 +124,12 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<VariableScope, 
             injectCodeOnNextLine(nodeContainingEntireStatement, mce, injectedLine);
         }
         return mce;
+    }
+
+    private boolean isJavaDefaultStaticObject(String name) {
+       return name != null &&
+               name.length() > 0 &&
+               Character.isUpperCase(name.charAt(0));
     }
 
     private Expression getBaseScope(Expression scope) {
