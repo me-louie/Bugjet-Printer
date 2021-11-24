@@ -1,5 +1,7 @@
 package util;
 
+import annotation.VariableScope;
+
 public final class Formatter {
 
     public static String generatePutStatement(int id, String name, String alias, String type, int lineNum,
@@ -17,6 +19,13 @@ public final class Formatter {
                 + id + "));" + "\n";
     }
 
+    public static String addTrackedScope(VariableScope vs) {
+        return "\t\tadd("
+                + "new VariableScope(\""
+                + vs.getVarName() + "\", \""
+                + vs.getEnclosingMethod() + "\", \""
+                + vs.getEnclosingClass() + "\"));" + "\n";
+    }
     private static String parseStatement(String statement) {
         String escapedStatement = statement
                 .replaceAll("\n", "\\\\n")
