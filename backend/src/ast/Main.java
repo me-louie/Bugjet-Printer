@@ -16,7 +16,7 @@ import java.util.*;
 
 public class Main {
 
-    private static final String PROGRAM_FILE_NAME = "/ObjectTest.java";
+    private static final String PROGRAM_FILE_NAME = "/SimpleTest_primitives.java";
     private static final String MODIFIED_FILES_DIRECTORY = "backend/test/modifiedast";
     private static final String INPUT_FILE_PATH = "backend/test" + PROGRAM_FILE_NAME;
     private static final String VARIABLE_LOGGER_FILE_PATH = "backend/src/ast/VariableLogger.java";
@@ -42,8 +42,6 @@ public class Main {
 
     public static String processProgram(CompilationUnit cu) throws Exception {
         // collect names/aliases of variables to track
-//         VoidVisitor<Map<String, String>> variableAnnotationCollector = new VariableAnnotationCollector();
-//         Map<String, String> variablesToTrack = new HashMap<>(); // map of variable names -> the aliases we'll track them under
 
         VoidVisitor<Map<VariableScope, String>> variableAnnotationCollector = new VariableAnnotationCollector();
         // map of variable scope -> the aliases we'll track them under
@@ -76,17 +74,18 @@ public class Main {
             System.exit(1);
         }
 
-        List<String> className = new ArrayList<>();
+        List<String> classNames = new ArrayList<>();
         VoidVisitor<List<String>> classNameVisitor = new ClassNameCollector();
-        classNameVisitor.visit(cu, className);
+        classNameVisitor.visit(cu, classNames);
+        String className = classNames.get(0);
 
-        writeModifiedProgram(cu);
+        writeModifiedProgram(cu, className);
         writeModifiedVariableLogger(lineInfoMap, variablesToTrack);
         writeModifiedVariableReferenceLogger();
         writeModifiedLineInfo();
-        CodeLoader.run(className.get(0));
+
+        CodeLoader.run(className);
         return new String(Files.readAllBytes(Paths.get("out/output.json")));
-        // todo: send output.json to frontend
     }
 
     private static String populateLineInfoMap(Map<VariableScope, List<LineInfo>> lineInfoMap) {
@@ -107,8 +106,8 @@ public class Main {
         return putStatements.toString();
     }
 
-    private static void writeModifiedProgram(CompilationUnit cu) throws IOException {
-        BufferedWriter writer = new BufferedWriter(new FileWriter(MODIFIED_AST_FILE_PATH));
+    private static void writeModifiedProgram(CompilationUnit cu, String classname) throws IOException {
+        BufferedWriter writer = new BufferedWriter(new FileWriter(MODIFIED_FILES_DIRECTORY + "/" + classname + ".java"));
         cu.setPackageDeclaration(MODIFIED_FILES_PACKAGE_NAME);
         cu.addImport("java.util.HashSet");
         cu.addImport("java.util.Set");

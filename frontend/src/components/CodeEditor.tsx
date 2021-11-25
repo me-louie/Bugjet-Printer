@@ -4,22 +4,24 @@ import AceEditor, { IMarker } from "react-ace";
 import "ace-builds/src-noconflict/mode-java";
 
 interface Props {
-  text?: string;
+  text: string;
+  setText?: (text: string) => void;
   readOnly?: boolean;
   height?: string;
+  width?: string;
+  showPrintMargin?: boolean;
   markers: IMarker[];
+  style?: React.CSSProperties;
 }
 
 function CodeEditor(props: Props) {
-  const [text, setText] = React.useState(props.text || "");
   const editorRef = React.useRef<AceEditor>(null);
 
   const onChange = (newValue: string) => {
-    setText(newValue);
+    if (props.setText) {
+      props.setText(newValue);
+    }
   }
-
-  console.log(props.text + " hello props");
-  console.log(text + " hello2")
 
   React.useEffect(() => {
     if (props.markers.length > 0) {
@@ -35,12 +37,15 @@ function CodeEditor(props: Props) {
       mode="java"
       name="hello"
       height={props.height || "100%"}
+      width={props.width}
+      style={props.style}
       readOnly={props.readOnly}
-      value={props.readOnly ? props.text : text}
+      value={props.text}
       onChange={onChange}
       fontSize={14}
       highlightActiveLine={true}
       markers={props.markers}
+      showPrintMargin={props.showPrintMargin !== false}
       setOptions={{
         // enableBasicAutocompletion: false,
         // enableLiveAutocompletion: true,
