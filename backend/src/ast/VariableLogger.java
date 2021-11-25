@@ -24,6 +24,7 @@ public class VariableLogger {
     public static void log(Object variableValue, String variableName, String enclosingMethod, String enclosingClass,
                            Integer id) {
         LineInfo lineInfo = lineInfoMap.get(id);
+        System.out.println("lineInfo: " + lineInfo);
         VariableScope scope = new VariableScope(variableName, enclosingMethod, enclosingClass);
         Output output = (outputMap.containsKey(scope)) ?
                 outputMap.get(scope) :

@@ -38,8 +38,8 @@ public class CodeLoader {
         fileManager.close();
 
         // load the compiled class
-//        URLClassLoader classLoader = URLClassLoader.newInstance(new URL[] { parentDirectory.toURI().toURL() });
-        Class<?> modifiedClass = Class.forName("modifiedast." + classname);
+        URLClassLoader classLoader = URLClassLoader.newInstance(new URL[] { parentDirectory.toURI().toURL() });
+        Class<?> modifiedClass = classLoader.loadClass("modifiedast." + classname);
 
         // call main on the loaded class
         Method method = modifiedClass.getDeclaredMethod("main", String[].class);
