@@ -14,12 +14,29 @@ function InputView(props: Props) {
   const { text, setText, setOutput } = props;
 
   const getOutput = async (text: string) => {
+    console.log('test')
     try {
       const output = await sendRequest(text);
       setOutput(output);
     } catch (e) {
       console.log(e);
     }
+  }
+
+  const readFile = (file: File) => {
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      if (reader.result) {
+        setText(reader.result as string);
+      }
+    }
+
+    reader.onerror = () => {
+      console.log(reader.error);
+    }
+
+    reader.readAsText(file);
   }
 
   return (
@@ -32,17 +49,35 @@ function InputView(props: Props) {
         showPrintMargin={false}
         height="80%"
         width="100%"
-        style={{ borderTop: '1px solid lightgrey' }}
+        style={{ borderTop: '1px solid lightgrey', borderBottom: '1px solid lightgrey' }}
         markers={[]}
       />
-      <Button
-        style={{ height: '11%', borderRadius: 0 }}
-        onClick={() => getOutput(text)}
-        variant="contained"
-        disableElevation
-      >
-        Send code
-      </Button>
+      <div style={{ display: 'flex', flexDirection: 'row', margin: 'auto', gap: '100px' }}>
+        <Button
+          // style={{ height: '11%', borderRadius: 0 }}
+          size="large"
+          variant="contained"
+          component="label"
+        // disableElevation
+        >
+          Upload file
+          <input type="file" accept=".java" hidden onChange={(e) => {
+            if (e.target.files) {
+              readFile(e.target.files[0]);
+            }
+          }} />
+        </Button>
+        <Button
+          // style={{ height: '11%', borderRadius: 0 }}
+          size="large"
+          onClick={() => getOutput(text)}
+          variant="contained"
+          color="success"
+        // disableElevation
+        >
+          Send code
+        </Button>
+      </div>
     </div>
   )
 }
