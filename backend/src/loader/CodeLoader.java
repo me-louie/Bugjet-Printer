@@ -39,7 +39,6 @@ public class CodeLoader {
 
         // load the compiled class
         URLClassLoader classLoader = URLClassLoader.newInstance(new URL[] { parentDirectory.toURI().toURL() });
-        System.out.println(Arrays.toString(classLoader.getURLs()));
         Class<?> modifiedClass = classLoader.loadClass("modifiedast." + classname);
 
         // call main on the loaded class
