@@ -19,6 +19,7 @@ class OutputController {
             jsonString = Main.process(newRequest.program);
             return new ResponseEntity<>(jsonString, HttpStatus.OK);
         } catch (Exception e) {
+            System.err.println(e.getMessage());
             return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
         }
 

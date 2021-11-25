@@ -74,16 +74,17 @@ public class Main {
             System.exit(1);
         }
 
-        List<String> className = new ArrayList<>();
+        List<String> classNames = new ArrayList<>();
         VoidVisitor<List<String>> classNameVisitor = new ClassNameCollector();
-        classNameVisitor.visit(cu, className);
+        classNameVisitor.visit(cu, classNames);
+        String className = classNames.get(0);
 
-        writeModifiedProgram(cu);
+        writeModifiedProgram(cu, className);
         writeModifiedVariableLogger(lineInfoMap, variablesToTrack);
         writeModifiedVariableReferenceLogger();
         writeModifiedLineInfo();
 
-        CodeLoader.run(className.get(0));
+        CodeLoader.run(className);
         return new String(Files.readAllBytes(Paths.get("out/output.json")));
     }
 
@@ -105,8 +106,8 @@ public class Main {
         return putStatements.toString();
     }
 
-    private static void writeModifiedProgram(CompilationUnit cu) throws IOException {
-        BufferedWriter writer = new BufferedWriter(new FileWriter(MODIFIED_AST_FILE_PATH));
+    private static void writeModifiedProgram(CompilationUnit cu, String classname) throws IOException {
+        BufferedWriter writer = new BufferedWriter(new FileWriter(MODIFIED_FILES_DIRECTORY + "/" + classname + ".java"));
         cu.setPackageDeclaration(MODIFIED_FILES_PACKAGE_NAME);
         cu.addImport("java.util.HashSet");
         cu.addImport("java.util.Set");
