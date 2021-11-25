@@ -30,7 +30,7 @@ A recent poll found that 100% of developers write code that doesn't work. This t
 3. TODO: Run the tool 
 4. Add your code to the tool's editor. Run it to render variable histories. Step through the visualization to see how and where your variable changes.
 
-See `backend/example` for some example code snippets that you can try out.
+See the `examples` folder for some example code snippets that you can try out.
 
 ## What we support
 1. Tracking primitive, array, and user-defined local variables. e.g.
