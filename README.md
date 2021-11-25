@@ -122,7 +122,54 @@ See the `examples` folder for some example code snippets that you can try out.
 ## Program requirements
 Code fed to our tool must 
 1. include a `main` method with the signature `public static void main(String[] args)`. The signature can also include any exceptions the method throws.
-2. follow Java naming conventions for variables. Local variables, method arguments, and non-final fields must be named using camel-case (e.g. `myVariable`, not `MyVariable`).
+   ```aidl
+   public static void main(String[] args) {
+      // this is valid 
+   }
+   
+   @Track(var = "i", nickname = "i")
+   void myMethod(int i) {
+      ...
+   }
+   ```
+
+   ```aidl
+   public static void main(String[] args) throws FileNotFoundException {
+      // this is also valid 
+   }
+   
+   @Track(var = "i", nickname = "i")
+   void myMethod(int i) {
+      ...
+   }
+   ```
+
+   ```aidl
+   public static void main() {
+      // this is not valid
+   }
+   
+   @Track(var = "i", nickname = "i")
+   void myMethod(int i) {
+      ...
+   }
+   ```
+2. follow Java naming conventions for variables. Local variables, method arguments, and non-final fields must be named using camelcase e.g.
+   ```aidl
+   @Track(var = "userDefObj", nickname = "validlyNamedVariable")
+   void myMethod() {
+        UserDefinedObject userDefObj = new UserDefinedObject();
+        userDefObj.setNum(10);            // userDefObj is named in camelcase, this is valid
+        int i = userDefObj.FINAL_FIELD;   // FINAL_FIELD is not camelcase, this is valid since the field is final
+        System.out.println("hello world") // System is not camelcase, this is valid since System is not a local variable/field/method arg
+   }
+   ```
+
+   ```aidl
+   @Track(var = "UserDefObj", nickname = "InvalidlyNamedVariable")
+   void myMethod() {
+        UserDefinedObject UserDefObj = new UserDefinedObject(); // UserDefObj is local and not camelcase, this is not valid
+   ```
 3. use curly braces (i.e. `{}`) for any control flow blocks. This includes loops and if/else statements. For example, if the user wanted to track variable `i`:
 
     ```aidl
