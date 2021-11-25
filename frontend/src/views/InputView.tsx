@@ -41,7 +41,7 @@ function InputView(props: Props) {
 
   return (
     <div style={{ width: '100vw', height: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-      <p style={{ textAlign: 'center', fontSize: '20px' }}>Analysis tool</p>
+      <p style={{ textAlign: 'center', fontSize: '20px' }}>Bug-jet Printer</p>
       <CodeEditor
         text={text}
         setText={setText}
@@ -54,11 +54,9 @@ function InputView(props: Props) {
       />
       <div style={{ display: 'flex', flexDirection: 'row', margin: 'auto', gap: '100px' }}>
         <Button
-          // style={{ height: '11%', borderRadius: 0 }}
           size="large"
           variant="contained"
           component="label"
-        // disableElevation
         >
           Upload file
           <input type="file" accept=".java" hidden onChange={(e) => {
@@ -68,12 +66,10 @@ function InputView(props: Props) {
           }} />
         </Button>
         <Button
-          // style={{ height: '11%', borderRadius: 0 }}
           size="large"
           onClick={() => getOutput(text)}
           variant="contained"
           color="success"
-        // disableElevation
         >
           Send code
         </Button>
