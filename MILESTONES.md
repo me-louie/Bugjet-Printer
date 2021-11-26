@@ -1,4 +1,82 @@
 # Milestones
+## Milestone 5
+
+### Summary Update
+**Backend:**  
+This week the team implemented the feature which allows users to track user-defined objects.
+Additionally, we made changes which restrict the logging of local variables to their specific scope.
+As a result, the user is able to track local variables of the same name in different methods and
+their histories remain independent.
+
+**Frontend:**  
+This week the team completed the frontend/backend connection. The user is able to import their sample
+program to the frontend code editor and dynamically call the backend to execute the program analysis.
+Visualization for primitive types is completed and visualization for array/objects is underway.
+
+### Feedback and Planned Changes
+Upon consulting with our TA, we plan to make some changes to the way that we handle for-loop declarations.
+Currently, loop iterators declared within the for-loop can be tracked. However, we also want to support
+the ability for a user to define and track a loop iterator declared outside the for loop.
+
+### Status of Final User Study
+Upon completion of our final TODOs, the team plans on conducting a final user study to evaluate the
+usefulness of our analysis tool. After providing an overview of the tool and some example
+programs/visualizations, we will provide the user with a sample program which intentionally has some
+bugs and ask them to use our tool to assist in debugging the program. We will collect and summarize the
+feedback from the study participants.
+
+### Example User Study Program
+Use program analysis tool to debug and fix this program:
+```
+public class UserStudyTest {
+
+   public static void main(String[] args) {
+       UserStudyTest ust = new UserStudyTest();
+       ust.swap();
+   }
+   // Given 2 arrays:
+   // arr1 = {10, 11, 12, 13, 14};
+   // arr2 = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+
+   // Goal: swap array values such that the end states look like the following:
+   // arr1 = {10, 9, 8, 7, 6}
+   // arr2 = {1, 2, 3, 4, 5, 14, 13, 12, 11, 10}
+
+   private void swap() {
+       System.out.println("HERE");
+       int[] arr1 = {10, 11, 12, 13, 14};
+       int[] arr2 = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+       int j = arr2.length - arr1.length -1;
+       for (int i = 1; i < arr1.length; i++) {
+           int temp = arr1[i];
+           arr1[i] = arr2[j];
+           arr2[j] = temp;
+       }
+       StringBuilder sb = new StringBuilder();
+       sb.append("arr1: \n");
+       for (int a = 0; a < arr1.length; a++) {
+           sb.append(arr1[a] + ", ");
+       }
+       sb.append("\n arr2: \n");
+
+       for (int b = 0; b < arr2.length; b++) {
+           sb.append(arr2[b] + ", ");
+       }
+       System.out.println(sb);
+   }
+}
+
+```
+
+### Next Steps and Timeline
+* Implement the ability for a user to define/track a loop iterator declared outside a for loop
+* Implement tracking of method arguments
+* Implement the slider visualization with different HTML elements for arrays 1d and 2d user objects
+* Make the the visualization graphs clickable so you can see them on a new window expanded
+* Front end error handling
+* Conduct final user study
+* Create the final presentation video (planned for Monday, November 29th once the above TODOs are completed)
+
 
 ## Milestone 4
 
