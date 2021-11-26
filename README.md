@@ -117,29 +117,29 @@ See the `examples` folder for some example code snippets that you can try out.
    }
    ```
    Individual fields can be indirectly tracked by tracking their enclosing object. In the example above the history of changes to `a.size` can be collected by tracking `a`. Note, however, that changes to `a`'s other fields will also be captured in this history.
-   1. Tracking of non-user defined objects (with the exception of arrays). e.g.
-      ```aidl
-         @Track(var = "myList", nickname = "myList")
-         void myMethod() {
-              List<String> list = new ArrayList<>(); 
-              list.add("a"); // we do not guarantee that this will be tracked properly
-         }
-      ```
-      Note that this includes fields of user defined objects inherited from non-user defined classes. Any inherited non-user defined field that is declared as private cannot be accessed by our tool and thus will not be tracked properly. e.g.
-      ```aidl
-      public class MyMap extends HashMap {
-           ...
-      }
-   
-      ...
-   
-      @Track(var = "myMap", nickname = "myMap")
+2. Tracking of non-user defined objects (with the exception of arrays). e.g.
+   ```aidl
+      @Track(var = "myList", nickname = "myList")
       void myMethod() {
-         MyMap<String, String> myMap = new MyMap<>(); 
-         myMap.put("a", "b"); // we do not guarantee that this will be tracked properly
+           List<String> list = new ArrayList<>(); 
+           list.add("a"); // we do not guarantee that this will be tracked properly
       }
-      ```
-2. Separate tracking of multiple local variables that have the same name within a single method. e.g.
+   ```
+   Note that this includes fields of user defined objects inherited from non-user defined classes. Any inherited non-user defined field that is declared as private cannot be accessed by our tool and thus will not be tracked properly. e.g.
+   ```aidl
+   public class MyMap extends HashMap {
+        ...
+   }
+   
+   ...
+   
+   @Track(var = "myMap", nickname = "myMap")
+   void myMethod() {
+      MyMap<String, String> myMap = new MyMap<>(); 
+      myMap.put("a", "b"); // we do not guarantee that this will be tracked properly
+   }
+   ```
+3. Separate tracking of multiple local variables that have the same name within a single method. e.g.
    ```aidl
    @Track(var = "i", nickname = "i")
    void myMethod() {
@@ -155,7 +155,7 @@ See the `examples` folder for some example code snippets that you can try out.
    }
    ```
    Mutations to `i` in both the for loop and the if/else block will be logged as part of a single history for `i`.
-3. Precise tracking of loop iterators. We are not able to log the final value of a loop iterator declared inside a for loop. e.g.
+4. Precise tracking of loop iterators. We are not able to log the final value of a loop iterator declared inside a for loop. e.g.
    ```aidl
    @Track(var = "i", nickname = "i")
    void myMethod() {
