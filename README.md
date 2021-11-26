@@ -84,18 +84,8 @@ See the `examples` folder for some example code snippets that you can try out.
         a.size = 5;
    }
    ```
-   Individual fields can be indirectly tracked by tracking their enclosing object. In the example above the history of changes to `a.size` can be collected by tracking `a`. Note, however, that changes to `a`'s other fields will also be captured in this history. 
-2. Tracking of loop iterators declared outside of the loop header. e.g.
-   ```aidl
-   @Track(var = "i", nickname = "i")
-   void myMethod() {
-        int i;  // iterator declared outside of loop header
-        for (i = 0; i < size; i++) {
-        ...
-        }
-   }
-   ```
-3. Tracking of non-user defined objects (with the exception of arrays). e.g.
+   Individual fields can be indirectly tracked by tracking their enclosing object. In the example above the history of changes to `a.size` can be collected by tracking `a`. Note, however, that changes to `a`'s other fields will also be captured in this history.
+2. Tracking of non-user defined objects (with the exception of arrays). e.g.
     ```aidl
       @Track(var = "myList", nickname = "myList")
       void myMethod() {
@@ -103,7 +93,7 @@ See the `examples` folder for some example code snippets that you can try out.
            list.add("a"); // we do not guarantee that this will be tracked properly
       }
       ```
-4. Separate tracking of multiple local variables that have the same name within a single method. e.g.
+3. Separate tracking of multiple local variables that have the same name within a single method. e.g.
    ```aidl
    @Track(var = "i", nickname = "i")
    void myMethod() {
