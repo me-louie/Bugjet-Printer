@@ -67,19 +67,44 @@ See the `examples` folder for some example code snippets that you can try out.
         }
    }
    ```
-3. Tracking of aliases for objects (including arrays)
+3. Tracking of aliases for objects (including arrays). By aliases we refer to both other local variables within the same scope, e.g.
    ```aidl
    @Track(var = "userDefObj", nickname = "userDefObj"
    void myMethod() {
         UserDefinedObject userDefObj = new UserDefinedObject();
         UserDefinedObject alias = userDefObj;
         alias.setNum(11);         // will be tracked
+   }
+   ```
+   and method arguments, e.g.
+   ```aidl
+   @Track(var = "userDefObj", nickname = "userDefObj"
+   void myMethod() {
+        UserDefinedObject userDefObj = new UserDefinedObject();
         doSomething(userDefObj);
    }
    
    void doSomething(UserDefObj anotherAlias) {
         anotherAlias.setNum(12);   // will be tracked
    }
+   ```
+   Note that this second category, aliases as method arguments, also includes the tracking of mutations at an arbitrary level of nesting. e.g.
+   ```aidl
+   @Track(var = "userDefObj", nickname = "userDefObj"
+   void myMethod() {
+        UserDefinedObject userDefObj = new UserDefinedObject();
+        userDefObj.num = 0;
+        doRecursiveSomething(userDefObj);
+   }
+   
+   void doRecursiveSomething(UserDefObj alias) {
+        if (alias.num >= 10) {
+            return;
+        }
+        alias.num += 1;
+        doRecursiveSomething(alias);
+   }
+   // mutation history for userDefObj.num will be logged as [0, 1, 2, ... , 10]
    ```
 
 ## What we don't support
@@ -92,15 +117,29 @@ See the `examples` folder for some example code snippets that you can try out.
    }
    ```
    Individual fields can be indirectly tracked by tracking their enclosing object. In the example above the history of changes to `a.size` can be collected by tracking `a`. Note, however, that changes to `a`'s other fields will also be captured in this history.
-2. Tracking of non-user defined objects (with the exception of arrays). e.g.
-    ```aidl
-      @Track(var = "myList", nickname = "myList")
+   1. Tracking of non-user defined objects (with the exception of arrays). e.g.
+      ```aidl
+         @Track(var = "myList", nickname = "myList")
+         void myMethod() {
+              List<String> list = new ArrayList<>(); 
+              list.add("a"); // we do not guarantee that this will be tracked properly
+         }
+      ```
+      Note that this includes fields of user defined objects inherited from non-user defined classes. Any inherited non-user defined field that is declared as private cannot be accessed by our tool and thus will not be tracked properly. e.g.
+      ```aidl
+      public class MyMap extends HashMap {
+           ...
+      }
+   
+      ...
+   
+      @Track(var = "myMap", nickname = "myMap")
       void myMethod() {
-           List<String> list = new ArrayList<>(); 
-           list.add("a"); // we do not guarantee that this will be tracked properly
+         MyMap<String, String> myMap = new MyMap<>(); 
+         myMap.put("a", "b"); // we do not guarantee that this will be tracked properly
       }
       ```
-3. Separate tracking of multiple local variables that have the same name within a single method. e.g.
+2. Separate tracking of multiple local variables that have the same name within a single method. e.g.
    ```aidl
    @Track(var = "i", nickname = "i")
    void myMethod() {
@@ -113,8 +152,19 @@ See the `examples` folder for some example code snippets that you can try out.
       } else {
          int i = 7;
       }
+   }
    ```
    Mutations to `i` in both the for loop and the if/else block will be logged as part of a single history for `i`.
+3. Precise tracking of loop iterators. We are not able to log the final value of a loop iterator declared inside a for loop. e.g.
+   ```aidl
+   @Track(var = "i", nickname = "i")
+   void myMethod() {
+      for (int i = 0; i < 5; i++) {
+         ...
+      }
+   }
+   ```
+   In the above example `i` reaches a final value of 5 before the loop is broken and it goes out of scope. This happens before we're able to log its final value. Thus its history will be logged as `[0, 1, 2, 3, 4]` while its true history is `[0, 1, 2, 3, 4, 5]`. 
 
 ## Program requirements
 Code fed to our tool must 
@@ -142,7 +192,7 @@ Code fed to our tool must
    ```
 
    ```aidl
-   public static void main() {
+   public static void main(String[] x) {
       // this is not valid
    }
    
@@ -166,6 +216,7 @@ Code fed to our tool must
    @Track(var = "UserDefObj", nickname = "InvalidlyNamedVariable")
    void myMethod() {
         UserDefinedObject UserDefObj = new UserDefinedObject(); // UserDefObj is local and not camelcase, this is not valid
+   }
    ```
 3. use curly braces (i.e. `{}`) for any control flow blocks. This includes loops and if/else statements. For example, if the user wanted to track variable `i`:
 
