@@ -1,5 +1,5 @@
 import React from 'react';
-import SwitchList from '../components/Switch';
+import SwitchList from '../components/SwitchList';
 import ProgramSlice from '../components/ProgramSlice';
 import CodeEditor from '../components/CodeEditor';
 import { IMarker } from 'react-ace';

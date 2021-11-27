@@ -45,6 +45,6 @@ public class CodeLoader {
         Method method = modifiedClass.getDeclaredMethod("main", String[].class);
         method.invoke(modifiedClass.getDeclaredConstructor().newInstance(), (Object) null);
 
-//        sourceFile.delete();
+        sourceFile.delete();
     }
 }
