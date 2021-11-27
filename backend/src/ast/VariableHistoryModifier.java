@@ -78,29 +78,13 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<VariableScope, 
         String name = ue.getExpression().toString();
         VariableScope scope = Scoper.createScope(name, ue);
         if (isTrackedVariable(scope, lineInfoMap)) {
-
-
             Node nodeContainingEntireStatement = ue.getParentNode().get();
-
             if (nodeContainingEntireStatement instanceof BinaryExpr be) {
                 nodeContainingEntireStatement = be.getParentNode().get();
             }
             trackVariableMutation(name, scope, (Statement) nodeContainingEntireStatement, ue, lineInfoMap);
         }
         return ue;
-    }
-
-    @Override
-    public BinaryExpr visit(BinaryExpr be, Map<VariableScope, List<LineInfo>> lineInfoMap) {
-        super.visit(be, lineInfoMap);
-        String name = be.toString();
-        VariableScope scope = Scoper.createScope(name, be);
-        if (isTrackedVariable(scope, lineInfoMap)) {
-            System.out.println(be.getParentNode());
-            System.out.println(be);
-            //trackVariableMutation(name, scope, be., be, lineInfoMap);
-        }
-        return be;
     }
 
 //    @Override
@@ -215,24 +199,12 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<VariableScope, 
             // If it's a for statement, don't include variable declaration (will be reclared each loop)
             if (forStmt.getBody() instanceof BlockStmt body) {
                 body.addStatement(0, loggingStatement);
-            } else if (forStmt.getBody() instanceof ExpressionStmt body) {
-                // todo: handle the case where the body of the for statement isn't wrapped in curly brackets
-                //       also need to handle the case where the thing we're interested in is the body of the
-                //       for statement and it's not in brackets
-                //       same for if blocks
-                //       also this if/else statement very bad, should try to double dispatch instead
             }
         } else if (anchorStatement instanceof WhileStmt whileStmt) {
             // if (node instanceof UnaryExpr || node instanceof AssignExpr){
             // If it's a for statement, don't include variable declaration (will be reclared each loop)
             if (whileStmt.getBody() instanceof BlockStmt body) {
                 body.addStatement(0, loggingStatement);
-            } else if (whileStmt.getBody() instanceof ExpressionStmt body) {
-                // todo: handle the case where the body of the for statement isn't wrapped in curly brackets
-                //       also need to handle the case where the thing we're interested in is the body of the
-                //       for statement and it's not in brackets
-                //       same for if blocks
-                //       also this if/else statement very bad, should try to double dispatch instead
             }
         } else if (node.findAncestor(SwitchEntry.class).isPresent()) {
             NodeList<Statement> switchBlockStatements = node.findAncestor(SwitchEntry.class).get().getStatements();
