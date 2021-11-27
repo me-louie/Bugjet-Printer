@@ -192,11 +192,21 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<VariableScope, 
             // Add logging for method arguments
             body.addStatement(0, loggingStatement);
         } else if (anchorStatement instanceof ForStmt forStmt) {
-            // if (node instanceof UnaryExpr || node instanceof AssignExpr){
+
             // If it's a for statement, don't include variable declaration (will be reclared each loop)
             if (forStmt.getBody() instanceof BlockStmt body) {
                 body.addStatement(0, loggingStatement);
             } else if (forStmt.getBody() instanceof ExpressionStmt body) {
+                // todo: handle the case where the body of the for statement isn't wrapped in curly brackets
+                //       also need to handle the case where the thing we're interested in is the body of the
+                //       for statement and it's not in brackets
+                //       same for if blocks
+                //       also this if/else statement very bad, should try to double dispatch instead
+            }
+        } else if (anchorStatement instanceof WhileStmt whileStmt) {
+            if (whileStmt.getBody() instanceof BlockStmt body) {
+                body.addStatement(0, loggingStatement);
+            } else if (whileStmt.getBody() instanceof ExpressionStmt body) {
                 // todo: handle the case where the body of the for statement isn't wrapped in curly brackets
                 //       also need to handle the case where the thing we're interested in is the body of the
                 //       for statement and it's not in brackets
