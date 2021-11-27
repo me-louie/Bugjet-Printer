@@ -80,7 +80,7 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<VariableScope, 
         VariableScope scope = Scoper.createScope(name, ue);
         if (isTrackedVariable(scope, lineInfoMap)) {
             Node nodeContainingEntireStatement = ue.getParentNode().get();
-            if (nodeContainingEntireStatement instanceof BinaryExpr be) {
+            while (nodeContainingEntireStatement instanceof BinaryExpr be) {
                 nodeContainingEntireStatement = be.getParentNode().get();
             }
             trackVariableMutation(name, scope, (Statement) nodeContainingEntireStatement, ue, lineInfoMap);
