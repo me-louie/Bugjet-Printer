@@ -78,10 +78,29 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<VariableScope, 
         String name = ue.getExpression().toString();
         VariableScope scope = Scoper.createScope(name, ue);
         if (isTrackedVariable(scope, lineInfoMap)) {
-            Statement nodeContainingEntireStatement = (Statement) ue.getParentNode().get();
-            trackVariableMutation(name, scope, nodeContainingEntireStatement, ue, lineInfoMap);
+
+
+            Node nodeContainingEntireStatement = ue.getParentNode().get();
+
+            if (nodeContainingEntireStatement instanceof BinaryExpr be) {
+                nodeContainingEntireStatement = be.getParentNode().get();
+            }
+            trackVariableMutation(name, scope, (Statement) nodeContainingEntireStatement, ue, lineInfoMap);
         }
         return ue;
+    }
+
+    @Override
+    public BinaryExpr visit(BinaryExpr be, Map<VariableScope, List<LineInfo>> lineInfoMap) {
+        super.visit(be, lineInfoMap);
+        String name = be.toString();
+        VariableScope scope = Scoper.createScope(name, be);
+        if (isTrackedVariable(scope, lineInfoMap)) {
+            System.out.println(be.getParentNode());
+            System.out.println(be);
+            //trackVariableMutation(name, scope, be., be, lineInfoMap);
+        }
+        return be;
     }
 
 //    @Override
@@ -192,7 +211,7 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<VariableScope, 
             // Add logging for method arguments
             body.addStatement(0, loggingStatement);
         } else if (anchorStatement instanceof ForStmt forStmt) {
-
+            // if (node instanceof UnaryExpr || node instanceof AssignExpr){
             // If it's a for statement, don't include variable declaration (will be reclared each loop)
             if (forStmt.getBody() instanceof BlockStmt body) {
                 body.addStatement(0, loggingStatement);
@@ -204,6 +223,8 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<VariableScope, 
                 //       also this if/else statement very bad, should try to double dispatch instead
             }
         } else if (anchorStatement instanceof WhileStmt whileStmt) {
+            // if (node instanceof UnaryExpr || node instanceof AssignExpr){
+            // If it's a for statement, don't include variable declaration (will be reclared each loop)
             if (whileStmt.getBody() instanceof BlockStmt body) {
                 body.addStatement(0, loggingStatement);
             } else if (whileStmt.getBody() instanceof ExpressionStmt body) {
