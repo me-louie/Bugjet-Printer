@@ -100,7 +100,9 @@ public class Main {
             File f = new File("backend/test/modifiedast");
             FileUtils.deleteDirectory(f);
             f.mkdirs();
-            System.out.println("directory made");
+            File f1 = new File("backend/test/modifiedast/gitProblem.txt");
+            f1.createNewFile();
+            System.out.println("directory made and  file made");
         }
         catch (IOException e) {
 
