@@ -29,8 +29,7 @@ public class Main {
     private static final String MODIFIED_AST_FILE_PATH = MODIFIED_FILES_DIRECTORY + PROGRAM_FILE_NAME;
     private static final String MODIFIED_VARIABLE_LOGGER_FILE_PATH = MODIFIED_FILES_DIRECTORY + "/VariableLogger.java";
     private static final String MODIFIED_LINE_INFO_FILE_PATH = MODIFIED_FILES_DIRECTORY + "/LineInfo.java";
-    private static final String MODIFIED_VARIABLE_REF_LOGGER_FILE_PATH = MODIFIED_FILES_DIRECTORY +
-            "/VariableReferenceLogger.java";
+    private static final String MODIFIED_VARIABLE_REF_LOGGER_FILE_PATH = MODIFIED_FILES_DIRECTORY + "/VariableReferenceLogger.java";
 
     public static void main(String[] args) throws Exception {
         // get ast
@@ -80,13 +79,22 @@ public class Main {
         List<String> classNames = new ArrayList<>();
         VoidVisitor<List<String>> classNameVisitor = new ClassNameCollector();
         classNameVisitor.visit(cu, classNames);
-        String className = classNames.get(0);
+        String className = classNames.get(classNames.size()-1);
 
         //testing:
 
         //Path path = Paths.get("backend/test/modifiedast");
 
-        // deleteIfExists File
+//        // deleteIfExists File
+
+
+        writeModifiedProgram(cu, className);
+        writeModifiedVariableLogger(lineInfoMap, variablesToTrack);
+        writeModifiedVariableReferenceLogger();
+        writeModifiedLineInfo();
+
+        CodeLoader.run(className);
+
         try {
             System.out.println("Deleting done");
             File f = new File("backend/test/modifiedast");
@@ -100,13 +108,13 @@ public class Main {
             e.printStackTrace();
         }
 
-        writeModifiedProgram(cu, className);
-        writeModifiedVariableLogger(lineInfoMap, variablesToTrack);
-        writeModifiedVariableReferenceLogger();
-        writeModifiedLineInfo();
+        String s =  new String(Files.readAllBytes(Paths.get("out/output.json")));
 
-        CodeLoader.run(className);
-        return new String(Files.readAllBytes(Paths.get("out/output.json")));
+        System.out.println("Deleting done");
+        File f = new File("out/output.json");
+        f.delete();
+
+        return s;
     }
 
     private static String populateLineInfoMap(Map<VariableScope, List<LineInfo>> lineInfoMap) {
