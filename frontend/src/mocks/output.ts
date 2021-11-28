@@ -1,21 +1,28 @@
 
 interface VariableChange {
-  statement: string;
-  enclosingClass: string;
-  enclosingMethod: string;
-  value: string;
-  line: number;
+    statement: string;
+    enclosingClass: string;
+    enclosingMethod: string;
+    value: string;
+    line: number;
+}
+
+export interface Scope {
+    enclosingClass: string;
+    enclosingMethod: string;
+    varName: string;
 }
 
 export interface Output {
-  name: string;
-  alias: string;
-  type: string;
-  history: VariableChange[];
+    name: string;
+    nickname: string;
+    type: string;
+    scope: Scope;
+    history: VariableChange[];
 }
 
 export const mockProgram =
-`import annotation.Track;
+    `import annotation.Track;
 
 public class SimpleTest {
 

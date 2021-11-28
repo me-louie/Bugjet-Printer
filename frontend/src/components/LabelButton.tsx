@@ -7,7 +7,11 @@ interface Props {
 
 export default function BasicButtons(props: Props) {
   return (
-    <Button variant="contained" disableElevation style={{ height: '100.2%' }} onClick={() => { alert('clicked'); }}>
+    <Button
+      variant="contained"
+      disableElevation
+      disableRipple
+      style={{ height: '100.2%', cursor: 'inherit', backgroundColor: '#1976d2' }}>
       {props.name}
     </Button>
   );

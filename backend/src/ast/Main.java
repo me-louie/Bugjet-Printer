@@ -6,11 +6,14 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.visitor.ModifierVisitor;
 import com.github.javaparser.ast.visitor.VoidVisitor;
+
+import org.apache.commons.io.FileUtils;
 import loader.CodeLoader;
 import util.Formatter;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
@@ -26,8 +29,7 @@ public class Main {
     private static final String MODIFIED_AST_FILE_PATH = MODIFIED_FILES_DIRECTORY + PROGRAM_FILE_NAME;
     private static final String MODIFIED_VARIABLE_LOGGER_FILE_PATH = MODIFIED_FILES_DIRECTORY + "/VariableLogger.java";
     private static final String MODIFIED_LINE_INFO_FILE_PATH = MODIFIED_FILES_DIRECTORY + "/LineInfo.java";
-    private static final String MODIFIED_VARIABLE_REF_LOGGER_FILE_PATH = MODIFIED_FILES_DIRECTORY +
-            "/VariableReferenceLogger.java";
+    private static final String MODIFIED_VARIABLE_REF_LOGGER_FILE_PATH = MODIFIED_FILES_DIRECTORY + "/VariableReferenceLogger.java";
 
     public static void main(String[] args) throws Exception {
         // get ast
@@ -77,15 +79,49 @@ public class Main {
         List<String> classNames = new ArrayList<>();
         VoidVisitor<List<String>> classNameVisitor = new ClassNameCollector();
         classNameVisitor.visit(cu, classNames);
-        String className = classNames.get(0);
+        String className = classNames.get(classNames.size()-1);
+
+        //testing:
+
+        //Path path = Paths.get("backend/test/modifiedast");
+
+//        // deleteIfExists File
+
 
         writeModifiedProgram(cu, className);
         writeModifiedVariableLogger(lineInfoMap, variablesToTrack);
         writeModifiedVariableReferenceLogger();
         writeModifiedLineInfo();
 
-        CodeLoader.run(className);
-        return new String(Files.readAllBytes(Paths.get("out/output.json")));
+        try {
+            CodeLoader.run(className);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                System.out.println("Deleting done");
+                File f = new File("backend/test/modifiedast");
+                FileUtils.deleteDirectory(f);
+                f.mkdirs();
+                File f1 = new File("backend/test/modifiedast/gitProblem.txt");
+                f1.createNewFile();
+                System.out.println("directory made and  file made");
+            }
+            catch (IOException e) {
+
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+
+
+        String s =  new String(Files.readAllBytes(Paths.get("out/output.json")));
+
+        System.out.println("Deleting done");
+        File f = new File("out/output.json");
+        f.delete();
+
+        return s;
     }
 
     private static String populateLineInfoMap(Map<VariableScope, List<LineInfo>> lineInfoMap) {
