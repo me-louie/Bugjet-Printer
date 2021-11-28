@@ -6,7 +6,13 @@ import { Output } from './mocks/output';
 
 
 function App() {
-  const [text, setText] = React.useState("");
+  const [text, setInput] = React.useState(sessionStorage.getItem("code") || "");
+
+  const setText = (code: string) => {
+    setInput(code);
+    sessionStorage.setItem("code", code);
+  }
+
   const [output, setOutput] = React.useState<Output[]>([]);
   if (!output.length) {
     return <InputView text={text} setText={setText} setOutput={setOutput} />

@@ -16,5 +16,6 @@
     <orderEntry type="library" name="lib" level="project" />
     <orderEntry type="library" name="lib" level="project" />
     <orderEntry type="library" name="apache.commons.io" level="project" />
+    <orderEntry type="library" name="lib" level="project" />
   </component>
 </module>

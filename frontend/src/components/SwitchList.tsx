@@ -12,30 +12,10 @@ interface Props {
 }
 
 export default function SwitchList(props: Props) {
-  // const [checked, setChecked] = React.useState(["double a"]);
-
-  // const handleToggle = (value: string) => () => {
-  //   const currentIndex = checked.indexOf(value);
-  //   const newChecked = [...checked];
-
-  //   if (currentIndex === -1) {
-  //     newChecked.push(value);
-  //   } else {
-  //     newChecked.splice(currentIndex, 1);
-  //   }
-
-  //   setChecked(newChecked);
-  // };
-
-  // // change names dependingh on the json object. 
-  // const obj = {
-  //   name: 'double a'
-  // }
-
   return (
     <List
       sx={{ width: "100%", maxHeight: 250, bgcolor: "background.paper", margin: "auto",
-            marginBottom: 3, borderRadius: 2, border: '1px solid black', boxSizing: 'border-box', padding: 0 }}
+            marginBottom: 3, borderRadius: 2, border: '1px solid black', boxSizing: 'border-box', padding: 0, overflow: 'auto' }}
       subheader={<ListSubheader style={{ borderTopRightRadius: 7, borderTopLeftRadius: 7, backgroundColor: '#1976d2', color: 'white', position: 'relative' }}>Variable Names:</ListSubheader>}
     >
       {props.slices.map((slice => (
@@ -51,17 +31,6 @@ export default function SwitchList(props: Props) {
           />
         </ListItem>
       )))}
-      {/* <ListItem>
-          <ListItemText id="switch-list-label-b" primary="double b" />
-          <Switch
-            edge="end"
-            onChange={handleToggle("double b")}
-            checked={checked.indexOf("double b") !== -1}
-            inputProps={{
-              "aria-labelledby": "switch-list-label-variable-b"
-            }}
-          />
-        </ListItem> */}
     </List>
   );
 }

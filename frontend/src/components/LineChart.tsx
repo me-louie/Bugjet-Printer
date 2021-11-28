@@ -77,7 +77,7 @@ export default class LineChart extends PureComponent<Props, State> {
     const axis2 = this.props.output.history.map((e, idx) => {
       return {
         x: idx * 2,
-        y: Number(e.value),
+        y: JSON.parse(e.value),
         ...e,
       }
     });
