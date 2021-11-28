@@ -1,9 +1,9 @@
 import React from 'react';
 import { IMarker } from 'react-ace/lib/types';
 import { Output } from '../mocks/output';
-import BarChart from './BarChart';
 import Box from '@mui/material/Box';
 import Slider from '@mui/material/Slider';
+import ReactJson from 'react-json-view';
 
 
 interface Props {
@@ -11,21 +11,9 @@ interface Props {
   setMarker: (arr: IMarker[]) => void;
 }
 
-export default function BarchartSlider(props: Props) {
+export default function ObjectSlider(props: Props) {
   const { output, setMarker } = props;
   const [sliderValue, setSliderValue] = React.useState(0);
-
-  const getEntryInfo = (value: number) => {
-    const entry = output.history[value];
-    return (
-      <div className="custom-tooltip" style={{ backgroundColor: 'lightgrey', paddingLeft: 10, paddingRight: 10 }}>
-        <p className="line-number">Line number: {entry.line}</p>
-        <p className="value">Value: {entry.value}</p>
-        <p className="enclosing-class">Class: {entry.enclosingClass}</p>
-        <p className="enclosing-method">Method: {entry.enclosingMethod}</p>
-      </div>
-    )
-  }
 
   const setSlider = (value: number) => {
     const entry = output.history[value];
@@ -40,26 +28,32 @@ export default function BarchartSlider(props: Props) {
     }]);
   }
 
+  const outputJSON = () => {
+    return {
+      ...output.history[sliderValue],
+      value: JSON.parse(output.history[sliderValue].value),
+    }
+  }
+
   const marks = output.history.map((e, idx) => {
     return {
       value: idx
     }
-  })
+  });
 
   return (
-    <div style={{ display: 'flex' }}>
-      <BarChart output={output} index={sliderValue} />
-      <Box sx={{ width: 300 }}>
+    <div style={{ display: 'flex', width: '100%' }}>
+      <Box sx={{ width: '90%', margin: 'auto', height: '100%' }}>
         <Slider
           aria-label="Array Values"
           value={sliderValue}
-          onChange={(_e, val) => setSlider(val as number)}
+          onChange={(e, val) => setSlider(val as number)}
           valueLabelDisplay="auto"
           step={1}
           max={output.history.length - 1}
           marks={marks}
         />
-        {getEntryInfo(sliderValue)}
+        <ReactJson style={{ textAlign: 'left', maxHeight: '85%', overflow: 'auto' }} src={outputJSON()} />
       </Box>
     </div>
   )

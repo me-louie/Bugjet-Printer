@@ -64,7 +64,7 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<VariableScope, 
         super.visit(ae, lineInfoMap);
         // If making an array access assignment we want the name of the variable without the square brackets
         String name = (isArrayAccessAssignment(ae)) ?
-                ((ArrayAccessExpr) ae.getTarget()).getName().toString() :
+                ((ArrayAccessExpr) ae.getTarget()).toString().split("\\[")[0] :
                 ae.getTarget().toString();
         VariableScope scope = Scoper.createScope(name, ae);
         Statement nodeContainingEntireStatement = (Statement) ae.getParentNode().get();

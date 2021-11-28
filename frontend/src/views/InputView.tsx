@@ -14,7 +14,6 @@ function InputView(props: Props) {
   const { text, setText, setOutput } = props;
 
   const getOutput = async (text: string) => {
-    console.log('test')
     try {
       const output = await sendRequest(text);
       setOutput(output);

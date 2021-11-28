@@ -1,7 +1,6 @@
 import React from 'react';
 import { IMarker } from 'react-ace/lib/types';
 import { Output } from '../mocks/output';
-import BarChart from './BarChart';
 import Box from '@mui/material/Box';
 import Slider from '@mui/material/Slider';
 
@@ -42,7 +41,7 @@ export default function TwoDarraySlider(props: Props) {
 
   const marks = props.output.history.map((e, idx) => {
     return {
-      value: 123
+      value: idx
     }
   })
 

@@ -30,12 +30,13 @@ function OutputView(props: Props) {
 
   return (
     <div className="App" style={{ margin: 40, display: "flex", justifyContent: "space-between" }}>
-      <div style={{ marginRight: 20, height: 'calc(100vh - 80px)', minHeight: 600 }}>
+      <div style={{ marginRight: 20, height: 'calc(100vh - 80px)', minHeight: 600, position: 'sticky', top: 40 }}>
         <SwitchList slices={slices} toggleShowSlice={toggleShowSlice} />
         <CodeEditor
           text={program}
           readOnly={true}
-          height="calc(100% - 205px - 20px)"
+          height="calc(100% - 205px - 50px)"
+          style={{ border: '1px solid black', borderRadius: 8 }}
           markers={marker}
         />
       </div>
@@ -43,6 +44,7 @@ function OutputView(props: Props) {
         {slices.filter(e => e.show).map((slice, idx) => {
           return (
             <ProgramSlice
+              key={slice.name + idx}
               name={slice.name}
               output={slice}
               marginBottom={idx === slices.length - 1 ? "0" : "20px"}

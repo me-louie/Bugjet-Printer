@@ -93,22 +93,27 @@ public class Main {
         writeModifiedVariableReferenceLogger();
         writeModifiedLineInfo();
 
-        CodeLoader.run(className);
-
         try {
-            System.out.println("Deleting done");
-            File f = new File("backend/test/modifiedast");
-            FileUtils.deleteDirectory(f);
-            f.mkdirs();
-            File f1 = new File("backend/test/modifiedast/gitProblem.txt");
-            f1.createNewFile();
-            System.out.println("directory made and  file made");
-        }
-        catch (IOException e) {
-
-            // TODO Auto-generated catch block
+            CodeLoader.run(className);
+        } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            try {
+                System.out.println("Deleting done");
+                File f = new File("backend/test/modifiedast");
+                FileUtils.deleteDirectory(f);
+                f.mkdirs();
+                File f1 = new File("backend/test/modifiedast/gitProblem.txt");
+                f1.createNewFile();
+                System.out.println("directory made and  file made");
+            }
+            catch (IOException e) {
+
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
+
 
         String s =  new String(Files.readAllBytes(Paths.get("out/output.json")));
 

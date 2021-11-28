@@ -5,9 +5,9 @@ import LineChart from './LineChart';
 import LabelButton from './LabelButton';
 import { Output } from '../mocks/output';
 import { IMarker } from 'react-ace';
-import BarChart from './BarChart';
 import BarChartSlider from './BarChartSlider';
 import TwoDarraySlider from './2DarraySlider';
+import Object from './Object';
 
 interface Props {
   name: string;
@@ -30,14 +30,17 @@ export default function ProgramSlice(props: Props) {
       case "float":
         return <LineChart output={props.output} setMarker={props.setMarker} />
       default: 
-        return null;   
+        return <Object output={props.output} setMarker={props.setMarker} />;
     }
   }
 
   return (
-    <Box sx={{ width: "100%", height: "300px", display: "flex", 
-               border: '1px solid black', marginBottom: props.marginBottom, borderRadius: "5px" }}>
-      <LabelButton name = {props.name}/>
+    <Box
+      sx={{ width: "100%", height: "300px", display: "flex", 
+            border: '1px solid black', marginBottom: props.marginBottom, borderRadius: "5px" }}
+      id={JSON.stringify(props.output.scope)}
+    >
+      <LabelButton name={props.name}/>
       {/* <CodeEditor text={props.text} readOnly={true} /> */}
       {getChart()}
       {/* //<LineChart output={props.output} setMarker={props.setMarker} /> */}

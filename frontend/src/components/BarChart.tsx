@@ -5,19 +5,9 @@ import {
   XAxis,
   YAxis,
   CartesianGrid,
-  Tooltip,
   Legend
 } from "recharts";
-// import { IMarker } from 'react-ace/lib/types';
 import { Output } from '../mocks/output';
-
-// const data = [
-//   {
-//     name: "Page A",
-//     uv: 4000,
-//     pv: 2400,
-//     amt: 2400
-//   },]
 
 interface Props {
   output: Output;
@@ -47,43 +37,9 @@ export default class BarChart extends React.PureComponent<Props, State> {
     }
   }
 
-  //   CustomTooltip = ({ active, payload }: any) => {
-  //     if (active && payload && payload.length) {
-  //       console.log(payload);
-  //       // const line = payload[0].payload.line as number;
-  //       // this.props.setMarker([{
-  //       //   startRow: line - 1,
-  //       //   endRow: line,
-  //       //   startCol: 0,
-  //       //   endCol: 0,
-  //       //   className: 'replacement_marker',
-  //       //   type: 'text'
-  //       // }]);
-
-  //       // return (
-  //       //   <div className="custom-tooltip" style={{ backgroundColor: 'lightgrey', paddingLeft: 10, paddingRight: 10 }}>
-  //       //     <p className="line-number">Line number: {line}</p>
-  //       //     <p className="value">Value: {payload[1].payload.value}</p>
-  //       //     <p className="enclosing-class">Class: {payload[0].payload.enclosingClass}</p>
-  //       //     <p className="enclosing-method">Method: {payload[0].payload.enclosingMethod}</p>
-  //       //   </div>
-  //       // );
-  //     }
-
-  //     this.props.setMarker([]);
-  //     return null;
-  //   }
-
   render() {
     const entry = this.props.output.history[this.props.index].value;
     const parsedArr = JSON.parse(entry);
-    console.log(parsedArr);
-
-    // if (typeof parsedArr !== "object" || parsedArr === null) {
-    //   return null;
-    // } else {
-
-    // }
 
     const data = typeof parsedArr !== "object" || parsedArr === null ?
       [0]
@@ -91,8 +47,6 @@ export default class BarChart extends React.PureComponent<Props, State> {
         return {
           index: idx,
           value: e,
-          // y: e,
-          // ...e,
         }
       });
 
@@ -115,7 +69,6 @@ export default class BarChart extends React.PureComponent<Props, State> {
         <XAxis dataKey="index" />
         <YAxis yAxisId="left" orientation="left" stroke="#8884d8" />
         <YAxis yAxisId="right" orientation="right" stroke="#82ca9d" />
-        {/* <Tooltip content={this.CustomTooltip} /> */}
         <Legend />
         <Bar yAxisId="left" dataKey="value" fill={this.state.color} />
       </ReBarChart>

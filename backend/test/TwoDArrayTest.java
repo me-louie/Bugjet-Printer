@@ -7,7 +7,7 @@ public class TwoDArrayTest {
     private double memory = 0;
 
     public static void main(String[] args) {
-        ArrayTest st = new ArrayTest();
+        TwoDArrayTest st = new TwoDArrayTest();
         st.calc();
         st.helloWorld();
         st.helloWorldNoDec();
