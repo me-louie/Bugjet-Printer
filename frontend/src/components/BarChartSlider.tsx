@@ -49,7 +49,7 @@ export default function BarchartSlider(props: Props) {
   return (
     <div style={{ display: 'flex' }}>
       <BarChart output={output} index={sliderValue} />
-      <Box sx={{ width: 300 }}>
+      <Box sx={{ width: 300, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
         <Slider
           aria-label="Array Values"
           value={sliderValue}

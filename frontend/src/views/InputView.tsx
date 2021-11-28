@@ -3,6 +3,7 @@ import React from 'react';
 import CodeEditor from '../components/CodeEditor';
 import { Output } from '../mocks/output';
 import { sendRequest } from '../service';
+import BugReportIcon from '@mui/icons-material/BugReport';
 
 interface Props {
   setOutput: (output: Output[]) => void;
@@ -40,7 +41,9 @@ function InputView(props: Props) {
 
   return (
     <div style={{ width: '100vw', height: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-      <p style={{ textAlign: 'center', fontSize: '20px' }}>Bug-jet Printer</p>
+      <p style={{ display: 'flex', justifyContent: 'center',alignItems: 'center', fontSize: '20px' }}>
+        <BugReportIcon />Bug-jet Printer
+      </p>
       <CodeEditor
         text={text}
         setText={setText}
