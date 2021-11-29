@@ -6,7 +6,7 @@ import { Output } from './mocks/output';
 
 
 function App() {
-  const [text, setInput] = React.useState(sessionStorage.getItem("code") || "");
+  const [text, setInput] = React.useState(sessionStorage.getItem("code") || "import annotation.Track;\n\n");
 
   const setText = (code: string) => {
     setInput(code);
