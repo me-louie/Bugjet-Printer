@@ -21,15 +21,6 @@ function InputView(props: Props) {
     } catch (e) {
       //console.log(e);
        alert(e);
-    //  return (
-    //   <div>
-    //     <h2>Something went wrong.</h2>
-    //     <details style={{ whiteSpace: 'pre-wrap' }}>
-    //       {e}
-    //       <br />
-    //     </details>
-    //   </div>
-    // );
     }
   }
 
