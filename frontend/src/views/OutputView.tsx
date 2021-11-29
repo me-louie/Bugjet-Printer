@@ -3,7 +3,7 @@ import SwitchList from '../components/SwitchList';
 import ProgramSlice from '../components/ProgramSlice';
 import CodeEditor from '../components/CodeEditor';
 import { IMarker } from 'react-ace';
-import { Output } from '../mocks/output';
+import { Output, Scope } from '../mocks/output';
 
 interface Props {
   program: string;
@@ -20,9 +20,9 @@ function OutputView(props: Props) {
   const [marker, setMarker] = React.useState<IMarker[]>([]);
   const [expanded, setExpanded] = React.useState<Output | null>(null);
 
-  const toggleShowSlice = (name: string, history:Output["history"]) => {
+  const toggleShowSlice = (name: string, scope: Scope) => {
     setShowSlices(slices.map(e => {
-      return (e.name === name && e.history ===history) ? {
+      return (e.name === name && e.scope === scope) ? {
         ...e,
         show: !e.show
       } : e;
