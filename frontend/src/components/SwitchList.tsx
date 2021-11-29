@@ -9,7 +9,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 
 interface Props {
   slices: (Output & { show: boolean })[];
-  toggleShowSlice: (name: string) => void;
+  toggleShowSlice: (name: string, history: Output["history"]) => void;
 }
 
 export default function SwitchList(props: Props) {
@@ -30,7 +30,7 @@ export default function SwitchList(props: Props) {
         <ListItem key={slice.name + idx} style={{ borderTop: '1px solid black' }}>
           <Tooltip title={slice.nickname} placement="bottom-start" arrow followCursor>
             <ListItemButton
-              id={`switch-list-label-${slice.name}`}
+              id={`switch-list-label-${slice.name + idx + slice.history}`}
               onClick={() => scrollToSliceByScope(slice.scope)}
             >
               {`${slice.type} ${slice.name}`}
@@ -38,7 +38,7 @@ export default function SwitchList(props: Props) {
           </Tooltip>
           <Switch
             edge="end"
-            onChange={() => props.toggleShowSlice(slice.name)}
+            onChange={() => props.toggleShowSlice(slice.name, slice.history)}
             checked={slice.show}
             inputProps={{
               "aria-labelledby": "switch-list-label-variable-a"

@@ -8,6 +8,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 @RestController
 class OutputController {
     @CrossOrigin(origins = "http://localhost:3000")
@@ -21,7 +24,10 @@ class OutputController {
             return new ResponseEntity<>(jsonString, HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
-            return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            String exceptionAsString = sw.toString();
+            return new ResponseEntity<>(exceptionAsString, HttpStatus.BAD_REQUEST);
         }
 
         //return jsonString;

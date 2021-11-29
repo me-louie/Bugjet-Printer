@@ -19,7 +19,8 @@ function InputView(props: Props) {
       const output = await sendRequest(text);
       setOutput(output);
     } catch (e) {
-      console.log(e);
+      //console.log(e);
+       alert(e);
     }
   }
 
