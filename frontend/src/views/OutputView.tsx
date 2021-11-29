@@ -20,9 +20,9 @@ function OutputView(props: Props) {
   const [marker, setMarker] = React.useState<IMarker[]>([]);
   const [expanded, setExpanded] = React.useState<Output | null>(null);
 
-  const toggleShowSlice = (name: string) => {
+  const toggleShowSlice = (name: string, history:Output["history"]) => {
     setShowSlices(slices.map(e => {
-      return e.name === name ? {
+      return (e.name === name && e.history ===history) ? {
         ...e,
         show: !e.show
       } : e;
