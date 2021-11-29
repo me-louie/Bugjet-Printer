@@ -1,4 +1,130 @@
 # Milestones
+
+### Final User Study Notes
+#### User1:
+**Comments:**  
+Nice tool for day to day variable tracking and has the potential to be used as a small BI(business intelligence) tools tracker. Moreover, it has loads of potential to be used as debugging software.
+
+**Pros:**
+* Useful for tracking bugs in code that have nested loops with array
+* Useful for code that has some custom logic for iterator position
+* UI is easy to understand
+* Can be used to analyze heartbeats for programs
+* Can be used to track events for simple BI tools
+
+**Cons:**
+* Support for complex data structure (red/black trees, hashmaps)
+* Graph axis stays the same if the point deviation is large
+* Not sure how non numeric values will be tracked & displayed in graphs, should non numerical values
+
+**User2:**
+
+Comments:  
+Great tool for tracking variables with easy UI to use
+
+**Pros:**
+* Good way to track variables in loops
+* Front end clear to read
+* Shows values at each line of the code
+* Can be used for decimals, double, float etc
+* Indication of where the bug lies
+* Supports bit flips
+
+**Cons:**
+* Data types that support this is limited
+* May not show trivial errors like null errors
+* Large data sets may be difficult to represent
+* Changing datatypes will not be supported or showed
+
+**User3:**
+
+Comments:
+
+A better sort of “debugger” to show variables and the changes it goes through. Can be expanded on a bigger scale to turn it into a debugger and can be eventually used for other languages too.
+
+**Pros:**
+* Great way for variable tracking in different situations such as loops and switch cases
+* UI is user friendly and the help of graphs show the visual changes of that variable
+* Can break down code in the middle and see how variables change
+* Supports object variables which generally change differently than other data types such as int and float
+* Can be used for other sequential languages such as C
+
+**Cons:**
+* Complex data types are not supported such as HashMaps
+* Upcasting is not supported and results in data loss
+* Large deviation in graphs is harder to notice visually
+
+### Task Driven Component
+We presented the participants with this program and asked them to use the program analysis tool to debug and fix it:
+public class UserStudyTest {
+
+```
+public static void main(String[] args) {
+UserStudyTest ust = new UserStudyTest();
+ust.swap();
+}
+// Given 2 arrays:
+// arr1 = {10, 11, 12, 13, 14};
+// arr2 = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+
+// Goal: swap array values such that the end states look like the following:
+// arr1 = {10, 9, 8, 7, 6}
+// arr2 = {1, 2, 3, 4, 5, 14, 13, 12, 11, 10}
+
+private void swap() {
+int[] arr1 = {10, 11, 12, 13, 14};
+int[] arr2 = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+int j = arr2.length - arr1.length -1;
+for (int i = 1; i < arr1.length; i++) {
+int temp = arr1[i];
+arr1[i] = arr2[j];
+arr2[j] = temp;
+}
+System.out.println(Arrays.toString(arr1));
+System.out.println(Arrays.toString(arr2));
+}
+```
+This what the debugged version the participants produced:
+
+```
+import annotation.Track;
+
+public class UserStudyTest {
+
+public static void main(String[] args) {
+UserStudyTest ust = new UserStudyTest();
+ust.swap();
+}
+// Given 2 arrays:
+// arr1 = {10, 11, 12, 13, 14};
+// arr2 = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+
+// Goal: swap array values such that the end states look like the following:
+// arr1 = {10, 9, 8, 7, 6}
+// arr2 = {1, 2, 3, 4, 5, 14, 13, 12, 11, 10}
+
+@Track(var = "arr1", nickname = "arr1")
+@Track(var = "arr2", nickname = "arr2")
+@Track(var = "i", nickname = "i")
+@Track(var = "j", nickname = "j")
+@Track(var = "temp", nickname = "temp")
+private void swap() {
+System.out.println("HERE");
+int[] arr1 = {10, 11, 12, 13, 14};
+int[] arr2 = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+int j = arr2.length -2;
+for (int i = 1; i < arr1.length; i++) {
+int temp = arr1[i];
+arr1[i] = arr2[j];
+arr2[j]= temp;
+j--;
+}
+System.out.println(Arrays.toString(arr1));
+System.out.println(Arrays.toString(arr2));
+}
+```
+
+
 ## Milestone 5
 
 ### Summary Update
