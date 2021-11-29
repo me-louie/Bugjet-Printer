@@ -27,17 +27,19 @@ A recent poll found that 100% of developers write code that doesn't work. This t
       }
       ```
       The tool automatically limits tracking to the scope of a method, thus it's not necessary for users to give unique names to variables or nicknames for the program to function properly. However, you may wish to do so to avoid confusion when looking at the visualization. 
-3. (Steps 3-4 assume the use of IntelliJ) Start the backend by running `Project2Group10/src/main/java/com/restservice/RestServiceApplication.java`. If the imports in this class are not recognized then right click the directory `Project2Group10/lib` and select "Add as Library...".
-4. Start the frontend by running the following commands from the terminal:
+
+   Ensure that you do not delete the default import statement for the `Track` annotation when adding your code to the editor. Not having this statement will cause errors.  
+4. (Steps 3-4 assume the use of IntelliJ) Start the backend by running `Project2Group10/src/main/java/com/restservice/RestServiceApplication.java`. If the imports in this class are not recognized then right click the directory `Project2Group10/lib` and select "Add as Library...".
+5. Start the frontend by running the following commands from the terminal:
    ```
    cd frontend
    npm install
    npm run start
    ```
    A browser window running the tool should open.
-5. Add your code to the tool's editor. Run it to render variable histories. Step through the visualization to see how and where your variable changes.
+6. Add your code to the tool's editor. Run it to render variable histories. Step through the visualization to see how and where your variable changes.
 
-See the `examples` folder for some example code snippets that you can try out.
+See the `Project2Group10/examples` folder for some example code snippets that you can try out.
 
 ## What we support
 1. Tracking primitive, array, and user-defined local variables. e.g.
