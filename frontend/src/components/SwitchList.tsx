@@ -9,7 +9,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 
 interface Props {
   slices: (Output & { show: boolean })[];
-  toggleShowSlice: (name: string, history: Output["scope"]) => void;
+  toggleShowSlice: (name: string, scope: Scope) => void;
 }
 
 export default function SwitchList(props: Props) {

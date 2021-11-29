@@ -33,7 +33,6 @@ function OutputView(props: Props) {
     return (
       <div className="App" style={{ margin: 40, display: "flex", justifyContent: "space-between" }}>
         <div style={{ marginRight: 20, height: 'calc(100vh - 80px)', minHeight: 600, position: 'sticky', top: 40 }}>
-          {/* <SwitchList slices={slices} toggleShowSlice={toggleShowSlice} /> */}
           <CodeEditor
             text={program}
             readOnly={true}

@@ -95,17 +95,13 @@ public class Main {
 
         try {
             CodeLoader.run(className);
-        } catch (Exception e) {
-            e.printStackTrace();
         } finally {
             try {
-                System.out.println("Deleting done");
                 File f = new File("backend/test/modifiedast");
                 FileUtils.deleteDirectory(f);
                 f.mkdirs();
                 File f1 = new File("backend/test/modifiedast/gitProblem.txt");
                 f1.createNewFile();
-                System.out.println("directory made and  file made");
             }
             catch (IOException e) {
 
@@ -117,7 +113,6 @@ public class Main {
 
         String s =  new String(Files.readAllBytes(Paths.get("out/output.json")));
 
-        System.out.println("Deleting done");
         File f = new File("out/output.json");
         f.delete();
 
