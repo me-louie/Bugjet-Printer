@@ -4,22 +4,31 @@ import CodeEditor from '../components/CodeEditor';
 import { Output } from '../mocks/output';
 import { sendRequest } from '../service';
 import BugReportIcon from '@mui/icons-material/BugReport';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
 
 interface Props {
-  setOutput: (output: Output[]) => void;
+  setOutputs: (output: Output[]) => void;
   text: string;
   setText: (text: string) => void;
 }
 
 function InputView(props: Props) {
-  const { text, setText, setOutput } = props;
+  const { text, setText, setOutputs } = props;
+  const [snackbarOpen, setSnackbarOpen] = React.useState(false);
 
-  const getOutput = async (text: string) => {
+  const getOutputs = async (text: string) => {
     try {
-      const output = await sendRequest(text);
-      setOutput(output);
+      const outputs = await sendRequest(text);
+
+      if (outputs.length) {
+        setOutputs(outputs);
+      } else {
+        setSnackbarOpen(true);
+      }
+
     } catch (e) {
-       alert(e);
+      alert(e);
     }
   }
 
@@ -39,9 +48,15 @@ function InputView(props: Props) {
     reader.readAsText(file);
   }
 
+  const handleClose = (_event?: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason !== 'clickaway') {
+      setSnackbarOpen(false);
+    }
+  }
+
   return (
     <div style={{ width: '100vw', height: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-      <p style={{ display: 'flex', justifyContent: 'center',alignItems: 'center', fontSize: '20px' }}>
+      <p style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', fontSize: '20px' }}>
         <BugReportIcon />Bug-jet Printer
       </p>
       <CodeEditor
@@ -69,13 +84,22 @@ function InputView(props: Props) {
         </Button>
         <Button
           size="large"
-          onClick={() => getOutput(text)}
+          onClick={() => getOutputs(text)}
           variant="contained"
           color="success"
         >
           Send code
         </Button>
       </div>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={5000}
+        onClose={handleClose}
+      >
+        <Alert onClose={handleClose} severity="warning" sx={{ width: '100%' }}>
+          No changes were logged!
+        </Alert>
+      </Snackbar>
     </div>
   )
 }
