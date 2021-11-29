@@ -19,7 +19,17 @@ function InputView(props: Props) {
       const output = await sendRequest(text);
       setOutput(output);
     } catch (e) {
-      console.log(e);
+      //console.log(e);
+       alert(e);
+    //  return (
+    //   <div>
+    //     <h2>Something went wrong.</h2>
+    //     <details style={{ whiteSpace: 'pre-wrap' }}>
+    //       {e}
+    //       <br />
+    //     </details>
+    //   </div>
+    // );
     }
   }
 
