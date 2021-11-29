@@ -24,6 +24,11 @@ public class PrimitiveTest {
             nestedMethod(a);
             return a;
         }
+        @Track(var = "a", nickname = "other a")
+        public void test() {
+            int a = 100;
+            a = 200;
+        }
 
         private void nestedMethod(double alias) {
             alias = -1;
