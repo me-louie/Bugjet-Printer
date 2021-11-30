@@ -1,4 +1,4 @@
-import { Button } from '@mui/material';
+import { Button, CircularProgress } from '@mui/material';
 import React from 'react';
 import CodeEditor from '../components/CodeEditor';
 import { Output } from '../mocks/output';
@@ -16,9 +16,11 @@ interface Props {
 function InputView(props: Props) {
   const { text, setText, setOutputs } = props;
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
 
   const getOutputs = async (text: string) => {
     try {
+      setLoading(true);
       const outputs = await sendRequest(text);
 
       if (outputs.length) {
@@ -29,6 +31,8 @@ function InputView(props: Props) {
 
     } catch (e) {
       alert(e);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -87,8 +91,17 @@ function InputView(props: Props) {
           onClick={() => getOutputs(text)}
           variant="contained"
           color="success"
+          disabled={loading}
+          style={{ backgroundColor: '#2E7D32', width: 128, opacity: loading ? 0.7 : 1 }}
         >
-          Send code
+          {loading ?
+            (
+              <CircularProgress
+                size={28}
+                style={{ color: 'white' }}
+              />
+            ) :
+            "Send code"}
         </Button>
       </div>
       <Snackbar
