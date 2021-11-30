@@ -168,6 +168,14 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<VariableScope, 
                     scope.getEnclosingClass(), id);
             injectCodeOnNextLine(nodeContainingEntireStatement, node, injectedLine);
         }
+        if (node instanceof AssignExpr && nodeContainingEntireStatement instanceof ForStmt fs) {
+            Statement injectOutsideOfLoop = StatementCreator.evaluateAssignmentStatement(objName, scope.getEnclosingMethod(),
+                    scope.getEnclosingClass(), id);
+            node.findAncestor(BlockStmt.class)
+                    .ifPresent(block -> block.addStatement(1 + block.getStatements().indexOf(nodeContainingEntireStatement),
+                            injectOutsideOfLoop));
+
+        }
     }
 
     private void addToLineInfoMap(VariableScope scope, String type,
