@@ -31,9 +31,15 @@ export default function ProgramSlice(props: Props) {
     switch (output.type) {
       case "int[][]":
         return <TwoDarraySlider output={output} setMarker={setMarker} />;
+      case "double[][]":
+        return <TwoDarraySlider output={output} setMarker={setMarker} />;
+      case "float[][]":
+        return <TwoDarraySlider output={output} setMarker={setMarker} />;
       case "int[]":
         return <BarChartSlider output={output} setMarker={setMarker} />;
       case "int":
+      case "short":
+      case "long":
       case "double":
       case "float":
         return <LineChart output={output} setMarker={setMarker} />
