@@ -37,6 +37,10 @@ export default function ProgramSlice(props: Props) {
         return <TwoDarraySlider output={output} setMarker={setMarker} />;
       case "int[]":
         return <BarChartSlider output={output} setMarker={setMarker} />;
+      case "char":
+        return <TwoDarraySlider output={output} setMarker={setMarker} />;
+      case "char[]":
+          return <TwoDarraySlider output={output} setMarker={setMarker} />;
       case "int":
       case "short":
       case "long":
