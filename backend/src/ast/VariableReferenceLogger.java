@@ -110,7 +110,8 @@ public class VariableReferenceLogger {
     }
 
     private static boolean isObjectModified(Object var) {
-        return !refToJsonMap.get(var.toString()).equals(gson.toJson(var));
+        return refToJsonMap.get(var.toString()) != null &&
+                !refToJsonMap.get(var.toString()).equals(gson.toJson(var));
     }
 
     private static boolean trackedVarReferenceHasChanged(Object var, VariableScope scope) {
