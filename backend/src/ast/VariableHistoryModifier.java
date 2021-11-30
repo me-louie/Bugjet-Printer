@@ -27,11 +27,11 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<VariableScope, 
 
     private void checkOriginalLineInfo(Map<VariableScope, List<LineInfo>> original) {
         if (originalLineInfoMap == null) {
-            Map<VariableScope, List<LineInfo>> copy = new HashMap<>();
+            originalLineInfoMap = new HashMap<>();
             for (Map.Entry<VariableScope, List<LineInfo>> entry : original.entrySet()) {
-                copy.put(entry.getKey(), new ArrayList<>(entry.getValue()));
+                originalLineInfoMap.put(entry.getKey(), new ArrayList<>(entry.getValue()));
             }
-            originalLineInfoMap = copy;
+            //originalLineInfoMap = copy;
         }
         return;
     }
