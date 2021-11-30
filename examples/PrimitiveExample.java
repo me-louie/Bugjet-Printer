@@ -2,10 +2,10 @@ import annotation.Track;
 
 import java.util.Arrays;
 
-public class UserStudyTest {
+public class PrimitiveExample {
     // This bugged program was used for our final user study
     public static void main(String[] args) {
-        UserStudyTest ust = new UserStudyTest();
+        PrimitiveExample ust = new PrimitiveExample();
         ust.swap();
     }
     // Given 2 arrays:
