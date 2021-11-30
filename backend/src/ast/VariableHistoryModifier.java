@@ -8,7 +8,6 @@ import com.github.javaparser.ast.body.*;
 import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.ast.visitor.ModifierVisitor;
-import com.github.javaparser.metamodel.StatementMetaModel;
 import util.NodeParser;
 import util.Scoper;
 import util.StatementCreator;
@@ -28,7 +27,6 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<VariableScope, 
             for (Map.Entry<VariableScope, List<LineInfo>> entry : original.entrySet()) {
                 originalLineInfoMap.put(entry.getKey(), new ArrayList<>(entry.getValue()));
             }
-            //originalLineInfoMap = copy;
         }
         return;
     }
@@ -224,23 +222,15 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<VariableScope, 
             // Add logging for method arguments
             body.addStatement(0, loggingStatement);
         } else if (anchorStatement instanceof ForStmt forStmt) {
-            // if (node instanceof UnaryExpr || node instanceof AssignExpr){
             // If it's a for statement, don't include variable declaration (will be reclared each loop)
             if (forStmt.getBody() instanceof BlockStmt body) {
                 body.addStatement(0, loggingStatement);
             }
-//            node.findAncestor(BlockStmt.class)
-//                    .ifPresent(block -> block.addStatement(1 + block.getStatements().indexOf(anchorStatement),
-//                            loggingStatement));
         } else if (anchorStatement instanceof WhileStmt whileStmt) {
-            // if (node instanceof UnaryExpr || node instanceof AssignExpr){
             // If it's a for statement, don't include variable declaration (will be reclared each loop)
             if (whileStmt.getBody() instanceof BlockStmt body) {
                 body.addStatement(0, loggingStatement);
             }
-//            node.findAncestor(BlockStmt.class)
-//                    .ifPresent(block -> block.addStatement(1 + block.getStatements().indexOf(anchorStatement),
-//                            loggingStatement));
         } else if (node.findAncestor(SwitchEntry.class).isPresent()) {
             NodeList<Statement> switchBlockStatements = node.findAncestor(SwitchEntry.class).get().getStatements();
             switchBlockStatements.add(switchBlockStatements.indexOf(anchorStatement) + 1, loggingStatement);
