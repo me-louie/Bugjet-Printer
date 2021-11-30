@@ -14,13 +14,28 @@ import util.Scoper;
 import util.StatementCreator;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class VariableHistoryModifier extends ModifierVisitor<Map<VariableScope, List<LineInfo>>> {
 
+    private Map<VariableScope, List<LineInfo>> originalLineInfoMap = null;
+
+    private void checkOriginalLineInfo(Map<VariableScope, List<LineInfo>> original) {
+        if (originalLineInfoMap == null) {
+            originalLineInfoMap = new HashMap<>();
+            for (Map.Entry<VariableScope, List<LineInfo>> entry : original.entrySet()) {
+                originalLineInfoMap.put(entry.getKey(), new ArrayList<>(entry.getValue()));
+            }
+            //originalLineInfoMap = copy;
+        }
+        return;
+    }
+
     @Override
     public VariableDeclarationExpr visit(VariableDeclarationExpr vde, Map<VariableScope, List<LineInfo>> lineInfoMap) {
+        checkOriginalLineInfo(lineInfoMap);
         super.visit(vde, lineInfoMap);
         for (VariableDeclarator vd : vde.getVariables()) {
             String name = vd.getNameAsString();
@@ -50,8 +65,9 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<VariableScope, 
     }
 
     @Override
-    public FieldDeclaration visit(FieldDeclaration fd, Map<VariableScope, List<LineInfo>> lineInfo) {
-        super.visit(fd, lineInfo);
+    public FieldDeclaration visit(FieldDeclaration fd, Map<VariableScope, List<LineInfo>> lineInfoMap) {
+        checkOriginalLineInfo(lineInfoMap);
+        super.visit(fd, lineInfoMap);
         // we set all fields to public access so that VariableReferenceLogger.checkBaseAndNestedObjects() can access
         // each field
         setAccessToPublic(fd);
@@ -62,6 +78,7 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<VariableScope, 
 
     @Override
     public AssignExpr visit(AssignExpr ae, Map<VariableScope, List<LineInfo>> lineInfoMap) {
+        checkOriginalLineInfo(lineInfoMap);
         super.visit(ae, lineInfoMap);
         // If making an array access assignment we want the name of the variable without the square brackets
         String name = (isArrayAccessAssignment(ae)) ?
@@ -75,6 +92,7 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<VariableScope, 
 
     @Override
     public UnaryExpr visit(UnaryExpr ue, Map<VariableScope, List<LineInfo>> lineInfoMap) {
+        checkOriginalLineInfo(lineInfoMap);
         super.visit(ue, lineInfoMap);
         String name = ue.getExpression().toString();
         VariableScope scope = Scoper.createScope(name, ue);
@@ -88,29 +106,31 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<VariableScope, 
         return ue;
     }
 
-//    @Override
-//    public MethodDeclaration visit(MethodDeclaration md, Map<VariableScope, List<LineInfo>> lineInfoMap) {
-//        super.visit(md, lineInfoMap);
-//        for (Parameter p : md.getParameters()) {
-//            String name = p.getNameAsString();
-//            VariableScope scope = Scoper.createScope(name, p);
-//            if (!isTrackedVariable(scope, lineInfoMap)) {
-//                continue;
-//            }
-//            String type = p.getType().toString();
-//            int id = UniqueNumberGenerator.generate();
-//            Statement body = md.findAll(BlockStmt.class).get(0);
-//            injectCodeOnNextLine(body, md, StatementCreator.evaluateVarDeclarationStatement(name,
-//                    scope.getEnclosingMethod(), scope.getEnclosingClass(), id));
-//            addToLineInfoMap(scope, type, md.getDeclarationAsString(),
-//                    body, lineInfoMap, id);
-//        }
-//
-//        return md;
-//    }
+    @Override
+    public MethodDeclaration visit(MethodDeclaration md, Map<VariableScope, List<LineInfo>> lineInfoMap) {
+        checkOriginalLineInfo(lineInfoMap);
+        super.visit(md, lineInfoMap);
+        for (Parameter p : md.getParameters()) {
+            String name = p.getNameAsString();
+            VariableScope scope = Scoper.createScope(name, p);
+            if (!isTrackedVariable(scope, originalLineInfoMap)) {
+                continue;
+            }
+            String type = p.getType().toString();
+            int id = UniqueNumberGenerator.generate();
+            Statement body = md.findAll(BlockStmt.class).get(0);
+            injectCodeOnNextLine(body, md, StatementCreator.evaluateVarDeclarationStatement(name,
+                    scope.getEnclosingMethod(), scope.getEnclosingClass(), id));
+            addToLineInfoMap(scope, type, md.getDeclarationAsString(),
+                    body, lineInfoMap, id);
+        }
+
+        return md;
+    }
 
     @Override
     public MethodCallExpr visit(MethodCallExpr mce, Map<VariableScope, List<LineInfo>> lineInfoMap) {
+        checkOriginalLineInfo(lineInfoMap);
         super.visit(mce, lineInfoMap);
         if (mce.getScope().isPresent()) {
             NameExpr exprScope = (NameExpr) getBaseScope(mce.getScope().get());
