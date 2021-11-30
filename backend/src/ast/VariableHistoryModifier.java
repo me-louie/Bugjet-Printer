@@ -8,14 +8,10 @@ import com.github.javaparser.ast.body.*;
 import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.ast.visitor.ModifierVisitor;
-import com.google.common.collect.Maps;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import util.NodeParser;
 import util.Scoper;
 import util.StatementCreator;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,7 +27,6 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<VariableScope, 
             for (Map.Entry<VariableScope, List<LineInfo>> entry : original.entrySet()) {
                 originalLineInfoMap.put(entry.getKey(), new ArrayList<>(entry.getValue()));
             }
-            //originalLineInfoMap = copy;
         }
         return;
     }
@@ -100,8 +95,11 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<VariableScope, 
         String name = ue.getExpression().toString();
         VariableScope scope = Scoper.createScope(name, ue);
         if (isTrackedVariable(scope, lineInfoMap)) {
-            Statement nodeContainingEntireStatement = (Statement) ue.getParentNode().get();
-            trackVariableMutation(name, scope, nodeContainingEntireStatement, ue, lineInfoMap);
+            Node nodeContainingEntireStatement = ue.getParentNode().get();
+            while (nodeContainingEntireStatement instanceof BinaryExpr be) {
+                nodeContainingEntireStatement = be.getParentNode().get();
+            }
+            trackVariableMutation(name, scope, (Statement) nodeContainingEntireStatement, ue, lineInfoMap);
         }
         return ue;
     }
@@ -188,6 +186,14 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<VariableScope, 
                     scope.getEnclosingClass(), id);
             injectCodeOnNextLine(nodeContainingEntireStatement, node, injectedLine);
         }
+        if (node instanceof AssignExpr && nodeContainingEntireStatement instanceof ForStmt fs) {
+            Statement injectOutsideOfLoop = StatementCreator.evaluateAssignmentStatement(objName, scope.getEnclosingMethod(),
+                    scope.getEnclosingClass(), id);
+            node.findAncestor(BlockStmt.class)
+                    .ifPresent(block -> block.addStatement(1 + block.getStatements().indexOf(nodeContainingEntireStatement),
+                            injectOutsideOfLoop));
+
+        }
     }
 
     private void addToLineInfoMap(VariableScope scope, String type,
@@ -216,16 +222,14 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<VariableScope, 
             // Add logging for method arguments
             body.addStatement(0, loggingStatement);
         } else if (anchorStatement instanceof ForStmt forStmt) {
-            // if (node instanceof UnaryExpr || node instanceof AssignExpr){
             // If it's a for statement, don't include variable declaration (will be reclared each loop)
             if (forStmt.getBody() instanceof BlockStmt body) {
                 body.addStatement(0, loggingStatement);
-            } else if (forStmt.getBody() instanceof ExpressionStmt body) {
-                // todo: handle the case where the body of the for statement isn't wrapped in curly brackets
-                //       also need to handle the case where the thing we're interested in is the body of the
-                //       for statement and it's not in brackets
-                //       same for if blocks
-                //       also this if/else statement very bad, should try to double dispatch instead
+            }
+        } else if (anchorStatement instanceof WhileStmt whileStmt) {
+            // If it's a for statement, don't include variable declaration (will be reclared each loop)
+            if (whileStmt.getBody() instanceof BlockStmt body) {
+                body.addStatement(0, loggingStatement);
             }
         } else if (node.findAncestor(SwitchEntry.class).isPresent()) {
             NodeList<Statement> switchBlockStatements = node.findAncestor(SwitchEntry.class).get().getStatements();
