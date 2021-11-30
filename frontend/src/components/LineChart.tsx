@@ -77,7 +77,7 @@ export default class LineChart extends PureComponent<Props, State> {
     const axis2 = this.props.output.history.map((e, idx) => {
       return {
         x: idx * 2,
-        y: Number(e.value),
+        y: JSON.parse(e.value),
         ...e,
       }
     });
@@ -91,7 +91,7 @@ export default class LineChart extends PureComponent<Props, State> {
             top: 20,
             right: 20,
             bottom: 20,
-            left: 20,
+            left: 40,
           }}
         >
           <CartesianGrid />

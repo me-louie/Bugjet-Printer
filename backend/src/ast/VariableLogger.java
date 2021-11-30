@@ -34,6 +34,7 @@ public class VariableLogger {
     }
 
     public static void writeOutputToDisk() throws IOException {
+        System.out.println("writing to disk");
         BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_PATH));
         writer.write(gson.toJson(outputMap.values()));
         writer.close();

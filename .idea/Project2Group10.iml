@@ -12,7 +12,11 @@
     <orderEntry type="library" name="springframework.boot.spring.starter.web" level="project" />
     <orderEntry type="module" module-name="backend" />
     <orderEntry type="module" module-name="frontend" />
-    <orderEntry type="library" name="lib (3)" level="project" />
+    <orderEntry type="library" exported="" name="lib (3)" level="project" />
+    <orderEntry type="library" name="lib" level="project" />
+    <orderEntry type="library" name="lib" level="project" />
+    <orderEntry type="library" name="apache.commons.io" level="project" />
+    <orderEntry type="library" name="lib" level="project" />
     <orderEntry type="library" name="lib" level="project" />
   </component>
 </module>
