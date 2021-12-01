@@ -42,11 +42,9 @@ public class Main {
 
     public static String processProgram(CompilationUnit cu) throws Exception {
         // collect names/aliases of variables to track
-
         VoidVisitor<Map<VariableScope, String>> variableAnnotationCollector = new VariableAnnotationCollector();
         // map of variable scope -> the aliases we'll track them under
         Map<VariableScope, String> variablesToTrack = new HashMap<>();
-
         variableAnnotationCollector.visit(cu, variablesToTrack);
         // add logging code to ast
         ModifierVisitor<Map<VariableScope, List<LineInfo>>> variableHistoryModifier = new VariableHistoryModifier();
@@ -70,7 +68,6 @@ public class Main {
             mainMethod.getBody().get().addStatement("VariableLogger.writeOutputToDisk();");
         } catch (NoSuchElementException e) {
             System.out.println("File does not contain a main method");
-            // todo: we'll probably want to return this error to the frontend to display to user
             System.exit(1);
         }
 
@@ -95,18 +92,12 @@ public class Main {
                 f1.createNewFile();
             }
             catch (IOException e) {
-
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }
-
-
         String s =  new String(Files.readAllBytes(Paths.get("out/output.json")));
-
         File f = new File("out/output.json");
         f.delete();
-
         return s;
     }
 
@@ -145,7 +136,6 @@ public class Main {
         StringBuilder variableLoggerString = new StringBuilder();
 
         while ((line = reader.readLine()) != null) {
-            // TODO: fix this hacky way to change the package name
             if (line.contains("package ast")) {
                 line = "package " + MODIFIED_FILES_PACKAGE_NAME + ";";
             }
