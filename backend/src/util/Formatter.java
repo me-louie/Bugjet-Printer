@@ -39,7 +39,6 @@ public final class Formatter {
             }
         }
         return sb.toString();
-
     }
 
     private static boolean containsLoggingStatements(String statement) {

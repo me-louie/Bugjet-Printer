@@ -69,8 +69,6 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<VariableScope, 
         // we set all fields to public access so that VariableReferenceLogger.checkBaseAndNestedObjects() can access
         // each field
         setAccessToPublic(fd);
-        // todo: FieldDeclarations aren't inside of a BlockStatement, which means we can't add a log statement directly
-        //       below them. This makes tracking these variables a bit trickier. Leaving it for now
         return fd;
     }
 
@@ -192,7 +190,6 @@ public class VariableHistoryModifier extends ModifierVisitor<Map<VariableScope, 
             node.findAncestor(BlockStmt.class)
                     .ifPresent(block -> block.addStatement(1 + block.getStatements().indexOf(nodeContainingEntireStatement),
                             injectOutsideOfLoop));
-
         }
     }
 

@@ -7,7 +7,6 @@ public final class StatementCreator {
 
     public static Statement logVariable(String name, String enclosingMethod, String enclosingClass, String value,
                                         int uniqueIdentifier) {
-        // TODO: possibly change this to something better
         if (value == null) {
             value = "\"uninitialized\"";
         }
