@@ -6,14 +6,12 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.visitor.ModifierVisitor;
 import com.github.javaparser.ast.visitor.VoidVisitor;
-
-import org.apache.commons.io.FileUtils;
 import loader.CodeLoader;
+import org.apache.commons.io.FileUtils;
 import util.Formatter;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
@@ -80,13 +78,6 @@ public class Main {
         VoidVisitor<List<String>> classNameVisitor = new ClassNameCollector();
         classNameVisitor.visit(cu, classNames);
         String className = classNames.get(classNames.size()-1);
-
-        //testing:
-
-        //Path path = Paths.get("backend/test/modifiedast");
-
-//        // deleteIfExists File
-
 
         writeModifiedProgram(cu, className);
         writeModifiedVariableLogger(lineInfoMap, variablesToTrack);

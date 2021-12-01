@@ -1,4 +1,4 @@
-# Cool and Fun Java Variable Tracker for Friends
+# Bug-jet Printer
 
 A recent poll found that 100% of developers write code that doesn't work. This tool aims to help mitigate the effects of that problem by providing an easy way to track a variable's value across the life of a program. The tool can be used in place of the less elegant solutions developers often resort to, like inserting thousands of print statements into their already appalling code. 
 
@@ -39,7 +39,9 @@ A recent poll found that 100% of developers write code that doesn't work. This t
    A browser window running the tool should open.
 6. Add your code to the tool's editor. Run it to render variable histories. Step through the visualization to see how and where your variable changes.
 
-See the `Project2Group10/examples` folder for some example code snippets that you can try out.
+See the `Project2Group10/examples` folder for some example code snippets that you can try out. These examples programs were purposely injected with bugs
+which can be debugged with the analysis tool.
+Additional (test) examples can be found within the `Project2Group10/backend/test` directory.
 
 ## What we support
 1. Tracking primitive, array, and user-defined local variables. e.g.

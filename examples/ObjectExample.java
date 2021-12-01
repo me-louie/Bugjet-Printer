@@ -7,11 +7,11 @@ public class ObjectExample {
         og.calc();
     }
 
-//    Example object program, trying to figure out what this program does with its objects field, will you our analysis to
-//    understand what is actually happening here without print statements. And fix the problems
+//    Example object program, try to figure out what this program does with its objects field and use our
+//    analysis to understand what is actually happening here without print statements. And fix the problems.
 
-    @Track(var = "BugA", nickname = "BugA")
-    @Track(var = "a", nickname = "anotherA")
+    @Track(var = "bugA", nickname = "bugA")
+    @Track(var = "a", nickname = "a")
     @Track(var = "anotherA", nickname = "anotherA")
     @Track(var = "i", nickname = "i")
     public void calc() {
@@ -26,12 +26,12 @@ public class ObjectExample {
         anotherA = null;
         anotherA = new A(-2, new int[]{5,6,7});
 
-        BugA BugA = new BugA(0, new char[]{'y','n','y'});
+        BugA bugA = new BugA(0, new char[]{'y','n','y'});
 
         // Based on the char array swap another A's array with the a's array, so y means replace and n means don't replace
         int i;
         for (i = 1;  i <3; i++){
-            if(BugA.ChaArr[i] == 'n'){
+            if(bugA.ChaArr[i] == 'n'){
                 anotherA.arr[i] = a.arr[i];
             }
         }
