@@ -5,7 +5,7 @@ A recent poll found that 100% of developers write code that doesn't work. This t
 ## How it works
 1. Write some code that doesn't work
 2. For each variable you wish to track add the `@Track` annotation above the method where the variable is first seen. For example, if you wanted to track the variable `myObject`:
-   ```aidl
+   ```
    @Track(var = "myObject", nickname = "myObject")
    void myMethod() {
        MyObject myObject = new MyObject();
@@ -14,7 +14,7 @@ A recent poll found that 100% of developers write code that doesn't work. This t
    ```
    
    `@Track` takes in two String arguments: `var`—the name of the variable you want to track—and `nickname`—the name you want the variable to be represented as in the tool's visualization. The `nickname` argument can be anything, including the actual name of the variable. It is intended to be used to differentiate two variables with the same name. e.g.
-      ```aidl
+      ```
       @Track(var = "i", nickname = "myMethodI")
       void myMethod(int i) {
         ...
@@ -43,7 +43,7 @@ See the `Project2Group10/examples` folder for some example code snippets that yo
 
 ## What we support
 1. Tracking primitive, array, and user-defined local variables. e.g.
-   ```aidl
+   ```
    @Track(var = "prim", nickname = "prim")
    @Track(var = "arr", nickname = "arr")
    @Track(var = "userDefObj", nickname = "userDefObj")
@@ -57,7 +57,7 @@ See the `Project2Group10/examples` folder for some example code snippets that yo
    }
    ```
 2. Tracking of primitive, array, and user-defined method arguments 
-      ```aidl
+      ```
    @Track(var = "prim", nickname = "prim")
    @Track(var = "arr", nickname = "arr")
    @Track(var = "userDefObj", nickname = "userDefObj")
@@ -70,7 +70,7 @@ See the `Project2Group10/examples` folder for some example code snippets that yo
    }
    ```
 3. Tracking of aliases for objects (including arrays). By aliases we refer to both other local variables within the same scope, e.g.
-   ```aidl
+   ```
    @Track(var = "userDefObj", nickname = "userDefObj"
    void myMethod() {
         UserDefinedObject userDefObj = new UserDefinedObject();
@@ -79,7 +79,7 @@ See the `Project2Group10/examples` folder for some example code snippets that yo
    }
    ```
    and method arguments, e.g.
-   ```aidl
+   ```
    @Track(var = "userDefObj", nickname = "userDefObj"
    void myMethod() {
         UserDefinedObject userDefObj = new UserDefinedObject();
@@ -91,7 +91,7 @@ See the `Project2Group10/examples` folder for some example code snippets that yo
    }
    ```
    Note that this second category, aliases as method arguments, also includes the tracking of mutations at an arbitrary level of nesting. e.g.
-   ```aidl
+   ```
    @Track(var = "userDefObj", nickname = "userDefObj"
    void myMethod() {
         UserDefinedObject userDefObj = new UserDefinedObject();
@@ -111,7 +111,7 @@ See the `Project2Group10/examples` folder for some example code snippets that yo
 
 ## What we don't support
 1. Tracking of individual fields. e.g. 
-   ```aidl
+   ```
    @Track(var = "a.size", nickname = "a.size")
    void myMethod() {
         A a = new A();
@@ -120,7 +120,7 @@ See the `Project2Group10/examples` folder for some example code snippets that yo
    ```
    Individual fields can be indirectly tracked by tracking their enclosing object. In the example above the history of changes to `a.size` can be collected by tracking `a`. Note, however, that changes to `a`'s other fields will also be captured in this history.
 2. Tracking of non-user defined objects (with the exception of arrays). e.g.
-   ```aidl
+   ```
       @Track(var = "myList", nickname = "myList")
       void myMethod() {
            List<String> list = new ArrayList<>(); 
@@ -128,7 +128,7 @@ See the `Project2Group10/examples` folder for some example code snippets that yo
       }
    ```
    Note that this includes fields of user defined objects inherited from non-user defined classes. Any inherited non-user defined field that is declared as private cannot be accessed by our tool and thus will not be tracked properly. e.g.
-   ```aidl
+   ```
    public class MyMap extends HashMap {
         ...
    }
@@ -142,7 +142,7 @@ See the `Project2Group10/examples` folder for some example code snippets that yo
    }
    ```
 3. Separate tracking of multiple local variables that have the same name within a single method. e.g.
-   ```aidl
+   ```
    @Track(var = "i", nickname = "i")
    void myMethod() {
       for (int i = 0; i < 5; i++) {
@@ -158,7 +158,7 @@ See the `Project2Group10/examples` folder for some example code snippets that yo
    ```
    Mutations to `i` in both the for loop and the if/else block will be logged as part of a single history for `i`.
 4. Precise tracking of loop iterators. We are not able to log the final value of a loop iterator declared inside a for loop. e.g.
-   ```aidl
+   ```
    @Track(var = "i", nickname = "i")
    void myMethod() {
       for (int i = 0; i < 5; i++) {
@@ -171,7 +171,7 @@ See the `Project2Group10/examples` folder for some example code snippets that yo
 ## Program requirements
 Code fed to our tool must 
 1. include a `main` method with the signature `public static void main(String[] args)`. The signature can also include any exceptions the method throws.
-   ```aidl
+   ```
    public static void main(String[] args) {
       // this is valid 
    }
@@ -182,7 +182,7 @@ Code fed to our tool must
    }
    ```
 
-   ```aidl
+   ```
    public static void main(String[] args) throws FileNotFoundException {
       // this is also valid 
    }
@@ -193,7 +193,7 @@ Code fed to our tool must
    }
    ```
 
-   ```aidl
+   ```
    public static void main(String[] x) {
       // this is not valid
    }
@@ -204,7 +204,7 @@ Code fed to our tool must
    }
    ```
 2. follow Java naming conventions for variables. Local variables, method arguments, and non-final fields must be named using camelcase e.g.
-   ```aidl
+   ```
    @Track(var = "userDefObj", nickname = "validlyNamedVariable")
    void myMethod() {
         UserDefinedObject userDefObj = new UserDefinedObject();
@@ -214,7 +214,7 @@ Code fed to our tool must
    }
    ```
 
-   ```aidl
+   ```
    @Track(var = "UserDefObj", nickname = "InvalidlyNamedVariable")
    void myMethod() {
         UserDefinedObject UserDefObj = new UserDefinedObject(); // UserDefObj is local and not camelcase, this is not valid
@@ -222,12 +222,12 @@ Code fed to our tool must
    ```
 3. use curly braces (i.e. `{}`) for any control flow blocks. This includes loops and if/else statements. For example, if the user wanted to track variable `i`:
 
-    ```aidl
+    ```a
     for (int i = 0; i < size; i++)   // this is not valid
         doSomething();
     ```
     
-    ```aidl
+    ```
     for (int i = 0; i < size; i++) { // this is valid
         doSomething();
     }
