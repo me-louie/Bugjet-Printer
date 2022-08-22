@@ -2,6 +2,8 @@
 
 A recent poll found that 100% of developers write code that doesn't work. This tool aims to help mitigate the effects of that problem by providing an easy way to track a variable's value across the life of a program. The tool can be used in place of the less elegant solutions developers often resort to, like inserting thousands of print statements into their already appalling code. 
 
+## [Demo Video](https://drive.google.com/file/d/1HQTmAaVkAm_eqbLfPsb6p9XmgEyQo9Hh/view?usp=sharing)
+
 ## How it works
 1. Write some code that doesn't work
 2. For each variable you wish to track add the `@Track` annotation above the method where the variable is first seen. For example, if you wanted to track the variable `myObject`:
